@@ -1,0 +1,47 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch: {}
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Configurar Java (necessario pro Gradle/Android)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Criar o projeto Android (se ainda nao existir)
+        run: |
+          if [ ! -d "android" ]; then
+            npx cap add android
+          else
+            npx cap sync android
+          fi
+
+      - name: Dar permissao de execucao ao gradlew
+        run: chmod +x android/gradlew
+
+      - name: Compilar APK de debug
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Publicar o APK como artefato do workflow
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
