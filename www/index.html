@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Extreme Wind — Logística &amp; Frotas</title>
+<link rel="icon" type="image/png" href="assets/icone-helice-color.png">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta name="theme-color" content="#00679A">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Extreme Wind">
+<style>
+  :root{
+    --brand:#00679A;
+    --brand-dark:#055384;
+    --brand-deep:#021C2C;
+    --steel:#1C8CE8;
+    --teal:#12BFA8;
+    --bg:#081C2C; --panel:#0F2A40; --panel2:#123350; --line:#1E4363;
+    --text:#EAF1F7; --muted:#8FA9C0;
+    --ok:#12A874; --nok:#E0483C; --warn:#D89A2B;
+    --sidebar-w:268px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0; height:100%; font-family:Segoe UI,Arial,sans-serif; background:var(--bg); color:var(--text);}
+  body{zoom:1.15;}
+  .app{display:flex; height:100vh; overflow:hidden;}
+
+  /* ---- Sidebar ---- */
+  .sidebar{
+    width:var(--sidebar-w); flex:none; background:linear-gradient(180deg,var(--brand-dark),var(--brand-deep));
+    display:flex; flex-direction:column; border-right:1px solid var(--line);
+  }
+  .sidebar-brand{
+    display:flex; align-items:center; gap:12px; padding:22px 20px 18px; border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .sidebar-brand h1{font-size:16px; margin:0; letter-spacing:.03em; line-height:1.25;}
+  .sidebar-brand .sub{font-size:11px; color:var(--muted); margin-top:2px;}
+
+  nav.menu{flex:1; overflow-y:auto; padding:16px 12px;}
+  .menu-label{font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; padding:6px 12px; margin-top:6px;}
+  .menu-item{
+    display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:8px; margin-bottom:4px;
+    color:var(--muted); cursor:pointer; font-size:13.5px; font-weight:600; transition:background .15s,color .15s;
+    border:1px solid transparent;
+  }
+  .menu-item .ic{width:20px; text-align:center; flex:none; font-size:15px;}
+  .menu-item:hover{background:rgba(255,255,255,.06); color:var(--text);}
+  .menu-item.active{background:var(--brand); color:#fff; border-color:rgba(255,255,255,.15);}
+
+  .sidebar-footer{
+    padding:14px 18px 18px; border-top:1px solid rgba(255,255,255,.08); font-size:11px; color:var(--muted); line-height:1.5;
+  }
+
+  /* ---- Main ---- */
+  main{flex:1; display:flex; flex-direction:column; min-width:0; background:var(--bg);}
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    padding:16px 26px; border-bottom:1px solid var(--line); flex:none;
+  }
+  .topbar h2{font-size:16px; margin:0;}
+  .topbar .path{font-size:11.5px; color:var(--muted); margin-top:2px;}
+  .topbar .badge{background:var(--panel2); border:1px solid var(--line); color:var(--muted); font-size:11.5px; padding:6px 12px; border-radius:20px;}
+
+  .view{flex:1; position:relative; overflow:hidden;}
+  .view iframe{position:absolute; inset:0; width:100%; height:100%; border:0; display:none; background:#0f1720;}
+  .view iframe.active{display:block;}
+
+  .home{position:absolute; inset:0; overflow-y:auto; padding:32px; display:none;}
+  .home.active{display:block;}
+  .home .hero{
+    background:linear-gradient(135deg,var(--brand),var(--brand-dark)); border-radius:14px; padding:36px 40px;
+    display:flex; align-items:center; gap:22px; margin-bottom:28px;
+  }
+  .home .hero svg{flex:none;}
+  .home .hero h3{margin:0 0 6px; font-size:22px;}
+  .home .hero p{margin:0; color:rgba(255,255,255,.8); font-size:13.5px; max-width:520px;}
+
+  .cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:18px; margin-bottom:28px;}
+  .card{
+    background:var(--panel); border:1px solid var(--line); border-left:4px solid var(--brand); border-radius:10px;
+    padding:22px; cursor:pointer; transition:border-color .15s, transform .15s;
+  }
+  .card:hover{border-color:var(--steel); transform:translateY(-2px);}
+  .card .card-title{font-size:14.5px; font-weight:700; margin-bottom:10px; display:flex; align-items:center; gap:8px;}
+  .card .kpirow{display:flex; gap:18px; margin-top:4px;}
+  .card .kpirow .n{font-size:24px; font-weight:700;}
+  .card .kpirow .l{font-size:11px; color:var(--muted); text-transform:uppercase; margin-top:2px;}
+  .card .go{margin-top:14px; font-size:12px; color:var(--steel); font-weight:600;}
+
+  .note-box{
+    background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:16px 20px;
+    font-size:12.5px; color:var(--muted); line-height:1.6;
+  }
+
+  ::-webkit-scrollbar{width:8px; height:8px;}
+  ::-webkit-scrollbar-thumb{background:var(--line); border-radius:4px;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <img src="assets/logo-extreme-wind-white.png" alt="Extreme Wind" style="height:44px; width:auto; display:block;">
+      <div>
+        <div class="sub" style="margin-top:6px;">Logística &amp; Frotas</div>
+      </div>
+    </div>
+
+    <nav class="menu">
+      <div class="menu-label">Visão</div>
+      <div class="menu-item active" data-view="home"><span class="ic">&#8962;</span> Início</div>
+
+      <div class="menu-label">Dashboards</div>
+      <div class="menu-item" data-view="equipes"><span class="ic">&#128101;</span> Controle de Equipes</div>
+      <div class="menu-item" data-view="frota"><span class="ic">&#128663;</span> Frota — Manutenção</div>
+    </nav>
+
+    <div class="sidebar-footer">
+      Uso interno · Setor de Logística e Frotas.<br>Não repassar fora da equipe.
+    </div>
+  </aside>
+
+  <main>
+    <div class="topbar">
+      <div>
+        <h2 id="topTitle">Início</h2>
+        <div class="path" id="topPath">Extreme Wind / Logística &amp; Frotas</div>
+      </div>
+      <div class="badge" id="topBadge">Atualizado 16/07/2026</div>
+    </div>
+
+    <div class="view">
+      <div class="home active" id="view-home">
+        <div class="hero">
+          <div style="background:rgba(255,255,255,.15); border-radius:20px; padding:16px; flex:none; display:flex; align-items:center; justify-content:center;">
+            <img src="assets/icone-helice-white.png" alt="" style="height:96px; width:auto; display:block;">
+          </div>
+          <div>
+            <img src="assets/logo-extreme-wind-white.png" alt="Extreme Wind" style="height:34px; width:auto; display:block; margin-bottom:12px;">
+            <h3>Painel de Logística &amp; Frotas</h3>
+            <p>Ponto único de acesso aos dashboards de controle de equipes (mobilização/desmobilização) e de frota/manutenção de veículos da Extreme Wind. Selecione um item no menu ao lado ou em um dos cartões abaixo.</p>
+          </div>
+        </div>
+
+        <div class="cards">
+          <div class="card" data-view="equipes">
+            <div class="card-title">&#128101; Controle de Equipes</div>
+            <div class="kpirow">
+              <div><div class="n">40</div><div class="l">Ativos hoje</div></div>
+              <div><div class="n" style="color:var(--nok)">-8</div><div class="l">Déficit</div></div>
+              <div><div class="n">10/12</div><div class="l">Parques</div></div>
+            </div>
+            <div class="go">Ver equipes ativas e histórico de mobilização →</div>
+          </div>
+
+          <div class="card" data-view="frota">
+            <div class="card-title">&#128663; Frota — Manutenção</div>
+            <div class="kpirow">
+              <div><div class="n">16</div><div class="l">Veículos</div></div>
+              <div><div class="n" style="color:var(--ok)">95%</div><div class="l">Conformidade</div></div>
+              <div><div class="n" style="color:var(--nok)">12</div><div class="l">Ações pendentes</div></div>
+            </div>
+            <div class="go">Ver detalhamento por veículo e plano de ação →</div>
+          </div>
+        </div>
+
+        <div class="note-box">
+          Dados consolidados a partir do Diário de Bordo e da planilha de Controle de Frota. Confira os valores na fonte antes de compartilhar externamente — uso interno da equipe.
+        </div>
+      </div>
+
+      <iframe id="view-equipes" src="dashboard-resumo-equipes.html" title="Controle de Equipes"></iframe>
+      <iframe id="view-frota" src="dashboard-frota-manutencao.html" title="Frota - Manutenção"></iframe>
+    </div>
+  </main>
+</div>
+
+<script>
+  const TITLES = {
+    home: { title: "Início", path: "Extreme Wind / Logística & Frotas" },
+    equipes: { title: "Controle de Equipes", path: "Extreme Wind / Logística & Frotas / Controle de Equipes" },
+    frota: { title: "Frota — Manutenção", path: "Extreme Wind / Logística & Frotas / Frota - Manutenção" }
+  };
+
+  function showView(view){
+    document.querySelectorAll(".menu-item").forEach(el => el.classList.toggle("active", el.dataset.view === view));
+    document.getElementById("view-home").classList.toggle("active", view === "home");
+    document.getElementById("view-equipes").classList.toggle("active", view === "equipes");
+    document.getElementById("view-frota").classList.toggle("active", view === "frota");
+    document.getElementById("topTitle").textContent = TITLES[view].title;
+    document.getElementById("topPath").textContent = TITLES[view].path;
+  }
+
+  document.querySelectorAll("[data-view]").forEach(el => {
+    el.addEventListener("click", () => showView(el.dataset.view));
+  });
+
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js").catch(() => {});
+    });
+  }
+</script>
+</body>
+</html>
+                                               

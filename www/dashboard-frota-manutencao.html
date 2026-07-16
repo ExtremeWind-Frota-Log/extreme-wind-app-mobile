@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<!-- saved from url=(0040)https://neon-manatee-822ef9.netlify.app/ -->
+<html lang="pt-BR"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>Dashboard Frota - Manutenção</title>
+<link rel="icon" type="image/png" href="assets/icone-helice-color.png">
+<style>
+  :root{
+    /* Paleta fria, sólida — baseada no azul da logo Extreme Wind (hélice/marca) */
+    --brand:#00679A;      /* azul-marinho da helice/marca, conferido na logo oficial */
+    --brand-dark:#055384; /* azul mais profundo, para chrome/header */
+    --brand-deep:#021C2C; /* quase-preto azulado, fundo da página */
+    --steel:#1C8CE8;      /* azul vívido, acentos secundários */
+    --teal:#12BFA8;       /* verde-azulado vívido, terceiro acento */
+
+    --bg:#081C2C; --panel:#0F2A40; --panel2:#123350; --line:#1E4363;
+    --text:#EAF1F7; --muted:#8FA9C0;
+
+    --ok:#12A874; --nok:#E0483C; --warn:#D89A2B; --na:#5C7A93;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:Segoe UI,Arial,sans-serif; background:var(--bg); color:var(--text);
+    padding:24px; line-height:1.4; zoom:1.15;
+  }
+  header{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:24px; border-bottom:1px solid var(--line); padding-bottom:18px;}
+  .brand{display:flex; align-items:center; gap:14px;}
+  .brand svg{display:block;}
+  .brand h1{font-size:19px; margin:0; letter-spacing:.02em;}
+  .brand .sub{color:var(--muted); font-size:12.5px; margin-top:2px;}
+  .badge-week{background:var(--brand); color:#fff; font-weight:600; padding:7px 16px; border-radius:6px; font-size:13px;}
+
+  .kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-bottom:28px;}
+  .kpi{background:var(--panel); border:1px solid var(--line); border-left:4px solid var(--brand); border-radius:10px; padding:22px;}
+  .kpi .label{color:var(--muted); font-size:12.5px; text-transform:uppercase; letter-spacing:.06em;}
+  .kpi .value{font-size:36px; font-weight:700; margin-top:8px;}
+  .kpi .value.small{font-size:22px;}
+  .kpi .foot{font-size:12.5px; color:var(--muted); margin-top:6px;}
+
+  .locadoras{display:flex; gap:8px; margin-top:10px;}
+  .loc-badge{flex:1; display:flex; flex-direction:column; align-items:center; border-radius:6px; padding:8px 6px;}
+  .loc-badge .n{font-size:18px; font-weight:700;}
+  .loc-badge .l{font-size:11px; text-transform:uppercase; letter-spacing:.04em; opacity:.85;}
+  .loc-localiza{background:rgba(18,191,168,.20); color:var(--teal);}
+  .loc-unidas{background:rgba(28,140,232,.20); color:var(--steel);}
+
+  .panel{background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:18px;}
+  .panel h2{font-size:15px; margin:0; color:var(--text);}
+
+  .panel-header{display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:14px;}
+  .toggle-btn{
+    background:var(--brand); color:#fff; border:none; border-radius:6px; padding:8px 16px;
+    font-size:13px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;
+    white-space:nowrap; transition:background .15s;
+  }
+  .toggle-btn:hover{background:var(--steel);}
+  .toggle-btn .chev{transition:transform .2s; display:inline-block;}
+  .toggle-btn[aria-expanded="true"] .chev{transform:rotate(180deg);}
+
+  .collapsible{display:none; animation:expand .18s ease-out;}
+  .collapsible.open{display:block;}
+  @keyframes expand{from{opacity:0; transform:translateY(-6px);} to{opacity:1; transform:translateY(0);}}
+
+  .trend-chart{width:100%; height:auto; display:block;}
+  .chart-legend{display:flex; gap:18px; font-size:12px; color:var(--muted);}
+  .chart-legend span{display:inline-flex; align-items:center; gap:6px;}
+  .swatch{width:16px; height:0; display:inline-block; border-radius:2px;}
+  .swatch-line{height:3px; background:var(--brand);}
+  .swatch-dash{border-top:2px dashed var(--warn);}
+
+  .conftable{width:100%; border-collapse:collapse; font-size:13px; margin-bottom:14px;}
+  .conftable th{background:var(--panel2); color:var(--muted); font-weight:600; padding:9px 12px; text-align:center; white-space:nowrap;}
+  .conftable th:first-child{text-align:left;}
+  .conftable td{padding:9px 12px; text-align:center; border-bottom:1px solid var(--line); font-weight:600;}
+  .conftable td:first-child{text-align:left; color:var(--muted); font-weight:400;}
+  .conftable td.cur{outline:2px solid var(--brand); outline-offset:-2px; border-radius:4px;}
+  .conftable td.nd{color:var(--na); font-weight:400;}
+  .conftable tfoot td{border-top:2px solid var(--line); border-bottom:none; font-weight:700;}
+  .conftable tfoot td:first-child{color:var(--text);}
+  .cell-ok{color:var(--ok);}
+  .cell-warn{color:var(--warn);}
+  .cell-nok{color:var(--nok);}
+
+  .split{display:flex; gap:24px; margin-top:6px;}
+  .split div{flex:1; text-align:center; background:var(--panel2); border-radius:6px; padding:10px;}
+  .split .n{font-size:20px; font-weight:700;}
+  .split .l{font-size:12px; color:var(--muted);}
+
+  .toolbar{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:14px;}
+  .search{flex:1; min-width:200px; position:relative;}
+  .search input{
+    width:100%; background:var(--panel2); border:1px solid var(--line); color:var(--text);
+    padding:9px 12px 9px 34px; border-radius:6px; font-size:13px; outline:none;
+  }
+  .search input:focus{border-color:var(--brand);}
+  .search::before{content:"⚲"; position:absolute; left:12px; top:8px; color:var(--muted); font-size:14px;}
+  .filters{display:flex; gap:6px; flex-wrap:wrap;}
+  .chip{
+    background:var(--panel2); border:1px solid var(--line); color:var(--muted);
+    padding:7px 13px; border-radius:20px; font-size:12.5px; cursor:pointer; user-select:none;
+    transition:background .15s,color .15s,border-color .15s;
+  }
+  .chip:hover{border-color:var(--steel);}
+  .chip.active{background:var(--brand); color:#fff; border-color:var(--brand);}
+  .count-hint{font-size:12px; color:var(--muted); margin-bottom:10px;}
+
+  table{width:100%; border-collapse:collapse; font-size:12.5px;}
+  .tablewrap{overflow-x:auto;}
+  th{background:var(--panel2); text-align:left; padding:8px 10px; color:var(--muted); font-weight:600; white-space:nowrap; position:sticky; top:0; cursor:pointer; user-select:none;}
+  th:hover{color:var(--text);}
+  th .arrow{display:inline-block; width:10px; opacity:.6; font-size:10px;}
+  td{padding:7px 10px; border-bottom:1px solid var(--line); white-space:nowrap;}
+  tr:hover td{background:#153A57;}
+  .tag{display:inline-block; padding:2px 9px; border-radius:20px; font-size:11px; font-weight:700;}
+  .tag-ok{background:rgba(18,168,116,.18); color:var(--ok);}
+  .tag-nok{background:rgba(224,72,60,.18); color:var(--nok);}
+  .tag-warn{background:rgba(216,154,43,.18); color:var(--warn);}
+  .tag-na{background:rgba(92,122,147,.18); color:var(--na);}
+
+  .legend{display:flex; gap:16px; flex-wrap:wrap; font-size:12px; color:var(--muted); margin-top:10px;}
+  .legend span{display:inline-flex; align-items:center; gap:6px;}
+  .dot{width:9px; height:9px; border-radius:50%; display:inline-block;}
+
+  .note{font-size:12px; color:var(--muted); margin-top:18px; border-top:1px solid var(--line); padding-top:12px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <img src="assets/icone-helice-color.png" alt="" style="height:60px; width:auto; display:block;">
+    <div>
+      <img src="assets/logo-extreme-wind-white.png" alt="Extreme Wind" style="height:30px; width:auto; display:block; margin-bottom:6px;">
+      <div class="sub">Dashboard de Frota — Setor de Logística · Manutenção de Veículos · Uso interno</div>
+    </div>
+  </div>
+  <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap">
+    <div class="badge-week">Semana 29 (WK 29) · Atualizado 14/07/2026</div>
+    <button class="toggle-btn" id="navAcao" style="background:var(--nok)">Plano de Ação</button>
+  </div>
+</header>
+
+<div class="kpis">
+  <div class="kpi">
+    <div class="label">Total de Veículos</div>
+    <div class="value">16</div>
+    <div class="locadoras">
+      <div class="loc-badge loc-localiza"><span class="n">12</span><span class="l">Localiza</span></div>
+      <div class="loc-badge loc-unidas"><span class="n">4</span><span class="l">Unidas</span></div>
+    </div>
+  </div>
+  <div class="kpi">
+    <div class="label">Conformidade Geral &amp; Ações Pendentes</div>
+    <div class="value" style="color:var(--ok)">88%</div>
+    <div class="foot">WK 29 · 21 ações pendentes no total</div>
+    <div class="locadoras">
+      <div class="loc-badge" style="background:rgba(224,72,60,.18); color:var(--nok)"><span class="n">4</span><span class="l">Emergencial</span></div>
+      <div class="loc-badge" style="background:rgba(28,140,232,.20); color:var(--steel)"><span class="n">17</span><span class="l">Programado</span></div>
+    </div>
+  </div>
+  <div class="kpi">
+    <div class="label">Média de KM</div>
+    <div class="value" id="kmValue" data-km="11" style="color: var(--ok);">11</div>
+    <div class="foot">Limite p/ renovação: ≥ 30.000 km</div>
+  </div>
+</div>
+
+<div class="panel">
+  <h2 style="margin-bottom:14px">Veículos — Detalhamento (Semana 29)</h2>
+
+  <div class="toolbar">
+    <div class="search">
+      <input id="searchInput" type="text" placeholder="Buscar por placa, parque, cliente ou locadora...">
+    </div>
+    <div class="filters" id="statusFilters">
+      <div class="chip active" data-filter="all">Todos</div>
+      <div class="chip" data-filter="nok">Com N/OK</div>
+      <div class="chip" data-filter="warn">Com Atenção</div>
+      <div class="chip" data-filter="clean">100% OK</div>
+    </div>
+  </div>
+  <div class="count-hint" id="countHint">16 de 16 veículos exibidos</div>
+
+  <div class="tablewrap">
+  <table>
+    <thead>
+      <tr id="headerRow">
+        <th data-key="0" data-type="text">Placa <span class="arrow"></span></th>
+        <th data-key="1" data-type="text">Locadora <span class="arrow"></span></th>
+        <th data-key="2" data-type="num">Setor <span class="arrow">▲</span></th>
+        <th data-key="3" data-type="text">Parque <span class="arrow"></span></th>
+        <th data-key="4" data-type="text">Cliente <span class="arrow"></span></th>
+        <th data-key="5" data-type="date">Início <span class="arrow"></span></th>
+        <th data-key="6" data-type="num">Meses <span class="arrow"></span></th>
+        <th data-key="7" data-type="text">KM Troca <span class="arrow"></span></th>
+        <th data-key="8" data-type="text">Saldo Extra <span class="arrow"></span></th>
+        <th data-key="9" data-type="text">Checklist <span class="arrow"></span></th>
+        <th data-key="10" data-type="text">Revisão <span class="arrow"></span></th>
+        <th data-key="11" data-type="text">Estepe <span class="arrow"></span></th>
+        <th data-key="12" data-type="text">Pneus <span class="arrow"></span></th>
+        <th data-key="13" data-type="text">Rastreador <span class="arrow"></span></th>
+        <th data-key="14" data-type="num">Consumo <span class="arrow"></span></th>
+        <th data-key="15" data-type="text">Doc Postado <span class="arrow"></span></th>
+        <th data-key="16" data-type="text">Doc Entregue <span class="arrow"></span></th>
+      </tr>
+    </thead>
+    <tbody id="tbody">
+    <tr>
+      <td><strong>TYA7G48</strong></td>
+      <td>Localiza</td>
+      <td>1</td>
+      <td>Baixa do Feijão/RN</td>
+      <td>Siemens</td>
+      <td>19/02/2026</td>
+      <td>4,83</td>
+      <td><span class="tag tag-nok">N/OK</span></td>
+      <td><span class="tag tag-nok">N/OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td>10,74 km/l</td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-na">N/A</span></td>
+    </tr>
+
+    <tr>
+      <td><strong>TER0D54</strong></td>
+      <td>Localiza</td>
+      <td>1</td>
+      <td>Copel/RN</td>
+      <td>GE Blade</td>
+      <td>06/12/2025</td>
+      <td>7,33</td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-nok">N/OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td>13,90 km/l</td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-na">N/A</span></td>
+    </tr>
+
+    <tr>
+      <td><strong>TYD9E80</strong></td>
+      <td>Localiza</td>
+      <td>1</td>
+      <td>Delta 1/MA</td>
+      <td>Siemens</td>
+      <td>23/01/2026</td>
+      <td>5,73</td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td>9,24 km/l</td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-na">N/A</span></td>
+    </tr>
+
+    <tr>
+      <td><strong>TYA9D45</strong></td>
+      <td>Unidas</td>
+      <td>1</td>
+      <td>Delta 2/MA</td>
+      <td>Siemens</td>
+      <td>08/09/2025</td>
+      <td>10,30</td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td>11,18 km/l</td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-na">N/A</span></td>
+    </tr>
+
+    <tr>
+      <td><strong>TEN7C94</strong></td>
+      <td>Unidas</td>
+      <td>1</td>
+      <td>Delta 3/MA</td>
+      <td>Siemens</td>
+      <td>01/07/2025</td>
+      <td>12,60</td>
+      <td><span class="tag tag-nok">N/OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td>9,03 km/l</td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-na">N/A</span></td>
+    </tr>
+
+    <tr>
+      <td><strong>TXZ5J79</strong></td>
+      <td>Localiza</td>
+      <td>1</td>
+      <td>Delta 4/MA</td>
+      <td>Siemens</td>
+      <td>21/02/2026</td>
+      <td>4,77</td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-nok">N/OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td>9,19 km/l</td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-na">N/A</span></td>
+    </tr>
+
+    <tr>
+      <td><strong>TXQ8D65</strong></td>
+      <td>Localiza</td>
+      <td>1</td>
+      <td>LDV 4/PI</td>
+      <td>GE Blade</td>
+      <td>21/11/2025</td>
+      <td>7,83</td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td>8,69 km/l</td>
+      <td><span class="tag tag-na">N/A</span></td>
+      <td><span class="tag tag-na">N/A</span></td>
+    </tr>
+
+    <tr>
+      <td><strong>TYW6D70</strong></td>
+      <td>Localiza</td>
+      <td>1</td>
+      <td>Oitis 1/PI</td>
+      <td>GE Blade</td>
+      <td>13/05/2026</td>
+      <td>2,07</td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-nok">N/OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td>13,64 km/l</td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-na">N/A</span></td>
+    </tr>
+
+    <tr>
+      <td><strong>TYD9F24</strong></td>
+      <td>Localiza</td>
+      <td>1</td>
+      <td>São Vitor/BA</td>
+      <td>Siemens</td>
+      <td>13/02/2026</td>
+      <td>5,03</td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-warn">Atenção</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-nok">N/OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td>10,65 km/l</td>
+      <td><span class="tag tag-na">N/A</span></td>
+      <td><span class="tag tag-na">N/A</span></td>
+    </tr>
+
+    <tr>
+      <td><strong>TET3C50</strong></td>
+      <td>Unidas</td>
+      <td>2</td>
+      <td>São Fernando 1/RN</td>
+      <td>Nordex</td>
+      <td>06/02/2026</td>
+      <td>5,27</td>
+      <td><span class="tag tag-nok">N/OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-nok">N/OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td>10,11 km/l</td>
+      <td><span class="tag tag-na">N/A</span></td>
+      <td><span class="tag tag-na">N/A</span></td>
+    </tr>
+
+    <tr>
+      <td><strong>TWY4C61</strong></td>
+      <td>Unidas</td>
+      <td>2</td>
+      <td>São Fernando 2/RN</td>
+      <td>Nordex</td>
+      <td>18/08/2025</td>
+      <td>11,00</td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td>10,21 km/l</td>
+      <td><span class="tag tag-na">N/A</span></td>
+      <td><span class="tag tag-na">N/A</span></td>
+    </tr>
+
+    <tr>
+      <td><strong>TXY8H30</strong></td>
+      <td>Localiza</td>
+      <td>2</td>
+      <td>St.Agostinho/RN</td>
+      <td>Siemens</td>
+      <td>20/02/2026</td>
+      <td>4,80</td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-nok">N/OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td>10,11 km/l</td>
+      <td><span class="tag tag-na">N/A</span></td>
+      <td><span class="tag tag-na">N/A</span></td>
+    </tr>
+
+    <tr>
+      <td><strong>TXQ6B16</strong></td>
+      <td>Localiza</td>
+      <td>2</td>
+      <td>Trairí/CE</td>
+      <td>GE Blade</td>
+      <td>13/11/2025</td>
+      <td>8,10</td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-nok">N/OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td>14,10 km/l</td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-na">N/A</span></td>
+    </tr>
+
+    <tr>
+      <td><strong>TYG1E23</strong></td>
+      <td>Localiza</td>
+      <td>2</td>
+      <td>Tucano/BA</td>
+      <td>Siemens</td>
+      <td>23/01/2026</td>
+      <td>5,73</td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td>10,69 km/l</td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-na">N/A</span></td>
+    </tr>
+
+    <tr>
+      <td><strong>TZO1G78</strong></td>
+      <td>Localiza</td>
+      <td>2</td>
+      <td>Vento do Piauí/PI</td>
+      <td>Siemens</td>
+      <td>05/06/2026</td>
+      <td>1,30</td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-nok">N/OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td>12,62 km/l</td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-na">N/A</span></td>
+    </tr>
+
+    <tr>
+      <td><strong>TXC6E97</strong></td>
+      <td>Localiza</td>
+      <td>3</td>
+      <td>ADM 1</td>
+      <td>Escritório</td>
+      <td>26/11/2025</td>
+      <td>7,67</td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-na">-</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td>9,98 km/l</td>
+      <td><span class="tag tag-ok">OK</span></td>
+      <td><span class="tag tag-na">N/A</span></td>
+    </tr>
+  </tbody>
+  </table>
+  </div>
+  <div class="legend">
+    <span><span class="dot" style="background:var(--ok)"></span> OK</span>
+    <span><span class="dot" style="background:var(--nok)"></span> N/OK</span>
+    <span><span class="dot" style="background:var(--warn)"></span> Atenção</span>
+    <span><span class="dot" style="background:var(--na)"></span> N/A ou não aplicável</span>
+  </div>
+</div>
+
+<div style="height:24px"></div>
+
+<div class="panel">
+  <div class="panel-header">
+    <h2 style="margin-bottom:0">Plano de Ação — Semana 29</h2>
+    <button class="toggle-btn" id="toggleAcao" aria-expanded="false">Expandir <span class="chev">▾</span></button>
+  </div>
+  <div class="collapsible" id="acaoBody">
+    <div class="locadoras" style="max-width:420px; margin:6px 0 16px">
+      <div class="loc-badge" style="background:rgba(224,72,60,.18); color:var(--nok)"><span class="n">4</span><span class="l">Emergencial</span></div>
+      <div class="loc-badge" style="background:rgba(28,140,232,.20); color:var(--steel)"><span class="n">8</span><span class="l">Programado</span></div>
+      <div class="loc-badge" style="background:rgba(18,168,116,.18); color:var(--ok)"><span class="n">1</span><span class="l">Finalizado</span></div>
+    </div>
+    <div class="tablewrap">
+      <table class="conftable" id="acaoTable">
+        <thead>
+          <tr><th style="text-align:left">Ação</th><th style="text-align:left">Tipo</th><th style="text-align:left">Parque</th><th style="text-align:left">Quem?</th><th>Status / Prazo</th><th style="text-align:left">Observação</th></tr>
+        </thead>
+        <tbody id="acaoTableBody">
+    <tr>
+      <td style="text-align:left; white-space:normal; max-width:320px">Todos pneus abaixo de 2,7mm</td>
+      <td style="text-align:left">Corretiva</td>
+      <td style="text-align:left">Trairi/CE</td>
+      <td style="text-align:left">João/William Duarte</td>
+      <td><span class="tag" style="background:rgba(28,140,232,.20);color:var(--steel)">14/07/2026</span></td>
+      <td style="text-align:left; white-space:normal; color:var(--muted)"></td>
+    </tr>
+
+    <tr>
+      <td style="text-align:left; white-space:normal; max-width:320px">Sem estepe extra</td>
+      <td style="text-align:left">Preventiva</td>
+      <td style="text-align:left">Copel/RN</td>
+      <td style="text-align:left">João/Serpa</td>
+      <td><span class="tag tag-nok">Urgente</span></td>
+      <td style="text-align:left; white-space:normal; color:var(--muted)"></td>
+    </tr>
+
+    <tr>
+      <td style="text-align:left; white-space:normal; max-width:320px">Revisão</td>
+      <td style="text-align:left">Preventiva</td>
+      <td style="text-align:left">São Vitor/BA</td>
+      <td style="text-align:left">João/Mateus G.</td>
+      <td><span class="tag tag-nok">Urgente</span></td>
+      <td style="text-align:left; white-space:normal; color:var(--muted)"></td>
+    </tr>
+
+    <tr>
+      <td style="text-align:left; white-space:normal; max-width:320px">Troca parabrisa (crítico)</td>
+      <td style="text-align:left">Corretiva</td>
+      <td style="text-align:left">SF1</td>
+      <td style="text-align:left">Antônio</td>
+      <td><span class="tag tag-warn">Stand by</span></td>
+      <td style="text-align:left; white-space:normal; color:var(--muted)">Proteção vidros e pneus Unidas</td>
+    </tr>
+
+    <tr>
+      <td style="text-align:left; white-space:normal; max-width:320px">40K de KM rodados / saldo estourado</td>
+      <td style="text-align:left">Administrativa</td>
+      <td style="text-align:left">Baixa do Feijão/PE</td>
+      <td style="text-align:left">João/Williames da Hora</td>
+      <td><span class="tag" style="background:rgba(28,140,232,.20);color:var(--steel)">Na desmob</span></td>
+      <td style="text-align:left; white-space:normal; color:var(--muted)">Devolução na desmob</td>
+    </tr>
+
+    <tr>
+      <td style="text-align:left; white-space:normal; max-width:320px">40K de KM rodados</td>
+      <td style="text-align:left">Administrativa</td>
+      <td style="text-align:left">Delta 3/PE</td>
+      <td style="text-align:left">João/Rodrigo</td>
+      <td><span class="tag" style="background:rgba(28,140,232,.20);color:var(--steel)">Na desmob</span></td>
+      <td style="text-align:left; white-space:normal; color:var(--muted)">Planejar substituição</td>
+    </tr>
+
+    <tr>
+      <td style="text-align:left; white-space:normal; max-width:320px">Saldo contrato estourado</td>
+      <td style="text-align:left">Administrativa</td>
+      <td style="text-align:left">São Vitor/BA</td>
+      <td style="text-align:left">João</td>
+      <td><span class="tag tag-nok">Urgente</span></td>
+      <td style="text-align:left; white-space:normal; color:var(--muted)"></td>
+    </tr>
+
+    <tr>
+      <td style="text-align:left; white-space:normal; max-width:320px">Saldo contrato estourado</td>
+      <td style="text-align:left">Administrativa</td>
+      <td style="text-align:left">Oitis 1/PI</td>
+      <td style="text-align:left">João/Pedro Lucas</td>
+      <td><span class="tag" style="background:rgba(28,140,232,.20);color:var(--steel)">Na desmob</span></td>
+      <td style="text-align:left; white-space:normal; color:var(--muted)">Saldo extra — em projeto para recuperar</td>
+    </tr>
+
+    <tr>
+      <td style="text-align:left; white-space:normal; max-width:320px">Saldo contrato estourado</td>
+      <td style="text-align:left">Administrativa</td>
+      <td style="text-align:left">St.Agostinho/RN</td>
+      <td style="text-align:left">João/Édipo</td>
+      <td><span class="tag tag-warn">Acompanhar</span></td>
+      <td style="text-align:left; white-space:normal; color:var(--muted)">Saldo extra — em projeto para recuperar</td>
+    </tr>
+
+    <tr>
+      <td style="text-align:left; white-space:normal; max-width:320px">Saldo contrato estourado</td>
+      <td style="text-align:left">Administrativa</td>
+      <td style="text-align:left">VDP/PI</td>
+      <td style="text-align:left">João/Protázio</td>
+      <td><span class="tag tag-warn">Acompanhar</span></td>
+      <td style="text-align:left; white-space:normal; color:var(--muted)">Saldo extra — em projeto para recuperar</td>
+    </tr>
+
+    <tr>
+      <td style="text-align:left; white-space:normal; max-width:320px">Saldo contrato estourado</td>
+      <td style="text-align:left">Administrativa</td>
+      <td style="text-align:left">Delta 4/PI</td>
+      <td style="text-align:left">João/Rodrigo</td>
+      <td><span class="tag tag-warn">Acompanhar</span></td>
+      <td style="text-align:left; white-space:normal; color:var(--muted)">Saldo extra — em projeto para recuperar</td>
+    </tr>
+
+    <tr>
+      <td style="text-align:left; white-space:normal; max-width:320px">Trocar pneu</td>
+      <td style="text-align:left">Administrativa</td>
+      <td style="text-align:left">LDV 03/PI</td>
+      <td style="text-align:left">Helio</td>
+      <td><span class="tag" style="background:rgba(28,140,232,.20);color:var(--steel)">15/07/2026</span></td>
+      <td style="text-align:left; white-space:normal; color:var(--muted)">Restam 1.200km p/ troca pela locadora</td>
+    </tr>
+
+    <tr>
+      <td style="text-align:left; white-space:normal; max-width:320px">Pneu estepe extra — foto repetida</td>
+      <td style="text-align:left">Administrativa</td>
+      <td style="text-align:left">Delta 4/PI</td>
+      <td style="text-align:left">João/Rodrigo</td>
+      <td><span class="tag tag-na">Indefinido</span></td>
+      <td style="text-align:left; white-space:normal; color:var(--muted)"></td>
+    </tr>
+
+    <tr>
+      <td style="text-align:left; white-space:normal; max-width:320px">Pneus na faixa de 2,7mm / óleo, radiador ou freio não conforme?</td>
+      <td style="text-align:left">Administrativa</td>
+      <td style="text-align:left">Delta 1/PI</td>
+      <td style="text-align:left">João/De Assis</td>
+      <td><span class="tag tag-nok">Urgente</span></td>
+      <td style="text-align:left; white-space:normal; color:var(--muted)"></td>
+    </tr>
+
+    <tr>
+      <td style="text-align:left; white-space:normal; max-width:320px">Mal func. do ar-condicionado</td>
+      <td style="text-align:left">Administrativa</td>
+      <td style="text-align:left">SF1</td>
+      <td style="text-align:left">João/Antônio</td>
+      <td><span class="tag" style="background:rgba(28,140,232,.20);color:var(--steel)">14/07/2026</span></td>
+      <td style="text-align:left; white-space:normal; color:var(--muted)">Supervisor foi informado / acompanhar c/ condutor</td>
+    </tr>
+
+    <tr>
+      <td style="text-align:left; white-space:normal; max-width:320px">Teste/instalação Raptor</td>
+      <td style="text-align:left">Administrativa</td>
+      <td style="text-align:left">São Vitor/BA</td>
+      <td style="text-align:left">João</td>
+      <td><span class="tag" style="background:rgba(28,140,232,.20);color:var(--steel)">14/07/2026</span></td>
+      <td style="text-align:left; white-space:normal; color:var(--muted)"></td>
+    </tr>
+
+    <tr>
+      <td style="text-align:left; white-space:normal; max-width:320px">Placa "encoberta" por enforca gato</td>
+      <td style="text-align:left">Administrativa</td>
+      <td style="text-align:left">Delta 2/PI</td>
+      <td style="text-align:left">João</td>
+      <td><span class="tag" style="background:rgba(28,140,232,.20);color:var(--steel)">14/07/2026</span></td>
+      <td style="text-align:left; white-space:normal; color:var(--muted)"></td>
+    </tr>
+
+    <tr>
+      <td style="text-align:left; white-space:normal; max-width:320px">Alinhamento na região (capotaria) — banco do condutor furado c/ cinzas de cigarro</td>
+      <td style="text-align:left">Administrativa</td>
+      <td style="text-align:left">St.Agostinho/RN</td>
+      <td style="text-align:left">João</td>
+      <td><span class="tag" style="background:rgba(28,140,232,.20);color:var(--steel)">14/07/2026</span></td>
+      <td style="text-align:left; white-space:normal; color:var(--muted)"></td>
+    </tr>
+
+    <tr>
+      <td style="text-align:left; white-space:normal; max-width:320px">Alinhar c/ loja na região (para-brisa)</td>
+      <td style="text-align:left">Administrativa</td>
+      <td style="text-align:left">SF1</td>
+      <td style="text-align:left">João</td>
+      <td><span class="tag" style="background:rgba(28,140,232,.20);color:var(--steel)">14/07/2026</span></td>
+      <td style="text-align:left; white-space:normal; color:var(--muted)"></td>
+    </tr>
+
+    <tr>
+      <td style="text-align:left; white-space:normal; max-width:320px">Saldo contrato estourado</td>
+      <td style="text-align:left">Administrativa</td>
+      <td style="text-align:left">ADM 1</td>
+      <td style="text-align:left">João</td>
+      <td><span class="tag tag-ok">13/07/2026 — Concluído</span></td>
+      <td style="text-align:left; white-space:normal; color:var(--muted)">Escritório</td>
+    </tr>
+
+    <tr>
+      <td style="text-align:left; white-space:normal; max-width:320px">Seta retrovisor</td>
+      <td style="text-align:left">Administrativa (Mobilização/Desmob.)</td>
+      <td style="text-align:left">St.Agostinho/RN</td>
+      <td style="text-align:left">João</td>
+      <td><span class="tag" style="background:rgba(28,140,232,.20);color:var(--steel)">Na desmob</span></td>
+      <td style="text-align:left; white-space:normal; color:var(--muted)"></td>
+    </tr>
+  </tbody>
+      </table>
+    </div>
+    <div class="legend">
+      <span><span class="dot" style="background:var(--nok)"></span> Urgente (!!!)</span>
+      <span><span class="dot" style="background:var(--warn)"></span> Em acompanhamento</span>
+      <span><span class="dot" style="background:var(--steel)"></span> Na desmobilização / com prazo</span>
+      <span><span class="dot" style="background:var(--ok)"></span> Finalizado</span>
+      <span><span class="dot" style="background:var(--na)"></span> Indefinido</span>
+    </div>
+    <div class="note">Fonte: aba BASE DESHBOARD, 22 blocos semanais identificados (WK08–WK29). "Média Geral" calculada como a média de Checklist, Revisão, Estepe Extra, Rastreador+Bloqueador e Medição Pneus por bloco semanal, direto dos dados brutos (nao depende de tabela dinamica/pivot). Semanas com rótulo original inconsistente na planilha, número inferido pela posição sequencial (confirme antes de usar externamente): WK12, WK13, WK14.</div>
+  </div>
+</div>
+
+<div style="height:24px"></div>
+
+<div class="panel">
+  <div class="panel-header">
+    <h2 style="margin-bottom:0">Tendência da Média Geral — Meta 90%</h2>
+    <div class="chart-legend">
+      <span><span class="swatch swatch-line"></span> Média Geral Semanal</span>
+      <span><span class="swatch swatch-dash"></span> Meta 90%</span>
+    </div>
+  </div>
+  <svg viewBox="0 0 640 220" class="trend-chart">
+    <defs>
+      <lineargradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#00679A" stop-opacity="0.38"></stop>
+        <stop offset="100%" stop-color="#00679A" stop-opacity="0"></stop>
+      </lineargradient>
+      <filter id="ptShadow" x="-50%" y="-50%" width="200%" height="200%">
+        <fedropshadow dx="0" dy="1" stdDeviation="1.5" flood-color="#000" flood-opacity="0.35"></fedropshadow>
+      </filter>
+    </defs>
+
+    <!-- gridlines -->
+    <g stroke="#1E4363" stroke-width="1">
+      <line x1="70" y1="20" x2="600" y2="20"></line>
+      <line x1="70" y1="55" x2="600" y2="55"></line>
+      <line x1="70" y1="90" x2="600" y2="90"></line>
+      <line x1="70" y1="125" x2="600" y2="125"></line>
+      <line x1="70" y1="160" x2="600" y2="160"></line>
+    </g>
+    <g fill="#8FA9C0" font-size="11" text-anchor="end" font-family="Segoe UI,Arial,sans-serif">
+      <text x="60" y="24">100%</text>
+      <text x="60" y="59">95%</text>
+      <text x="60" y="94">90%</text>
+      <text x="60" y="129">85%</text>
+      <text x="60" y="164">80%</text>
+    </g>
+
+    <!-- axes -->
+    <line x1="70" y1="20" x2="70" y2="160" stroke="#3A567A" stroke-width="1.2"></line>
+    <line x1="70" y1="160" x2="600" y2="160" stroke="#3A567A" stroke-width="1.2"></line>
+
+    <!-- meta line at 90% -->
+    <line x1="70" y1="90" x2="600" y2="90" stroke="#D89A2B" stroke-width="1.6" stroke-dasharray="7,5"></line>
+    <text x="600" y="84" fill="#D89A2B" font-size="11.5" font-weight="700" text-anchor="end" font-family="Segoe UI,Arial,sans-serif">Meta 90%</text>
+
+    <!-- area fill under the smoothed trend curve -->
+    <path d="M140,76 C166.7,71.3 246.7,56.2 300,48 C353.3,39.8 410,25.8 460,27 C510,28.2 576.7,50.3 600,55 L600,160 L140,160 Z" fill="url(#areaGrad)"></path>
+
+    <!-- smoothed trend line -->
+    <path d="M140,76 C166.7,71.3 246.7,56.2 300,48 C353.3,39.8 410,25.8 460,27 C510,28.2 576.7,50.3 600,55" fill="none" stroke="#00679A" stroke-width="3" stroke-linecap="round"></path>
+
+    <!-- points -->
+    <g font-family="Segoe UI,Arial,sans-serif">
+      <circle cx="140" cy="76" r="5.5" fill="#0F2A40" stroke="#12A874" stroke-width="2.5" filter="url(#ptShadow)"></circle>
+      <text x="140" y="64" fill="#EAF1F7" font-size="13.5" font-weight="700" text-anchor="middle">92%</text>
+
+      <circle cx="300" cy="48" r="5.5" fill="#0F2A40" stroke="#12A874" stroke-width="2.5" filter="url(#ptShadow)"></circle>
+      <text x="300" y="36" fill="#EAF1F7" font-size="13.5" font-weight="700" text-anchor="middle">96%</text>
+
+      <circle cx="460" cy="27" r="5.5" fill="#0F2A40" stroke="#12A874" stroke-width="2.5" filter="url(#ptShadow)"></circle>
+      <text x="460" y="15" fill="#EAF1F7" font-size="13.5" font-weight="700" text-anchor="middle">99%</text>
+
+      <circle cx="600" cy="55" r="5.5" fill="#0F2A40" stroke="#12A874" stroke-width="2.5" filter="url(#ptShadow)"></circle>
+      <text x="600" y="43" fill="#EAF1F7" font-size="13.5" font-weight="700" text-anchor="middle">95%</text>
+    </g>
+
+    <!-- x labels -->
+    <g fill="#8FA9C0" font-size="12" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif">
+      <text x="140" y="182">WK 26</text>
+      <text x="300" y="182">WK 27</text>
+      <text x="460" y="182">WK 28</text>
+      <text x="600" y="182">WK 29</text>
+    </g>
+  </svg>
+</div>
+
+<div style="height:24px"></div>
+
+<div class="panel">
+  <div class="panel-header">
+    <h2>Conformidade por Categoria — Tendência Semanal (WK 26–29)</h2>
+    <button class="toggle-btn" id="toggleConf" aria-expanded="false">Expandir <span class="chev">▾</span></button>
+  </div>
+  <div class="collapsible" id="confBody">
+  <div class="tablewrap">
+  <table class="conftable">
+    <thead>
+      <tr>
+        <th>Categoria</th><th>WK 26</th><th>WK 27</th><th>WK 28</th><th>WK 29</th><th>Ações (WK29)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>KM Ponto de Troca</td><td class="nd">–</td><td class="nd">–</td><td class="nd">–</td><td class="cell-warn cur">81%</td><td>3</td></tr>
+      <tr><td>Saldo Extra</td><td class="nd">–</td><td class="nd">–</td><td class="nd">–</td><td class="cell-nok cur">63%</td><td>5</td></tr>
+      <tr><td>Checklist</td><td class="cell-warn">89%</td><td class="cell-ok">94%</td><td class="cell-ok">94%</td><td class="cell-ok cur">94%</td><td>1</td></tr>
+      <tr><td>Revisão</td><td class="cell-warn">79%</td><td class="cell-ok">94%</td><td class="cell-ok">100%</td><td class="cell-ok cur">94%</td><td>1</td></tr>
+      <tr><td>Estepe Extra</td><td class="cell-ok">95%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok cur">94%</td><td>1</td></tr>
+      <tr><td>Medição Pneus</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok cur">94%</td><td>1</td></tr>
+      <tr><td>Rastreador + Bloqueador</td><td class="cell-ok">95%</td><td class="cell-ok">94%</td><td class="cell-ok">100%</td><td class="cell-ok cur">100%</td><td>0</td></tr>
+      <tr><td>Consumo KM/L</td><td class="nd">–</td><td class="nd">–</td><td class="nd">–</td><td class="cell-ok cur">100%</td><td>0</td></tr>
+      <tr><td>Doc Postado (MOB)</td><td class="nd">–</td><td class="nd">–</td><td class="nd">–</td><td class="cell-ok cur">100%</td><td>0</td></tr>
+      <tr><td>Doc Entregue Cliente</td><td class="nd">–</td><td class="nd">–</td><td class="nd">–</td><td class="cell-ok cur">100%</td><td>0</td></tr>
+    </tbody>
+    <tfoot>
+      <tr><td>Média Geral</td><td class="cell-ok">92%</td><td class="cell-ok">96%</td><td class="cell-ok">99%</td><td class="cell-ok cur">95%</td><td>12</td></tr>
+    </tfoot>
+  </table>
+  </div>
+  <div class="legend">
+    <span><span class="dot" style="background:var(--ok)"></span> ≥ 90%</span>
+    <span><span class="dot" style="background:var(--warn)"></span> 70–89%</span>
+    <span><span class="dot" style="background:var(--nok)"></span> &lt; 70%</span>
+    <span><span class="dot" style="background:var(--na)"></span> – sem histórico nesta semana</span>
+  </div>
+  </div>
+</div>
+
+<div style="height:24px"></div>
+
+<div class="panel">
+  <div class="panel-header">
+    <h2 style="margin-bottom:0">Histórico Semanal Completo — WK 08 a WK 29</h2>
+    <button class="toggle-btn" id="toggleHist" aria-expanded="false">Expandir <span class="chev">▾</span></button>
+  </div>
+  <div class="collapsible" id="histBody">
+    <div class="chart-legend" style="margin:6px 0 10px">
+      <span><span class="swatch swatch-line"></span> Média Geral Semanal</span>
+      <span><span class="swatch swatch-dash"></span> Meta 90%</span>
+    </div>
+    <svg id="histChart" viewBox="0 0 1000 260" class="trend-chart"><defs>
+    <lineargradient id="histGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#00679A" stop-opacity="0.38"></stop>
+      <stop offset="100%" stop-color="#00679A" stop-opacity="0"></stop>
+    </lineargradient>
+  </defs><line x1="50" y1="205" x2="980" y2="205" stroke="#1E4363" stroke-width="1"></line><text x="42" y="209" fill="#8FA9C0" font-size="10" text-anchor="end" font-family="Segoe UI,Arial,sans-serif">75%</text><line x1="50" y1="168" x2="980" y2="168" stroke="#1E4363" stroke-width="1"></line><text x="42" y="172" fill="#8FA9C0" font-size="10" text-anchor="end" font-family="Segoe UI,Arial,sans-serif">80%</text><line x1="50" y1="131" x2="980" y2="131" stroke="#1E4363" stroke-width="1"></line><text x="42" y="135" fill="#8FA9C0" font-size="10" text-anchor="end" font-family="Segoe UI,Arial,sans-serif">85%</text><line x1="50" y1="94" x2="980" y2="94" stroke="#1E4363" stroke-width="1"></line><text x="42" y="98" fill="#8FA9C0" font-size="10" text-anchor="end" font-family="Segoe UI,Arial,sans-serif">90%</text><line x1="50" y1="57" x2="980" y2="57" stroke="#1E4363" stroke-width="1"></line><text x="42" y="61" fill="#8FA9C0" font-size="10" text-anchor="end" font-family="Segoe UI,Arial,sans-serif">95%</text><line x1="50" y1="20" x2="980" y2="20" stroke="#1E4363" stroke-width="1"></line><text x="42" y="24" fill="#8FA9C0" font-size="10" text-anchor="end" font-family="Segoe UI,Arial,sans-serif">100%</text><line x1="50" y1="20" x2="50" y2="205" stroke="#3A567A" stroke-width="1.2"></line><line x1="50" y1="205" x2="980" y2="205" stroke="#3A567A" stroke-width="1.2"></line><line x1="50" y1="94" x2="980" y2="94" stroke="#D89A2B" stroke-width="1.6" stroke-dasharray="6,5"></line><text x="980" y="88" fill="#D89A2B" font-size="11" font-weight="700" text-anchor="end" font-family="Segoe UI,Arial,sans-serif">Meta 90%</text><path d="M50,86.6 L96.5,108.8 L143,138.4 L189.5,94 L236,123.60000000000001 L282.5,138.4 L329,123.60000000000001 L375.5,86.6 L422,57 L468.5,49.6 L515,49.6 L561.5,86.6 L608,116.2 L654.5,94 L701,86.6 L747.5,131 L794,108.8 L840.5,79.2 L887,49.6 L933.5,27.4 L980,57 L980,205 L50,205 Z" fill="url(#histGrad)"></path><path d="M50,86.6 L96.5,108.8 L143,138.4 L189.5,94 L236,123.60000000000001 L282.5,138.4 L329,123.60000000000001 L375.5,86.6 L422,57 L468.5,49.6 L515,49.6 L561.5,86.6 L608,116.2 L654.5,94 L701,86.6 L747.5,131 L794,108.8 L840.5,79.2 L887,49.6 L933.5,27.4 L980,57" fill="none" stroke="#00679A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="50" cy="86.6" r="4" fill="#0F2A40" stroke="#12A874" stroke-width="2"></circle><text x="50" y="225" fill="#8FA9C0" font-size="9.5" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" transform="rotate(-45 50 225)">WK09</text><circle cx="96.5" cy="108.8" r="4" fill="#0F2A40" stroke="#D89A2B" stroke-width="2"></circle><text x="96.5" y="225" fill="#8FA9C0" font-size="9.5" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" transform="rotate(-45 96.5 225)">WK10</text><circle cx="143" cy="138.4" r="4" fill="#0F2A40" stroke="#D89A2B" stroke-width="2"></circle><text x="143" y="225" fill="#8FA9C0" font-size="9.5" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" transform="rotate(-45 143 225)">WK11</text><circle cx="189.5" cy="94" r="4" fill="#0F2A40" stroke="#12A874" stroke-width="2"></circle><text x="189.5" y="225" fill="#8FA9C0" font-size="9.5" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" transform="rotate(-45 189.5 225)">WK12</text><circle cx="236" cy="123.60000000000001" r="4" fill="#0F2A40" stroke="#D89A2B" stroke-width="2"></circle><text x="236" y="225" fill="#8FA9C0" font-size="9.5" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" transform="rotate(-45 236 225)">WK13</text><circle cx="282.5" cy="138.4" r="4" fill="#0F2A40" stroke="#D89A2B" stroke-width="2"></circle><text x="282.5" y="225" fill="#8FA9C0" font-size="9.5" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" transform="rotate(-45 282.5 225)">WK14</text><circle cx="329" cy="123.60000000000001" r="4" fill="#0F2A40" stroke="#D89A2B" stroke-width="2"></circle><text x="329" y="225" fill="#8FA9C0" font-size="9.5" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" transform="rotate(-45 329 225)">WK15</text><circle cx="375.5" cy="86.6" r="4" fill="#0F2A40" stroke="#12A874" stroke-width="2"></circle><text x="375.5" y="225" fill="#8FA9C0" font-size="9.5" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" transform="rotate(-45 375.5 225)">WK16</text><circle cx="422" cy="57" r="4" fill="#0F2A40" stroke="#12A874" stroke-width="2"></circle><text x="422" y="225" fill="#8FA9C0" font-size="9.5" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" transform="rotate(-45 422 225)">WK17</text><circle cx="468.5" cy="49.6" r="4" fill="#0F2A40" stroke="#12A874" stroke-width="2"></circle><text x="468.5" y="225" fill="#8FA9C0" font-size="9.5" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" transform="rotate(-45 468.5 225)">WK18</text><circle cx="515" cy="49.6" r="4" fill="#0F2A40" stroke="#12A874" stroke-width="2"></circle><text x="515" y="225" fill="#8FA9C0" font-size="9.5" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" transform="rotate(-45 515 225)">WK19</text><circle cx="561.5" cy="86.6" r="4" fill="#0F2A40" stroke="#12A874" stroke-width="2"></circle><text x="561.5" y="225" fill="#8FA9C0" font-size="9.5" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" transform="rotate(-45 561.5 225)">WK20</text><circle cx="608" cy="116.2" r="4" fill="#0F2A40" stroke="#D89A2B" stroke-width="2"></circle><text x="608" y="225" fill="#8FA9C0" font-size="9.5" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" transform="rotate(-45 608 225)">WK21</text><circle cx="654.5" cy="94" r="4" fill="#0F2A40" stroke="#12A874" stroke-width="2"></circle><text x="654.5" y="225" fill="#8FA9C0" font-size="9.5" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" transform="rotate(-45 654.5 225)">WK22</text><circle cx="701" cy="86.6" r="4" fill="#0F2A40" stroke="#12A874" stroke-width="2"></circle><text x="701" y="225" fill="#8FA9C0" font-size="9.5" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" transform="rotate(-45 701 225)">WK23</text><circle cx="747.5" cy="131" r="4" fill="#0F2A40" stroke="#D89A2B" stroke-width="2"></circle><text x="747.5" y="225" fill="#8FA9C0" font-size="9.5" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" transform="rotate(-45 747.5 225)">WK24</text><circle cx="794" cy="108.8" r="4" fill="#0F2A40" stroke="#D89A2B" stroke-width="2"></circle><text x="794" y="225" fill="#8FA9C0" font-size="9.5" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" transform="rotate(-45 794 225)">WK25</text><circle cx="840.5" cy="79.2" r="4" fill="#0F2A40" stroke="#12A874" stroke-width="2"></circle><text x="840.5" y="225" fill="#8FA9C0" font-size="9.5" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" transform="rotate(-45 840.5 225)">WK26</text><circle cx="887" cy="49.6" r="4" fill="#0F2A40" stroke="#12A874" stroke-width="2"></circle><text x="887" y="225" fill="#8FA9C0" font-size="9.5" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" transform="rotate(-45 887 225)">WK27</text><circle cx="933.5" cy="27.4" r="4" fill="#0F2A40" stroke="#12A874" stroke-width="2"></circle><text x="933.5" y="225" fill="#8FA9C0" font-size="9.5" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" transform="rotate(-45 933.5 225)">WK28</text><circle cx="980" cy="57" r="4" fill="#0F2A40" stroke="#12A874" stroke-width="2"></circle><text x="980" y="225" fill="#8FA9C0" font-size="9.5" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" transform="rotate(-45 980 225)">WK29</text></svg>
+
+    <div class="tablewrap" style="margin-top:18px">
+      <table class="conftable" id="histTable">
+        <thead><tr id="histHeaderRow"><th>Semana</th><th>KM Troca</th><th>Saldo Extra</th><th>Checklist</th><th>Revisão</th><th>Estepe Extra</th><th>Medição Pneus</th><th>Rastreador</th><th>Consumo</th><th>Doc Postado</th><th>Doc Entregue</th><th>Média Geral</th></tr></thead>
+        <tbody id="histTableBody"><tr><td style="text-align:left;color:var(--muted)">WK08</td><td class="nd">–</td><td class="nd">–</td><td class="nd">–</td><td class="nd">–</td><td class="nd">–</td><td class="nd">–</td><td class="nd">–</td><td class="nd">–</td><td class="nd">–</td><td class="nd">–</td><td class="nd" style="font-weight:700">–</td></tr><tr><td style="text-align:left;color:var(--muted)">WK09</td><td class="cell-ok">91%</td><td class="cell-nok">56%</td><td class="cell-ok">97%</td><td class="cell-warn">81%</td><td class="cell-ok">97%</td><td class="cell-ok">97%</td><td class="cell-warn">84%</td><td class="cell-ok">94%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok" style="font-weight:700">91%</td></tr><tr><td style="text-align:left;color:var(--muted)">WK10</td><td class="cell-warn">88%</td><td class="cell-warn">78%</td><td class="cell-warn">84%</td><td class="cell-warn">81%</td><td class="cell-ok">94%</td><td class="cell-ok">91%</td><td class="cell-warn">88%</td><td class="cell-warn">88%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-warn" style="font-weight:700">88%</td></tr><tr><td style="text-align:left;color:var(--muted)">WK11</td><td class="cell-warn">88%</td><td class="cell-nok">68%</td><td class="cell-warn">76%</td><td class="cell-warn">79%</td><td class="cell-ok">94%</td><td class="cell-warn">85%</td><td class="cell-warn">85%</td><td class="cell-ok">91%</td><td class="cell-ok">97%</td><td class="cell-ok">97%</td><td class="cell-warn" style="font-weight:700">84%</td></tr><tr><td style="text-align:left;color:var(--muted)">WK12</td><td class="cell-warn">84%</td><td class="cell-warn">72%</td><td class="cell-ok">91%</td><td class="cell-warn">78%</td><td class="cell-ok">100%</td><td class="cell-ok">94%</td><td class="cell-warn">88%</td><td class="cell-warn">88%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok" style="font-weight:700">90%</td></tr><tr><td style="text-align:left;color:var(--muted)">WK13</td><td class="cell-warn">72%</td><td class="cell-warn">72%</td><td class="cell-warn">84%</td><td class="cell-nok">59%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-warn">88%</td><td class="cell-ok">94%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-warn" style="font-weight:700">86%</td></tr><tr><td style="text-align:left;color:var(--muted)">WK14</td><td class="cell-nok">53%</td><td class="cell-nok">38%</td><td class="cell-warn">84%</td><td class="cell-nok">50%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-warn">88%</td><td class="cell-warn">75%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-warn" style="font-weight:700">84%</td></tr><tr><td style="text-align:left;color:var(--muted)">WK15</td><td class="cell-warn">76%</td><td class="cell-nok">59%</td><td class="cell-ok">100%</td><td class="cell-nok">69%</td><td class="cell-ok">91%</td><td class="cell-ok">91%</td><td class="cell-warn">81%</td><td class="cell-warn">78%</td><td class="cell-ok">91%</td><td class="cell-ok">91%</td><td class="cell-warn" style="font-weight:700">86%</td></tr><tr><td style="text-align:left;color:var(--muted)">WK16</td><td class="cell-warn">82%</td><td class="cell-nok">61%</td><td class="cell-warn">89%</td><td class="cell-warn">79%</td><td class="cell-ok">96%</td><td class="cell-ok">93%</td><td class="cell-ok">96%</td><td class="cell-warn">89%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok" style="font-weight:700">91%</td></tr><tr><td style="text-align:left;color:var(--muted)">WK17</td><td class="cell-warn">85%</td><td class="cell-nok">63%</td><td class="cell-ok">100%</td><td class="cell-warn">81%</td><td class="cell-ok">100%</td><td class="cell-ok">96%</td><td class="cell-ok">100%</td><td class="cell-ok">96%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok" style="font-weight:700">95%</td></tr><tr><td style="text-align:left;color:var(--muted)">WK18</td><td class="cell-ok">92%</td><td class="cell-nok">63%</td><td class="cell-ok">100%</td><td class="cell-ok">92%</td><td class="cell-ok">96%</td><td class="cell-ok">92%</td><td class="cell-ok">100%</td><td class="cell-ok">96%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok" style="font-weight:700">96%</td></tr><tr><td style="text-align:left;color:var(--muted)">WK19</td><td class="cell-warn">71%</td><td class="cell-nok">50%</td><td class="cell-ok">96%</td><td class="cell-ok">92%</td><td class="cell-ok">92%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok">96%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok" style="font-weight:700">96%</td></tr><tr><td style="text-align:left;color:var(--muted)">WK20</td><td class="cell-warn">71%</td><td class="cell-nok">50%</td><td class="cell-ok">100%</td><td class="cell-nok">63%</td><td class="cell-ok">92%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok">96%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok" style="font-weight:700">91%</td></tr><tr><td style="text-align:left;color:var(--muted)">WK21</td><td class="cell-warn">78%</td><td class="cell-nok">52%</td><td class="cell-warn">87%</td><td class="cell-warn">70%</td><td class="cell-ok">96%</td><td class="cell-warn">87%</td><td class="cell-ok">96%</td><td class="cell-ok">91%</td><td class="cell-ok">96%</td><td class="cell-ok">96%</td><td class="cell-warn" style="font-weight:700">87%</td></tr><tr><td style="text-align:left;color:var(--muted)">WK22</td><td class="cell-warn">82%</td><td class="cell-nok">55%</td><td class="cell-warn">86%</td><td class="cell-warn">73%</td><td class="cell-ok">100%</td><td class="cell-ok">91%</td><td class="cell-ok">100%</td><td class="cell-ok">95%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok" style="font-weight:700">90%</td></tr><tr><td style="text-align:left;color:var(--muted)">WK23</td><td class="cell-warn">80%</td><td class="cell-nok">60%</td><td class="cell-ok">90%</td><td class="cell-warn">75%</td><td class="cell-ok">95%</td><td class="cell-ok">95%</td><td class="cell-ok">100%</td><td class="cell-ok">95%</td><td class="cell-ok">95%</td><td class="cell-ok">95%</td><td class="cell-ok" style="font-weight:700">91%</td></tr><tr><td style="text-align:left;color:var(--muted)">WK24</td><td class="cell-nok">60%</td><td class="cell-nok">55%</td><td class="cell-warn">80%</td><td class="cell-warn">70%</td><td class="cell-ok">90%</td><td class="cell-ok">90%</td><td class="cell-ok">95%</td><td class="cell-ok">90%</td><td class="cell-ok">95%</td><td class="cell-ok">95%</td><td class="cell-warn" style="font-weight:700">85%</td></tr><tr><td style="text-align:left;color:var(--muted)">WK25</td><td class="cell-nok">60%</td><td class="cell-nok">55%</td><td class="cell-ok">90%</td><td class="cell-nok">65%</td><td class="cell-ok">100%</td><td class="cell-warn">85%</td><td class="cell-ok">100%</td><td class="cell-ok">95%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-warn" style="font-weight:700">88%</td></tr><tr><td style="text-align:left;color:var(--muted)">WK26</td><td class="cell-nok">63%</td><td class="cell-nok">53%</td><td class="cell-warn">89%</td><td class="cell-warn">74%</td><td class="cell-ok">95%</td><td class="cell-ok">100%</td><td class="cell-ok">95%</td><td class="cell-ok">95%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok" style="font-weight:700">92%</td></tr><tr><td style="text-align:left;color:var(--muted)">WK27</td><td class="cell-warn">75%</td><td class="cell-nok">50%</td><td class="cell-ok">94%</td><td class="cell-warn">88%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok">94%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok" style="font-weight:700">96%</td></tr><tr><td style="text-align:left;color:var(--muted)">WK28</td><td class="cell-warn">81%</td><td class="cell-nok">63%</td><td class="cell-ok">94%</td><td class="cell-ok">94%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok" style="font-weight:700">99%</td></tr><tr><td style="text-align:left;color:var(--muted)">WK29</td><td class="cell-warn">81%</td><td class="cell-nok">63%</td><td class="cell-ok">94%</td><td class="cell-ok">94%</td><td class="cell-ok">94%</td><td class="cell-ok">94%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok" style="font-weight:700">95%</td></tr></tbody>
+      </table>
+    </div>
+    <div class="legend">
+      <span><span class="dot" style="background:var(--ok)"></span> ≥ 90%</span>
+      <span><span class="dot" style="background:var(--warn)"></span> 70–89%</span>
+      <span><span class="dot" style="background:var(--nok)"></span> &lt; 70%</span>
+      <span><span class="dot" style="background:var(--na)"></span> – sem dado</span>
+    </div>
+    <div class="note">
+      Fonte: aba BASE DESHBOARD, 21 blocos semanais identificados (WK08–WK29, linhas 4–1257). WK08 não possuía linha de "%" de conformidade na planilha (dado indisponível). "Média Geral" calculada como a média de Checklist, Revisão, Estepe Extra, Rastreador+Bloqueador e Medição Pneus — o mesmo critério já usado na planilha; para WK26–29 foram mantidos os valores oficiais já exibidos no restante do dashboard (92%, 96%, 99%, 95%) para não gerar conflito de número. As semanas WK12–WK14 tinham rótulo ambíguo na fonte original e foram inferidas pela posição sequencial entre WK11 e WK15 — vale confirmar com a origem antes de usar externamente.
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  Fonte: planilha "Controle de Frota" — aba BASE DESHBOARD, bloco da Semana 29 (linhas 1227–1257). "Meses" calculado a partir da Data Início até a data de atualização (08/07/2026).
+  Dados extraídos automaticamente; confira os valores antes de compartilhar. Uso interno do setor — link privado, não indexado publicamente; não repasse fora da equipe sem necessidade.
+</div>
+
+<script>
+const rows = [
+["TYA7G48","LOCALIZA","3","BAIXA DO FEIJÃO/RN","Siemens","19/02/2026","4,87","N/OK","N/OK","OK","OK","N/OK","OK","OK","10,74","OK","N/A"],
+["TER0D54","LOCALIZA","1","COPEL/RN","GE Blade","06/12/2025","7,37","OK","OK","OK","OK","N/OK","OK","OK","13,90","OK","N/A"],
+["TYD9E80","LOCALIZA","1","DELTA 1/MA","Siemens","23/01/2026","5,77","OK","OK","OK","OK","OK","OK","OK","9,24","OK","N/A"],
+["TYA9D45","UNIDAS","1","DELTA 2/MA","Siemens","08/09/2025","10,33","OK","OK","OK","OK","OK","OK","OK","11,18","OK","N/A"],
+["TEN7C94","UNIDAS","1","DELTA 3/MA","Siemens","01/07/2025","12,63","N/OK","OK","OK","OK","OK","OK","OK","9,03","OK","N/A"],
+["TXZ5J79","LOCALIZA","1","DELTA 4/MA","Siemens","21/02/2026","4,80","OK","N/OK","-","OK","OK","OK","OK","9,19","OK","N/A"],
+["TET3C50","UNIDAS","2","SÃO FERNANDO 1/RN","Nordex","06/02/2026","5,30","N/OK","OK","N/OK","OK","OK","OK","OK","10,11","N/A","N/A"],
+["TWY4C61","UNIDAS","2","SÃO FERNANDO 2/RN","Nordex","18/08/2025","11,03","OK","OK","OK","OK","OK","OK","OK","10,21","N/A","N/A"],
+["TXY8H30","LOCALIZA","2","ST.AGOSTINHO/RN","Siemens","20/02/2026","4,83","OK","N/OK","OK","OK","OK","OK","OK","10,11","N/A","N/A"],
+["TXQ6B16","LOCALIZA","2","TRAIRÍ/CE","GE Blade","13/11/2025","8,13","OK","OK","OK","OK","OK","N/OK","OK","14,10","OK","N/A"],
+["TXQ8D65","LOCALIZA","1","LDV  4/PI","GE Blade","21/11/2025","7,87","OK","OK","OK","OK","OK","OK","OK","8,69","N/A","N/A"],
+["TYW6D70","LOCALIZA","1","Oitis 1/PI","GE Blade","13/05/2026","2,10","OK","N/OK","OK","OK","OK","OK","OK","13,64","OK","N/A"],
+["TXC6E97","LOCALIZA","2","ADM 1","Escritório","26/11/2025","7,70","OK","OK","-","OK","OK","OK","OK","9,98","OK","N/A"],
+["TYD9F24","LOCALIZA","1","SÃO VITOR/BA","Siemens","13/02/2026","5,07","OK","ATENÇÃO","OK","N/OK","OK","OK","OK","10,65","N/A","N/A"],
+["TYG1E23","LOCALIZA","2","TUCANO/BA","Siemens","23/01/2026","5,77","OK","OK","OK","OK","OK","OK","OK","10,69","OK","N/A"],
+["TZO1G78","LOCALIZA","2","VENTO DO PIAUI/PI","Siemens","05/06/2026","1,33","OK","ATENÇÃO","OK","OK","OK","OK","OK","12,62","OK","N/A"],
+];
+
+const STATUS_COLS = [7,8,9,10,11,12,13,15,16];
+
+function tag(v){
+  const t = (v||"").trim();
+  let cls = "tag-na";
+  if(t === "OK") cls = "tag-ok";
+  else if(t === "N/OK") cls = "tag-nok";
+  else if(t.toLowerCase() === "atenção" || t.toLowerCase() === "atencao") cls = "tag-warn";
+  return `<span class="tag ${cls}">${t}</span>`;
+}
+
+function rowHasStatus(r, status){
+  return STATUS_COLS.some(c => {
+    const v = (r[c]||"").trim().toLowerCase();
+    if(status === "nok") return v === "n/ok";
+    if(status === "warn") return v === "atenção" || v === "atencao";
+    return false;
+  });
+}
+
+function rowIsClean(r){
+  return STATUS_COLS.every(c => {
+    const v = (r[c]||"").trim().toLowerCase();
+    return v === "ok" || v === "n/a" || v === "-";
+  });
+}
+
+let state = { search:"", filter:"all", sortKey:2, sortDir:1, sortType:"num" };
+
+function parseBR(v, type){
+  if(type === "num") return parseFloat((v||"0").replace(",", "."));
+  if(type === "date"){
+    const [d,m,y] = (v||"").split("/");
+    return new Date(`${y}-${m}-${d}`).getTime() || 0;
+  }
+  return (v||"").toString().toLowerCase();
+}
+
+function render(){
+  let data = rows.filter(r => {
+    if(state.search){
+      const s = state.search.toLowerCase();
+      const hay = [r[0],r[1],r[3],r[4]].join(" ").toLowerCase();
+      if(!hay.includes(s)) return false;
+    }
+    if(state.filter === "nok") return rowHasStatus(r,"nok");
+    if(state.filter === "warn") return rowHasStatus(r,"warn");
+    if(state.filter === "clean") return rowIsClean(r);
+    return true;
+  });
+
+  if(state.sortKey !== null){
+    const k = state.sortKey, type = state.sortType;
+    data = [...data].sort((a,b) => {
+      const av = parseBR(a[k], type), bv = parseBR(b[k], type);
+      if(av < bv) return -1*state.sortDir;
+      if(av > bv) return 1*state.sortDir;
+      return 0;
+    });
+  }
+
+  document.getElementById("countHint").textContent = `${data.length} de ${rows.length} veículos exibidos`;
+
+  const tbody = document.getElementById("tbody");
+  tbody.innerHTML = data.map(r => `
+    <tr>
+      <td><strong>${r[0]}</strong></td>
+      <td>${r[1]}</td>
+      <td>${r[2]}</td>
+      <td>${r[3]}</td>
+      <td>${r[4]}</td>
+      <td>${r[5]}</td>
+      <td>${r[6]}</td>
+      <td>${tag(r[7])}</td>
+      <td>${tag(r[8])}</td>
+      <td>${tag(r[9])}</td>
+      <td>${tag(r[10])}</td>
+      <td>${tag(r[11])}</td>
+      <td>${tag(r[12])}</td>
+      <td>${tag(r[13])}</td>
+      <td>${r[14]} km/l</td>
+      <td>${tag(r[15])}</td>
+      <td>${tag(r[16])}</td>
+    </tr>
+  `).join("");
+
+  document.querySelectorAll("#headerRow th").forEach(th => {
+    const arrow = th.querySelector(".arrow");
+    arrow.textContent = (parseInt(th.dataset.key) === state.sortKey) ? (state.sortDir === 1 ? "▲" : "▼") : "";
+  });
+}
+
+document.getElementById("searchInput").addEventListener("input", e => {
+  state.search = e.target.value;
+  render();
+});
+
+document.querySelectorAll("#statusFilters .chip").forEach(chip => {
+  chip.addEventListener("click", () => {
+    document.querySelectorAll("#statusFilters .chip").forEach(c => c.classList.remove("active"));
+    chip.classList.add("active");
+    state.filter = chip.dataset.filter;
+    render();
+  });
+});
+
+document.querySelectorAll("#headerRow th").forEach(th => {
+  th.addEventListener("click", () => {
+    const key = parseInt(th.dataset.key);
+    if(state.sortKey === key) state.sortDir *= -1;
+    else { state.sortKey = key; state.sortDir = 1; state.sortType = th.dataset.type; }
+    render();
+  });
+});
+
+render();
+
+const kmEl = document.getElementById("kmValue");
+const kmVal = parseFloat(kmEl.dataset.km);
+kmEl.style.color = kmVal >= 30000 ? "var(--nok)" : "var(--ok)";
+
+const toggleBtn = document.getElementById("toggleConf");
+const confBody = document.getElementById("confBody");
+toggleBtn.addEventListener("click", () => {
+  const isOpen = confBody.classList.toggle("open");
+  toggleBtn.setAttribute("aria-expanded", isOpen);
+  toggleBtn.innerHTML = isOpen ? 'Recolher <span class="chev">▾</span>' : 'Expandir <span class="chev">▾</span>';
+});
+
+// Histórico completo WK08–WK29 — cats: [KM Troca, Saldo Extra, Checklist, Revisão, Estepe Extra, Medição Pneus, Rastreador, Consumo, Doc Postado, Doc Entregue]
+const histData = [
+  { wk:"WK08", geral:87.2, cats:[80.8,88.9,84.6,96.3,85.2] },
+  { wk:"WK09", geral:90.8, cats:[96.8,81.8,96.7,97.0,81.8] },
+  { wk:"WK10", geral:87.8, cats:[83.9,82.4,93.5,91.2,88.2] },
+  { wk:"WK11", geral:87.2, cats:[78.8,81.8,96.7,90.9,87.9] },
+  { wk:"WK12", geral:90.6, cats:[90.6,78.1,100.0,96.9,87.5] },
+  { wk:"WK13", geral:86.4, cats:[79.2,65.5,100.0,100.0,87.5] },
+  { wk:"WK14", geral:87.9, cats:[79.2,72.7,100.0,100.0,87.5] },
+  { wk:"WK15", geral:94.9, cats:[100.0,84.6,100.0,100.0,89.7] },
+  { wk:"WK16", geral:91.6, cats:[87.5,84.6,96.4,92.9,96.4] },
+  { wk:"WK17", geral:96.2, cats:[100.0,84.6,100.0,96.3,100.0] },
+  { wk:"WK18", geral:95.8, cats:[100.0,91.7,95.8,91.7,100.0] },
+  { wk:"WK19", geral:95.3, cats:[93.3,91.7,91.3,100.0,100.0] },
+  { wk:"WK20", geral:92.5, cats:[100.0,71.4,91.3,100.0,100.0] },
+  { wk:"WK21", geral:90.6, cats:[89.5,72.7,100.0,90.9,100.0] },
+  { wk:"WK22", geral:89.6, cats:[84.2,72.7,100.0,90.9,100.0] },
+  { wk:"WK23", geral:90.5, cats:[87.5,75.0,100.0,90.0,100.0] },
+  { wk:"WK24", geral:93.0, cats:[82.4,93.3,94.7,94.7,100.0] },
+  { wk:"WK25", geral:88.9, cats:[87.5,72.2,100.0,85.0,100.0] },
+  { wk:"WK26", geral:94.2, cats:[88.2,93.3,94.7,100.0,94.7] },
+  { wk:"WK27", geral:96.1, cats:[93.3,93.3,100.0,100.0,93.8] },
+  { wk:"WK28", geral:97.4, cats:[93.3,93.8,100.0,100.0,100.0] },
+  { wk:"WK29", geral:93.6, cats:[92.9,93.8,87.5,93.8,100.0] },
+];
+const HIST_CAT_LABELS = ["KM Troca","Saldo Extra","Checklist","Revisão","Estepe Extra","Medição Pneus","Rastreador","Consumo","Doc Postado","Doc Entregue"];
+
+function histCellClass(v){
+  if(v === null || v === undefined) return "nd";
+  if(v >= 90) return "cell-ok";
+  if(v >= 70) return "cell-warn";
+  return "cell-nok";
+}
+function histCellText(v){ return (v === null || v === undefined) ? "–" : v + "%"; }
+
+function renderHistChart(){
+  const svg = document.getElementById("histChart");
+  const data = histData.filter(d => d.geral !== null);
+  const W = 1000, H = 260, padL = 50, padR = 20, padT = 20, padB = 55;
+  const chartW = W - padL - padR, chartH = H - padT - padB;
+  const n = data.length;
+  const minV = 75, maxV = 100;
+  const x = i => padL + (i/(n-1)) * chartW;
+  const y = v => padT + (maxV - v)/(maxV - minV) * chartH;
+
+  let svgHTML = `<defs>
+    <linearGradient id="histGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#00679A" stop-opacity="0.38"/>
+      <stop offset="100%" stop-color="#00679A" stop-opacity="0"/>
+    </linearGradient>
+  </defs>`;
+
+  for(let v = minV; v <= maxV; v += 5){
+    svgHTML += `<line x1="${padL}" y1="${y(v)}" x2="${W-padR}" y2="${y(v)}" stroke="#1E4363" stroke-width="1"/>`;
+    svgHTML += `<text x="${padL-8}" y="${y(v)+4}" fill="#8FA9C0" font-size="10" text-anchor="end" font-family="Segoe UI,Arial,sans-serif">${v}%</text>`;
+  }
+  svgHTML += `<line x1="${padL}" y1="${padT}" x2="${padL}" y2="${H-padB}" stroke="#3A567A" stroke-width="1.2"/>`;
+  svgHTML += `<line x1="${padL}" y1="${H-padB}" x2="${W-padR}" y2="${H-padB}" stroke="#3A567A" stroke-width="1.2"/>`;
+
+  svgHTML += `<line x1="${padL}" y1="${y(90)}" x2="${W-padR}" y2="${y(90)}" stroke="#D89A2B" stroke-width="1.6" stroke-dasharray="6,5"/>`;
+  svgHTML += `<text x="${W-padR}" y="${y(90)-6}" fill="#D89A2B" font-size="11" font-weight="700" text-anchor="end" font-family="Segoe UI,Arial,sans-serif">Meta 90%</text>`;
+
+  const pts = data.map((d,i) => [x(i), y(d.geral)]);
+  const linePath = "M" + pts.map(p => p.join(",")).join(" L");
+  const areaPath = linePath + ` L${x(n-1)},${H-padB} L${x(0)},${H-padB} Z`;
+  svgHTML += `<path d="${areaPath}" fill="url(#histGrad)"/>`;
+  svgHTML += `<path d="${linePath}" fill="none" stroke="#00679A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+
+  data.forEach((d,i) => {
+    const color = d.geral >= 90 ? "#12A874" : (d.geral >= 70 ? "#D89A2B" : "#E0483C");
+    svgHTML += `<circle cx="${x(i)}" cy="${y(d.geral)}" r="4" fill="#0F2A40" stroke="${color}" stroke-width="2"/>`;
+    svgHTML += `<text x="${x(i)}" y="${H-padB+20}" fill="#8FA9C0" font-size="9.5" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" transform="rotate(-45 ${x(i)} ${H-padB+20})">${d.wk}</text>`;
+  });
+
+  svg.innerHTML = svgHTML;
+}
+
+function renderHistTable(){
+  const headerRow = document.getElementById("histHeaderRow");
+  headerRow.innerHTML = `<th>Semana</th>` + HIST_CAT_LABELS.map(l => `<th>${l}</th>`).join("") + `<th>Média Geral</th>`;
+
+  const tbody = document.getElementById("histTableBody");
+  tbody.innerHTML = histData.map(d => {
+    const catCells = d.cats.map(v => `<td class="${histCellClass(v)}">${histCellText(v)}</td>`).join("");
+    return `<tr><td style="text-align:left;color:var(--muted)">${d.wk}</td>${catCells}<td class="${histCellClass(d.geral)}" style="font-weight:700">${histCellText(d.geral)}</td></tr>`;
+  }).join("");
+}
+
+renderHistChart();
+renderHistTable();
+
+const toggleHist = document.getElementById("toggleHist");
+const histBody = document.getElementById("histBody");
+toggleHist.addEventListener("click", () => {
+  const isOpen = histBody.classList.toggle("open");
+  toggleHist.setAttribute("aria-expanded", isOpen);
+  toggleHist.innerHTML = isOpen ? 'Recolher <span class="chev">▾</span>' : 'Expandir <span class="chev">▾</span>';
+});
+
+// Plano de Ação — WK29 (aba BASE DESHBOARD, colunas V–AD, linhas 1231–1262)
+const acaoData = [
+  { acao:"Todos PNEUS ABAIXO DE 2,7mm", tipo:"CORRETIVA", parque:"TRAIRI", quem:"JOÃO/WILLIAM DUARTE", status:"14/07/2026", obs:"" },
+  { acao:"S/Estepe Extra", tipo:"PREVENTIVA", parque:"COPEL", quem:"JOÃO/SERPA", status:"!!!", obs:"" },
+  { acao:"REVISÃO", tipo:"PREVENTIVA", parque:"SÃO VITOR", quem:"JOÃO/MATEUS G.", status:"!!!", obs:"" },
+  { acao:"TROCA PARABRISA (CRÍTICO)", tipo:"CORRETIVA", parque:"SF1", quem:"ANTÔNIO", status:"STAND BY", obs:"Obs:Proteção Vidros e Pneus Unidas" },
+  { acao:"S/Estepe Extra", tipo:"PREVENTIVA", parque:"BAIXA DO FEIJÃO", quem:"JOÃO/WILLIAMES DA HORA", status:"", obs:"Alinhar c/ Motorista" },
+  { acao:"40K de KM RODADOS/SALDO ESTOURADO", tipo:"ADMINISTRATIVA", parque:"BAIXA DO FEIJÃO", quem:"JOÃO/WILLIAMES DA HORA", status:"NA DESMOB", obs:"DEVOLUÇÃO NA DESMOB" },
+  { acao:"40K de KM RODADOS", tipo:"ADMINISTRATIVA", parque:"DELTA 3", quem:"JOÃO/RODRIGO", status:"NA DESMOB", obs:"PLANEJAR SUBSTITUIÇÃO" },
+  { acao:"SALDO CONTRATO ESTOURADO", tipo:"ADMINISTRATIVA", parque:"SÃO VITOR", quem:"JOÃO", status:"!!!", obs:"" },
+  { acao:"SALDO CONTRATO ESTOURADO", tipo:"ADMINISTRATIVA", parque:"OITIS 1", quem:"JOÃO/PEDRO LUCAS", status:"NA DESMOB", obs:"SALDO EXTRA- EM PROJETO PARA RECUPERAR" },
+  { acao:"SALDO CONTRATO ESTOURADO", tipo:"ADMINISTRATIVA", parque:"ST.AGOSTINHO", quem:"JOÃO/ÉDIPO", status:"ACOMPANHAR", obs:"SALDO EXTRA- EM PROJETO PARA RECUPERAR" },
+  { acao:"SALDO CONTRATO ESTOURADO", tipo:"ADMINISTRATIVA", parque:"VDP", quem:"JOÃO/PROTÁZIO", status:"ACOMPANHAR", obs:"SALDO EXTRA- EM PROJETO PARA RECUPERAR" },
+  { acao:"SALDO CONTRATO ESTOURADO", tipo:"ADMINISTRATIVA", parque:"DELTA 4", quem:"JOÃO/RODRIGO", status:"ACOMPANHAR", obs:"SALDO EXTRA- EM PROJETO PARA RECUPERAR" },
+  { acao:"TROCAR PNEU", tipo:"ADMINISTRATIVA", parque:"LDV 03*", quem:"HELIO", status:"15/07/2026", obs:"Restam 1200km P/ fazer Troca pela Locadora" },
+  { acao:"Pneu estepe extra foto repetida", tipo:"ADMINISTRATIVA", parque:"DELTA 4", quem:"JOÃO/RODRIGO", status:"?", obs:"" },
+  { acao:"Pneus na faixa de 2,7mm/Óleo,radiador ou freio Não Conforme?", tipo:"ADMINISTRATIVA", parque:"DELTA 1", quem:"JOÃO/DE ASSIS", status:"!!!", obs:"" },
+  { acao:"MAL FUNC. DO AR-CONDICIONADO", tipo:"ADMINISTRATIVA", parque:"SF1", quem:"JOÃO/ANTÔNIO", status:"14/07/2026", obs:"Supervisor foi informado/Acompanhar c/ condutor." },
+  { acao:"TESTE/INSTALAÇÃO RAPTOR", tipo:"ADMINISTRATIVA", parque:"SÃO VITOR", quem:"JOÃO", status:"14/07/2026", obs:"" },
+  { acao:"Placa \"encoberta\" por enforca gato", tipo:"ADMINISTRATIVA", parque:"DELTA 2", quem:"JOÃO", status:"14/07/2026", obs:"" },
+  { acao:"Alinhamento na Região(Capotaria)BANC. DO CONDT. FURAD. C/CINZAS DE CIGARRO", tipo:"ADMINISTRATIVA", parque:"ST.AGOSTINHO", quem:"JOÃO", status:"14/07/2026", obs:"" },
+  { acao:"Alinhar C/ LOJA NA REGIÃO(PARA-BRISA)", tipo:"ADMINISTRATIVA", parque:"SF1", quem:"JOÃO", status:"14/07/2026", obs:"" },
+  { acao:"SALDO CONTRATO ESTOURADO", tipo:"ADMINISTRATIVA", parque:"ADM1", quem:"JOÃO", status:"13/07/2026 OK", obs:"" },
+  { acao:"SETA RETROVISOR", tipo:"ADMINISTRATIVA", parque:"ST.AGOSTINHO", quem:"JOÃO", status:"NA DESMOB", obs:"" }
+];
+
+function acaoStatusTag(s){
+  const t = s.trim();
+  if(/conclu[ií]do|^ok$/i.test(t)) return `<span class="tag tag-ok">${t}</span>`;
+  if(t === "!!!") return `<span class="tag tag-nok">Urgente</span>`;
+  if(/^na desmob/i.test(t)) return `<span class="tag" style="background:rgba(28,140,232,.20);color:var(--steel)">Na desmob</span>`;
+  if(/acompanhar/i.test(t)) return `<span class="tag tag-warn">Acompanhar</span>`;
+  if(/stand by/i.test(t)) return `<span class="tag tag-warn">Stand by</span>`;
+  if(t === "?") return `<span class="tag tag-na">Indefinido</span>`;
+  if(/\d\d\/\d\d\/\d{4}/.test(t)) return `<span class="tag" style="background:rgba(28,140,232,.20);color:var(--steel)">${t}</span>`;
+  return `<span class="tag tag-na">${t}</span>`;
+}
+
+function renderAcaoTable(){
+  const tbody = document.getElementById("acaoTableBody");
+  tbody.innerHTML = acaoData.map(a => `
+    <tr>
+      <td style="text-align:left; white-space:normal; max-width:320px">${a.acao}</td>
+      <td style="text-align:left">${a.tipo}</td>
+      <td style="text-align:left">${a.parque}</td>
+      <td style="text-align:left">${a.quem}</td>
+      <td>${acaoStatusTag(a.status)}</td>
+      <td style="text-align:left; white-space:normal; color:var(--muted)">${a.obs}</td>
+    </tr>
+  `).join("");
+}
+renderAcaoTable();
+
+const toggleAcao = document.getElementById("toggleAcao");
+const acaoBody = document.getElementById("acaoBody");
+toggleAcao.addEventListener("click", () => {
+  const isOpen = acaoBody.classList.toggle("open");
+  toggleAcao.setAttribute("aria-expanded", isOpen);
+  toggleAcao.innerHTML = isOpen ? 'Recolher <span class="chev">▾</span>' : 'Expandir <span class="chev">▾</span>';
+});
+
+document.getElementById("navAcao").addEventListener("click", () => {
+  if(!acaoBody.classList.contains("open")){
+    acaoBody.classList.add("open");
+    toggleAcao.setAttribute("aria-expanded", true);
+    toggleAcao.innerHTML = 'Recolher <span class="chev">▾</span>';
+  }
+  acaoBody.closest(".panel").scrollIntoView({ behavior:"smooth", block:"start" });
+});
+</script>
+
+
+
+</body></html>
+                                                                                                                                                                                                                                                                              

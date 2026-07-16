@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard - Extreme Wind</title>
+<link rel="icon" type="image/png" href="assets/icone-helice-color.png">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root{
+    /* Paleta unificada com o restante do site — azul-marinho da logo Extreme Wind */
+    --bg:#081C2C; --card:#0F2A40; --line:#1E4363;
+    --text:#EAF1F7; --muted:#8FA9C0; --accent:#1C8CE8; --green:#12A874;
+    --red:#E0483C; --amber:#D89A2B; --purple:#9b59b6;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; font-family:'Segoe UI',Arial,sans-serif; background:var(--bg); color:var(--text); padding:28px 32px 60px; zoom:1.15;}
+  h1{font-size:22px; margin:0 0 2px;}
+  .subtitle{color:var(--muted); font-size:13px; margin-bottom:10px;}
+  .tabs{display:flex; gap:8px; margin:18px 0 26px; border-bottom:1px solid var(--line);}
+  .tab{padding:10px 18px; font-size:13px; font-weight:600; color:var(--muted); cursor:pointer; border-bottom:2px solid transparent;}
+  .tab.active{color:var(--accent); border-bottom:2px solid var(--accent);}
+  .panel{display:none;}
+  .panel.active{display:block;}
+  .kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; margin-bottom:24px;}
+  .kpi{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px 18px;}
+  .kpi .label{font-size:12px; color:var(--muted); text-transform:uppercase;}
+  .kpi .value{font-size:28px; font-weight:700; margin-top:6px;}
+  .kpi .sub{font-size:12px; color:var(--muted); margin-top:4px;}
+  .value.red{color:var(--red);} .value.amber{color:var(--amber);}
+  .grid{display:grid; grid-template-columns:2fr 1fr 1fr; gap:16px; margin-bottom:20px;}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px;}
+  @media(max-width:900px){ .grid,.grid2{grid-template-columns:1fr;} }
+  .card{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:18px;}
+  .card h2{font-size:14px; margin:0 0 12px; font-weight:600;}
+  .card h2 span{color:var(--muted); font-weight:400; font-size:12px;}
+  table{width:100%; border-collapse:collapse; font-size:13px;}
+  th,td{text-align:left; padding:8px 10px; border-bottom:1px solid var(--line);}
+  th{color:var(--muted); font-weight:600; font-size:11px; text-transform:uppercase;}
+  tr.deficit td{background:rgba(224,72,60,.08);}
+  tr.deficit td:nth-child(4){color:var(--red); font-weight:700;}
+  td.num{text-align:right;}
+  .badge{display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:600;}
+  .badge.ge{background:rgba(28,140,232,.18); color:var(--accent);}
+  .badge.nordex{background:rgba(155,89,182,.2); color:#c68ce0;}
+  .badge.siemens{background:rgba(18,168,116,.18); color:var(--green);}
+  .alerts{margin-top:6px;}
+  .alert{padding:10px 12px; border-radius:8px; margin-bottom:8px; font-size:13px;}
+  .alert.crit{background:rgba(224,72,60,.1); border:1px solid rgba(224,72,60,.35);}
+  .alert.warn{background:rgba(216,154,43,.1); border:1px solid rgba(216,154,43,.35);}
+  .alert.info{background:rgba(28,140,232,.1); border:1px solid rgba(28,140,232,.35);}
+  .section-title{font-size:16px; margin:32px 0 12px; padding-top:10px; border-top:1px solid var(--line);}
+  .improve li{margin-bottom:10px; font-size:13.5px; line-height:1.5;}
+  .improve b{color:var(--accent);}
+  .footer{color:var(--muted); font-size:11px; margin-top:30px;}
+  canvas{max-height:280px;}
+  .scrollx{overflow-x:auto;}
+</style>
+</head>
+<body>
+<img src="assets/logo-extreme-wind-white.png" alt="Extreme Wind" style="height:38px; width:auto; display:block; margin-bottom:14px;">
+<h1>Dashboard - Extreme Wind</h1>
+<div class="subtitle">Diario de Bordo - dados consolidados em 16/07/2026</div>
+<div class="tabs">
+  <div class="tab active" data-tab="ativos">Equipes ativas (hoje)</div>
+  <div class="tab" data-tab="historico">Historico mobilizacao/desmobilizacao</div>
+</div>
+
+<div class="panel active" id="panel-ativos">
+<div class="kpis">
+  <div class="kpi"><div class="label">Tecnicos ativos</div><div class="value">40</div><div class="sub">em campo agora</div></div>
+  <div class="kpi"><div class="label">Planejado (headcount)</div><div class="value">45</div><div class="sub">meta de equipes</div></div>
+  <div class="kpi"><div class="label">Projetos aguardando inicio</div><div class="value red">2</div><div class="sub">Trairi/CE (Siemens) + Galpao Simoes Filho/BA</div></div>
+  <div class="kpi"><div class="label">Parques ativos</div><div class="value">10<span class="sub" style="font-size:16px;"> / 12</span></div><div class="sub">2 parques vazios</div></div>
+</div>
+<div class="grid">
+  <div class="card"><h2>Real vs. Plano por parque <span>tecnicos</span></h2><canvas id="chartParques"></canvas></div>
+  <div class="card"><h2>Por cliente <span>tecnicos ativos</span></h2><canvas id="chartCliente"></canvas></div>
+  <div class="card"><h2>Por supervisor (SUOP) <span>tecnicos ativos</span></h2><canvas id="chartSuop"></canvas></div>
+</div>
+<div class="card">
+  <h2>Detalhe por parque</h2>
+  <table>
+    <thead><tr><th>Parque</th><th>Cliente</th><th>Supervisor</th><th class="num">Real</th><th class="num">Plano</th><th class="num">Diferenca</th></tr></thead>
+    <tbody id="tbodyParques"></tbody>
+  </table>
+</div>
+<div class="section-title">Alertas</div>
+<div class="alerts">
+  <div class="alert crit">GALPÃO SIMÕES FILHO/BA - 0 de 2 técnicos planejados. Aguardando início de projeto.</div>
+  <div class="alert crit">TRAIRI/CE (novo projeto SIEMENS) - 0 de 3 técnicos planejados. Aguardando início de projeto.</div>
+  <div class="alert info">DELTA/PI - concentra 25% de todo o headcount real (10 de 40) em 4 sub-equipes; maior parque em volume de gente.</div>
+</div>
+<div class="section-title">Sugestoes de melhoria</div>
+<ul class="improve">
+  <li><b>Consertar a origem das tabelas dinamicas do Resumo (Controle).</b> "QUANT. REAL" e "Contagem de CLIENTE" podem puxar da aba DADOS (historico de eventos) em vez de CONTROLE DE EQUIPES (quem esta ativo agora). As colunas PLAN/DIFERENCA/CLIENTES ao lado sao fixas por linha e desalinham toda vez que um parque some da lista.</li>
+  <li><b>Alerta automatico de sub-lotacao.</b> Formatacao condicional (vermelho) em qualquer parque com Real menor que Plano.</li>
+  <li><b>Rastrear tempo em campo (ACUMULADO / TERMINO 3 MESES).</b> Um painel de tecnicos proximos de 90 dias ajuda a planejar rodizio/ferias.</li>
+  <li><b>Padronizar "vaga aberta".</b> Status visual unico (verde-claro) para parques sem equipe, diferenciando de "sub-lotado".</li>
+  <li><b>Consolidar os 3 mini-relatorios em um so.</b> Real x Parque, Contagem por Cliente e Contagem por SUOP hoje tem fontes diferentes.</li>
+  <li><b>Data de ultima atualizacao visivel.</b> Um campo "atualizado em" ajuda quem consome o relatorio.</li>
+</ul>
+</div>
+
+<div class="panel" id="panel-historico">
+<div class="kpis">
+  <div class="kpi"><div class="label">Mobilizacoes</div><div class="value">691</div><div class="sub">51.3% dos eventos</div></div>
+  <div class="kpi"><div class="label">Desmobilizacoes</div><div class="value">651</div><div class="sub">48.3% dos eventos</div></div>
+  <div class="kpi"><div class="label">Cancelamentos</div><div class="value amber">6</div><div class="sub">0.4% dos eventos</div></div>
+  <div class="kpi"><div class="label">Total de eventos</div><div class="value">1348</div><div class="sub">jan/24 a jul/26</div></div>
+</div>
+<div class="grid2">
+  <div class="card"><h2>Ranking por parque <span>top 10</span></h2><canvas id="chartRankingParque"></canvas></div>
+  <div class="card"><h2>Ranking por cliente <span>total historico</span></h2><canvas id="chartRankingCliente"></canvas></div>
+</div>
+<div class="card" style="margin-bottom:20px;">
+  <h2>Evolucao mensal de eventos <span>jan/24 a jul/26</span></h2>
+  <div class="scrollx"><canvas id="chartEvolucao" style="min-width:900px;"></canvas></div>
+</div>
+<div class="card">
+  <h2>Solicitacoes por motivo (mensal) <span>Cliente x Extreme - percentual do mes em cada barra</span></h2>
+  <div id="motivoResumo" style="margin:-4px 0 10px; color:#93a3b8; font-size:12px;"></div>
+  <div class="scrollx"><canvas id="chartMotivo" style="min-width:900px;"></canvas></div>
+</div>
+</div>
+
+<div class="footer">Painel 1: CONTROLE DE EQUIPES. Painel 2: DADOS/RESUMOS (aba DASHBOARD original). 16/07/2026.</div>
+
+<script>
+document.querySelectorAll('.tab').forEach(function(t){
+  t.addEventListener('click', function(){
+    document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active');});
+    document.querySelectorAll('.panel').forEach(function(x){x.classList.remove('active');});
+    t.classList.add('active');
+    document.getElementById('panel-'+t.dataset.tab).classList.add('active');
+  });
+});
+Chart.defaults.color = '#93a3b8';
+Chart.defaults.font.family = "'Segoe UI',Arial,sans-serif";
+
+var parques = [
+  {nome:"OITIS/PI", cliente:"GE", suop:"EVAIR", real:3, plano:3},
+  {nome:"COPEL/RN", cliente:"GE", suop:"EVAIR", real:3, plano:3},
+  {nome:"TRAIRI/CE", cliente:"GE", suop:"EVAIR", real:3, plano:3},
+  {nome:"SÃO FERNANDO/RN", cliente:"NORDEX", suop:"MAGALHÃES", real:6, plano:6},
+  {nome:"SÃO VITOR/BA", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
+  {nome:"BAIXA DO FEIJÃO/RN", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
+  {nome:"TUCANO/BA", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
+  {nome:"SANTO AGOSTINHO/RN", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
+  {nome:"DELTA/PI", cliente:"SIEMENS", suop:"WILDNER", real:10, plano:10},
+  {nome:"VENTOS DO PIAUÍ/PI", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
+  {nome:"TRAIRI/CE (novo)", cliente:"SIEMENS", suop:"-", real:0, plano:3},
+  {nome:"GALPÃO SIMÕES FILHO/BA", cliente:"SIEMENS", suop:"-", real:0, plano:2}
+];
+function badgeClass(c){ return {GE:'ge',NORDEX:'nordex',SIEMENS:'siemens'}[c] || 'ge'; }
+var tbody = document.getElementById('tbodyParques');
+parques.forEach(function(p){
+  var diff = p.real - p.plano;
+  var tr = document.createElement('tr');
+  if(diff<0) tr.className='deficit';
+  tr.innerHTML = '<td>'+p.nome+'</td><td><span class="badge '+badgeClass(p.cliente)+'">'+p.cliente+'</span></td><td>'+p.suop+'</td><td class="num">'+p.real+'</td><td class="num">'+p.plano+'</td><td class="num">'+(diff>0?'+':'')+diff+'</td>';
+  tbody.appendChild(tr);
+});
+var totReal = parques.reduce(function(s,p){return s+p.real;},0);
+var totPlano = parques.reduce(function(s,p){return s+p.plano;},0);
+var trTot = document.createElement('tr');
+trTot.style.fontWeight='700'; trTot.style.borderTop='2px solid #2a3746';
+trTot.innerHTML = '<td>Total Geral</td><td></td><td></td><td class="num">'+totReal+'</td><td class="num">'+totPlano+'</td><td class="num">'+(totReal-totPlano)+'</td>';
+tbody.appendChild(trTot);
+
+new Chart(document.getElementById('chartParques'), {
+  type:'bar',
+  data:{ labels: parques.map(function(p){return p.nome;}),
+    datasets:[
+      {label:'Real', data:parques.map(function(p){return p.real;}), backgroundColor:'#1C8CE8', borderRadius:4},
+      {label:'Plano', data:parques.map(function(p){return p.plano;}), backgroundColor:'#3a4759', borderRadius:4}
+    ]},
+  options:{responsive:true, plugins:{legend:{position:'top', labels:{boxWidth:12}}},
+    scales:{x:{ticks:{font:{size:10}}, grid:{display:false}}, y:{beginAtZero:true, grid:{color:'#2a3746'}}}}
+});
+function aggregate(key){ var m={}; parques.forEach(function(p){ m[p[key]]=(m[p[key]]||0)+p.real; }); return m; }
+var clienteAgg = aggregate('cliente');
+new Chart(document.getElementById('chartCliente'), {
+  type:'doughnut',
+  data:{labels:Object.keys(clienteAgg), datasets:[{data:Object.values(clienteAgg), backgroundColor:['#1C8CE8','#9b59b6','#12A874'], borderColor:'#0F2A40', borderWidth:2}]},
+  options:{responsive:true, plugins:{legend:{position:'bottom', labels:{boxWidth:12, font:{size:11}}}}}
+});
+var suopAgg = aggregate('suop');
+var suopQtdLabelsPlugin = {
+  id: 'suopQtdLabels',
+  afterDatasetsDraw: function(chart){
+    if(chart.canvas.id !== 'chartSuop') return;
+    var ctx = chart.ctx;
+    var meta = chart.getDatasetMeta(0);
+    meta.data.forEach(function(arc, i){
+      var val = chart.data.datasets[0].data[i];
+      if(!val) return;
+      var pos = arc.tooltipPosition();
+      ctx.save();
+      ctx.fillStyle = '#0f1720';
+      ctx.font = 'bold 12px Segoe UI, Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(String(val), pos.x, pos.y);
+      ctx.restore();
+    });
+  }
+};
+Chart.register(suopQtdLabelsPlugin);
+new Chart(document.getElementById('chartSuop'), {
+  type:'doughnut',
+  data:{labels:Object.keys(suopAgg), datasets:[{data:Object.values(suopAgg), backgroundColor:['#D89A2B','#1C8CE8','#12A874','#E0483C'], borderColor:'#0F2A40', borderWidth:2}]},
+  options:{responsive:true, plugins:{legend:{position:'bottom', labels:{boxWidth:12, font:{size:11}}},
+    tooltip:{callbacks:{label:function(ctx){ return ctx.label + ': ' + ctx.parsed + ' tecnicos'; }}}}}
+});
+
+var rankingParque = [
+  ["LDV3/PI",83,83,1],
+  ["OITIS/PI",82,79,0],
+  ["COPEL/RN",35,32,1],
+  ["TRAIRI/CE",35,32,0],
+  ["UMBURANAS/BA",31,31,0],
+  ["CAMPO LARGO/BA",25,25,0],
+  ["VENTOS DA BAHIA/BA",25,25,0],
+  ["FONTE DOS VENTOS/PE",24,24,0],
+  ["SINOMA FÁBRICA/BA",21,21,1],
+  ["VSM/RN",21,21,0]
+];
+new Chart(document.getElementById('chartRankingParque'), {
+  type:'bar',
+  data:{ labels: rankingParque.map(function(p){return p[0];}),
+    datasets:[
+      {label:'Mobilizacao', data:rankingParque.map(function(p){return p[1];}), backgroundColor:'#1C8CE8'},
+      {label:'Desmobilizacao', data:rankingParque.map(function(p){return p[2];}), backgroundColor:'#9b59b6'},
+      {label:'Cancelamento', data:rankingParque.map(function(p){return p[3];}), backgroundColor:'#E0483C'}
+    ]},
+  options:{indexAxis:'y', responsive:true, plugins:{legend:{position:'top', labels:{boxWidth:12, font:{size:11}}}},
+    scales:{x:{stacked:true, grid:{color:'#2a3746'}}, y:{stacked:true, grid:{display:false}}}}
+});
+
+var rankingCliente = [
+  ["GE",391,382,4],
+  ["GAMESA",195,170,1],
+  ["NORDEX / LWS",62,56,0],
+  ["SINOMA BLADES",21,21,1],
+  ["LM",11,11,0],
+  ["EÓLICAS BABILÔNIA",5,5,0],
+  ["ELETROBRAS",4,4,0],
+  ["VESTAS",2,2,0]
+];
+new Chart(document.getElementById('chartRankingCliente'), {
+  type:'bar',
+  data:{ labels: rankingCliente.map(function(p){return p[0];}),
+    datasets:[
+      {label:'Mobilizacao', data:rankingCliente.map(function(p){return p[1];}), backgroundColor:'#1C8CE8'},
+      {label:'Desmobilizacao', data:rankingCliente.map(function(p){return p[2];}), backgroundColor:'#9b59b6'},
+      {label:'Cancelamento', data:rankingCliente.map(function(p){return p[3];}), backgroundColor:'#E0483C'}
+    ]},
+  options:{indexAxis:'y', responsive:true, plugins:{legend:{position:'top', labels:{boxWidth:12, font:{size:11}}}},
+    scales:{x:{stacked:true, grid:{color:'#2a3746'}}, y:{stacked:true, grid:{display:false}}}}
+});
+
+var meses = ["Jan/24","Fev/24","Mar/24","Abr/24","Mai/24","Jun/24","Jul/24","Ago/24","Set/24","Out/24","Nov/24","Dez/24","Jan/25","Fev/25","Mar/25","Abr/25","Mai/25","Jun/25","Jul/25","Ago/25","Set/25","Out/25","Nov/25","Dez/25","Jan/26","Fev/26","Mar/26","Abr/26","Mai/26","Jun/26","Jul/26"];
+var mob = [22,7,5,27,16,23,10,13,22,12,11,5,35,13,17,17,40,32,17,12,13,23,43,9,79,37,31,40,33,18,9];
+var desmob = [5,1,16,6,13,23,17,20,9,11,30,13,10,9,18,23,24,15,23,34,27,11,15,68,11,16,39,56,44,29,15];
+var canc = [0,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,1,0,0];
+new Chart(document.getElementById('chartEvolucao'), {
+  type:'line',
+  data:{ labels: meses,
+    datasets:[
+      {label:'Mobilizacao', data:mob, borderColor:'#1C8CE8', backgroundColor:'#1C8CE8', tension:.25, pointRadius:2},
+      {label:'Desmobilizacao', data:desmob, borderColor:'#9b59b6', backgroundColor:'#9b59b6', tension:.25, pointRadius:2},
+      {label:'Cancelamento', data:canc, borderColor:'#E0483C', backgroundColor:'#E0483C', tension:.25, pointRadius:2}
+    ]},
+  options:{responsive:true, plugins:{legend:{position:'top', labels:{boxWidth:12, font:{size:11}}}},
+    scales:{x:{ticks:{font:{size:10}}, grid:{display:false}}, y:{beginAtZero:true, grid:{color:'#2a3746'}}}}
+});
+
+var motivoCliente = [16,3,16,26,15,24,10,21,21,6,25,10,38,15,20,29,42,28,30,34,33,25,50,59,71,34,42,41,44,25,16];
+var motivoExtreme = [11,5,5,7,14,22,17,14,11,17,16,8,7,7,15,11,22,19,10,12,7,9,9,18,19,19,28,56,34,22,8];
+var motivoTotais = motivoCliente.map(function(v,i){ return v + motivoExtreme[i]; });
+var somaCliente = motivoCliente.reduce(function(a,b){return a+b;},0);
+var somaExtreme = motivoExtreme.reduce(function(a,b){return a+b;},0);
+var somaGeralMotivo = somaCliente + somaExtreme;
+var pctClienteGeral = (somaCliente/somaGeralMotivo*100).toFixed(1);
+var pctExtremeGeral = (somaExtreme/somaGeralMotivo*100).toFixed(1);
+document.getElementById('motivoResumo').textContent = 'Historico completo: Cliente ' + pctClienteGeral + '% (' + somaCliente + ') | Extreme ' + pctExtremeGeral + '% (' + somaExtreme + ') de ' + somaGeralMotivo + ' solicitacoes';
+
+var pctLabelsPlugin = {
+  id: 'pctLabelsMotivo',
+  afterDatasetsDraw: function(chart){
+    if(chart.canvas.id !== 'chartMotivo') return;
+    var ctx = chart.ctx;
+    chart.data.datasets.forEach(function(ds, dsIndex){
+      var meta = chart.getDatasetMeta(dsIndex);
+      meta.data.forEach(function(bar, i){
+        var val = ds.data[i];
+        var total = motivoTotais[i];
+        if(!total || !val) return;
+        var pct = Math.round(val/total*100);
+        var h = Math.abs(bar.base - bar.y);
+        if(h < 11) return;
+        ctx.save();
+        ctx.fillStyle = '#0f1720';
+        ctx.font = 'bold 8px Segoe UI, Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(pct+'%', bar.x, (bar.y + bar.base)/2);
+        ctx.restore();
+      });
+    });
+  }
+};
+Chart.register(pctLabelsPlugin);
+
+new Chart(document.getElementById('chartMotivo'), {
+  type:'bar',
+  data:{ labels: meses,
+    datasets:[
+      {label:'Solicitacao Cliente', data:motivoCliente, backgroundColor:'#1C8CE8', stack:'s'},
+      {label:'Solicitacao Extreme', data:motivoExtreme, backgroundColor:'#D89A2B', stack:'s'}
+    ]},
+  options:{responsive:true, plugins:{legend:{position:'top', labels:{boxWidth:12, font:{size:11}}},
+    tooltip:{callbacks:{label:function(ctx){
+      var val = ctx.parsed.y;
+      var total = motivoTotais[ctx.dataIndex];
+      var pct = total ? Math.round(val/total*100) : 0;
+      return ctx.dataset.label + ': ' + val + ' (' + pct + '%)';
+    }}}},
+    scales:{x:{stacked:true, ticks:{font:{size:10}}, grid:{display:false}}, y:{stacked:true, beginAtZero:true, grid:{color:'#2a3746'}}}}
+});
+</script>
+</body>
+</html>
