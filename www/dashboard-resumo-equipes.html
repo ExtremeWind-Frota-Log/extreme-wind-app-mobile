@@ -14,6 +14,10 @@
   }
   *{box-sizing:border-box;}
   body{margin:0; font-family:'Segoe UI',Arial,sans-serif; background:var(--bg); color:var(--text); padding:28px 32px 60px; zoom:1.15;}
+  @media (max-width:820px){
+    body{zoom:1; padding:16px 14px 40px;}
+    h1{font-size:19px;}
+  }
   h1{font-size:22px; margin:0 0 2px;}
   .subtitle{color:var(--muted); font-size:13px; margin-bottom:10px;}
   .tabs{display:flex; gap:8px; margin:18px 0 26px; border-bottom:1px solid var(--line);}
@@ -59,7 +63,7 @@
 <body>
 <img src="assets/logo-extreme-wind-white.png" alt="Extreme Wind" style="height:38px; width:auto; display:block; margin-bottom:14px;">
 <h1>Dashboard - Extreme Wind</h1>
-<div class="subtitle">Diario de Bordo - dados consolidados em 16/07/2026</div>
+<div class="subtitle">Diario de Bordo - dados consolidados em 17/07/2026</div>
 <div class="tabs">
   <div class="tab active" data-tab="ativos">Equipes ativas (hoje)</div>
   <div class="tab" data-tab="historico">Historico mobilizacao/desmobilizacao</div>
@@ -67,10 +71,10 @@
 
 <div class="panel active" id="panel-ativos">
 <div class="kpis">
-  <div class="kpi"><div class="label">Tecnicos ativos</div><div class="value">40</div><div class="sub">em campo agora</div></div>
+  <div class="kpi"><div class="label">Tecnicos ativos</div><div class="value">43</div><div class="sub">em campo agora</div></div>
   <div class="kpi"><div class="label">Planejado (headcount)</div><div class="value">45</div><div class="sub">meta de equipes</div></div>
-  <div class="kpi"><div class="label">Projetos aguardando inicio</div><div class="value red">2</div><div class="sub">Trairi/CE (Siemens) + Galpao Simoes Filho/BA</div></div>
-  <div class="kpi"><div class="label">Parques ativos</div><div class="value">10<span class="sub" style="font-size:16px;"> / 12</span></div><div class="sub">2 parques vazios</div></div>
+  <div class="kpi"><div class="label">Projetos aguardando inicio</div><div class="value red">1</div><div class="sub">Galpao Simoes Filho/BA</div></div>
+  <div class="kpi"><div class="label">Parques ativos</div><div class="value">11<span class="sub" style="font-size:16px;"> / 12</span></div><div class="sub">1 parque vazio</div></div>
 </div>
 <div class="grid">
   <div class="card"><h2>Real vs. Plano por parque <span>tecnicos</span></h2><canvas id="chartParques"></canvas></div>
@@ -79,16 +83,18 @@
 </div>
 <div class="card">
   <h2>Detalhe por parque</h2>
+  <div class="scrollx">
   <table>
     <thead><tr><th>Parque</th><th>Cliente</th><th>Supervisor</th><th class="num">Real</th><th class="num">Plano</th><th class="num">Diferenca</th></tr></thead>
     <tbody id="tbodyParques"></tbody>
   </table>
+  </div>
 </div>
 <div class="section-title">Alertas</div>
 <div class="alerts">
   <div class="alert crit">GALPÃO SIMÕES FILHO/BA - 0 de 2 técnicos planejados. Aguardando início de projeto.</div>
-  <div class="alert crit">TRAIRI/CE (novo projeto SIEMENS) - 0 de 3 técnicos planejados. Aguardando início de projeto.</div>
-  <div class="alert info">DELTA/PI - concentra 25% de todo o headcount real (10 de 40) em 4 sub-equipes; maior parque em volume de gente.</div>
+  <div class="alert info">TRAIRI/CE (SIEMENS) - equipe mobilizada em 17/07/2026 (Tiago Balbino, Samuel Santos Araujo, Joab Bezerra de Sales). Projeto iniciado.</div>
+  <div class="alert info">DELTA/PI - concentra 23% de todo o headcount real (10 de 43) em 4 sub-equipes; maior parque em volume de gente.</div>
 </div>
 <div class="section-title">Sugestoes de melhoria</div>
 <ul class="improve">
@@ -103,10 +109,10 @@
 
 <div class="panel" id="panel-historico">
 <div class="kpis">
-  <div class="kpi"><div class="label">Mobilizacoes</div><div class="value">691</div><div class="sub">51.3% dos eventos</div></div>
-  <div class="kpi"><div class="label">Desmobilizacoes</div><div class="value">651</div><div class="sub">48.3% dos eventos</div></div>
+  <div class="kpi"><div class="label">Mobilizacoes</div><div class="value">694</div><div class="sub">51.4% dos eventos</div></div>
+  <div class="kpi"><div class="label">Desmobilizacoes</div><div class="value">651</div><div class="sub">48.2% dos eventos</div></div>
   <div class="kpi"><div class="label">Cancelamentos</div><div class="value amber">6</div><div class="sub">0.4% dos eventos</div></div>
-  <div class="kpi"><div class="label">Total de eventos</div><div class="value">1348</div><div class="sub">jan/24 a jul/26</div></div>
+  <div class="kpi"><div class="label">Total de eventos</div><div class="value">1351</div><div class="sub">jan/24 a jul/26</div></div>
 </div>
 <div class="grid2">
   <div class="card"><h2>Ranking por parque <span>top 10</span></h2><canvas id="chartRankingParque"></canvas></div>
@@ -123,7 +129,7 @@
 </div>
 </div>
 
-<div class="footer">Painel 1: CONTROLE DE EQUIPES. Painel 2: DADOS/RESUMOS (aba DASHBOARD original). 16/07/2026.</div>
+<div class="footer">Painel 1: CONTROLE DE EQUIPES. Painel 2: DADOS/RESUMOS (aba DASHBOARD original). 17/07/2026.</div>
 
 <script>
 document.querySelectorAll('.tab').forEach(function(t){
@@ -148,7 +154,7 @@ var parques = [
   {nome:"SANTO AGOSTINHO/RN", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
   {nome:"DELTA/PI", cliente:"SIEMENS", suop:"WILDNER", real:10, plano:10},
   {nome:"VENTOS DO PIAUÍ/PI", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
-  {nome:"TRAIRI/CE (novo)", cliente:"SIEMENS", suop:"-", real:0, plano:3},
+  {nome:"TRAIRI/CE (novo)", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
   {nome:"GALPÃO SIMÕES FILHO/BA", cliente:"SIEMENS", suop:"-", real:0, plano:2}
 ];
 function badgeClass(c){ return {GE:'ge',NORDEX:'nordex',SIEMENS:'siemens'}[c] || 'ge'; }
@@ -217,7 +223,7 @@ var rankingParque = [
   ["LDV3/PI",83,83,1],
   ["OITIS/PI",82,79,0],
   ["COPEL/RN",35,32,1],
-  ["TRAIRI/CE",35,32,0],
+  ["TRAIRI/CE",38,32,0],
   ["UMBURANAS/BA",31,31,0],
   ["CAMPO LARGO/BA",25,25,0],
   ["VENTOS DA BAHIA/BA",25,25,0],
@@ -260,7 +266,7 @@ new Chart(document.getElementById('chartRankingCliente'), {
 });
 
 var meses = ["Jan/24","Fev/24","Mar/24","Abr/24","Mai/24","Jun/24","Jul/24","Ago/24","Set/24","Out/24","Nov/24","Dez/24","Jan/25","Fev/25","Mar/25","Abr/25","Mai/25","Jun/25","Jul/25","Ago/25","Set/25","Out/25","Nov/25","Dez/25","Jan/26","Fev/26","Mar/26","Abr/26","Mai/26","Jun/26","Jul/26"];
-var mob = [22,7,5,27,16,23,10,13,22,12,11,5,35,13,17,17,40,32,17,12,13,23,43,9,79,37,31,40,33,18,9];
+var mob = [22,7,5,27,16,23,10,13,22,12,11,5,35,13,17,17,40,32,17,12,13,23,43,9,79,37,31,40,33,18,12];
 var desmob = [5,1,16,6,13,23,17,20,9,11,30,13,10,9,18,23,24,15,23,34,27,11,15,68,11,16,39,56,44,29,15];
 var canc = [0,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,1,0,0];
 new Chart(document.getElementById('chartEvolucao'), {
@@ -276,7 +282,7 @@ new Chart(document.getElementById('chartEvolucao'), {
 });
 
 var motivoCliente = [16,3,16,26,15,24,10,21,21,6,25,10,38,15,20,29,42,28,30,34,33,25,50,59,71,34,42,41,44,25,16];
-var motivoExtreme = [11,5,5,7,14,22,17,14,11,17,16,8,7,7,15,11,22,19,10,12,7,9,9,18,19,19,28,56,34,22,8];
+var motivoExtreme = [11,5,5,7,14,22,17,14,11,17,16,8,7,7,15,11,22,19,10,12,7,9,9,18,19,19,28,56,34,22,11];
 var motivoTotais = motivoCliente.map(function(v,i){ return v + motivoExtreme[i]; });
 var somaCliente = motivoCliente.reduce(function(a,b){return a+b;},0);
 var somaExtreme = motivoExtreme.reduce(function(a,b){return a+b;},0);
@@ -326,8 +332,4 @@ new Chart(document.getElementById('chartMotivo'), {
       var pct = total ? Math.round(val/total*100) : 0;
       return ctx.dataset.label + ': ' + val + ' (' + pct + '%)';
     }}}},
-    scales:{x:{stacked:true, ticks:{font:{size:10}}, grid:{display:false}}, y:{stacked:true, beginAtZero:true, grid:{color:'#2a3746'}}}}
-});
-</script>
-</body>
-</html>
+    scales:{x:{stacked:true, ticks:{
