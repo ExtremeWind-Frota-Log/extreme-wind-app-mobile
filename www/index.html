@@ -101,8 +101,10 @@
 
   /* ---- Celular: sidebar vira gaveta escondida, some por padrao, abre com o botao ---- */
   .menu-toggle{
-    display:none; flex:none; width:34px; height:34px; border-radius:8px; border:1px solid var(--line);
-    background:var(--panel2); color:var(--text); font-size:16px; cursor:pointer; align-items:center; justify-content:center;
+    display:none; flex:none; width:44px; height:44px; border-radius:8px; border:1px solid var(--line);
+    background:var(--panel2); color:var(--text); font-size:18px; cursor:pointer; align-items:center; justify-content:center;
+    touch-action:manipulation; -webkit-tap-highlight-color:rgba(255,255,255,.25); user-select:none;
+    position:relative; z-index:50;
   }
   .sidebar-backdrop{
     display:none; position:fixed; inset:0; background:rgba(2,8,14,.55); z-index:40;
@@ -209,4 +211,63 @@
         </div>
       </div>
 
-      <iframe id="view-equipes" src="d
+      <iframe id="view-equipes" src="dashboard-resumo-equipes.html" title="Controle de Equipes"></iframe>
+      <iframe id="view-frota" src="dashboard-frota-manutencao.html" title="Frota - Manutenção"></iframe>
+    </div>
+  </main>
+</div>
+
+<script>
+  console.log("EW-APP-SCRIPT-BOOT-OK");
+
+  const TITLES = {
+    home: { title: "Início", path: "Extreme Wind / Logística & Frotas" },
+    equipes: { title: "Controle de Equipes", path: "Extreme Wind / Logística & Frotas / Controle de Equipes" },
+    frota: { title: "Frota — Manutenção", path: "Extreme Wind / Logística & Frotas / Frota - Manutenção" }
+  };
+
+  function showView(view){
+    document.querySelectorAll(".menu-item").forEach(function(el){ el.classList.toggle("active", el.dataset.view === view); });
+    document.getElementById("view-home").classList.toggle("active", view === "home");
+    document.getElementById("view-equipes").classList.toggle("active", view === "equipes");
+    document.getElementById("view-frota").classList.toggle("active", view === "frota");
+    document.getElementById("topTitle").textContent = TITLES[view].title;
+    document.getElementById("topPath").textContent = TITLES[view].path;
+  }
+
+  var sidebar = document.getElementById("sidebar");
+  var backdrop = document.getElementById("sidebarBackdrop");
+  var menuToggle = document.getElementById("menuToggle");
+
+  function openDrawer(){
+    sidebar.classList.add("open");
+    backdrop.classList.add("open");
+  }
+  function closeDrawer(){
+    sidebar.classList.remove("open");
+    backdrop.classList.remove("open");
+  }
+
+  document.querySelectorAll("[data-view]").forEach(function(el){
+    el.addEventListener("click", function(){ showView(el.dataset.view); closeDrawer(); });
+    el.addEventListener("touchend", function(ev){ ev.preventDefault(); showView(el.dataset.view); closeDrawer(); });
+  });
+
+  menuToggle.addEventListener("click", function(){
+    sidebar.classList.contains("open") ? closeDrawer() : openDrawer();
+  });
+  menuToggle.addEventListener("touchend", function(ev){
+    ev.preventDefault();
+    sidebar.classList.contains("open") ? closeDrawer() : openDrawer();
+  });
+  backdrop.addEventListener("click", closeDrawer);
+  backdrop.addEventListener("touchend", function(ev){ ev.preventDefault(); closeDrawer(); });
+
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function(){
+      navigator.serviceWorker.register("./sw.js").catch(function(){});
+    });
+  }
+</script>
+</body>
+</html>
