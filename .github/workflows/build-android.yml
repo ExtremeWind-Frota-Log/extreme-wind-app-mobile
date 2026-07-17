@@ -39,7 +39,7 @@ jobs:
           fi
 
       - name: Gerar icone e splash screen a partir de resources/
-        run: npx capacitor-assets generate --android
+        run: npx @capacitor/assets generate --android
 
       - name: Dar permissao de execucao ao gradlew
         run: chmod +x android/gradlew
