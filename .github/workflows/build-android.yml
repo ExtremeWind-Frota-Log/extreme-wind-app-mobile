@@ -1,5 +1,10 @@
 name: Build Android APK
 
+# Gera o .apk automaticamente sempre que voce enviar (push) alteracoes.
+# O projeto Android e criado do zero a cada execucao (nao precisa subir a
+# pasta android/ pro repositorio) -- tudo acontece nos servidores do GitHub.
+# Ao final, baixe o "app-debug.apk" na aba "Actions" > (execucao mais recente) > Artifacts.
+
 on:
   push:
     branches: [ main, master ]
@@ -32,6 +37,9 @@ jobs:
           else
             npx cap sync android
           fi
+
+      - name: Gerar icone e splash screen a partir de resources/
+        run: npx capacitor-assets generate --android
 
       - name: Dar permissao de execucao ao gradlew
         run: chmod +x android/gradlew
