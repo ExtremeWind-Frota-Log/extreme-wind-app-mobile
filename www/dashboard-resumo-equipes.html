@@ -92,8 +92,7 @@
 </div>
 <div class="section-title">Alertas</div>
 <div class="alerts">
-  <div class="alert crit">GALPÃO SIMÕES FILHO/BA - 0 de 2 técnicos planejados. Aguardando início de projeto.</div>
-  <div class="alert info">TRAIRI/CE (SIEMENS) - equipe mobilizada em 17/07/2026 (Tiago Balbino, Samuel Santos Araujo, Joab Bezerra de Sales). Projeto iniciado.</div>
+  <div class="alert crit">GALPÃO SIMÕES FILHO/BA - 0 de 2 técnicos planejados. Parque totalmente descoberto.</div>
   <div class="alert info">DELTA/PI - concentra 23% de todo o headcount real (10 de 43) em 4 sub-equipes; maior parque em volume de gente.</div>
 </div>
 <div class="section-title">Sugestoes de melhoria</div>
@@ -146,7 +145,7 @@ Chart.defaults.font.family = "'Segoe UI',Arial,sans-serif";
 var parques = [
   {nome:"OITIS/PI", cliente:"GE", suop:"EVAIR", real:3, plano:3},
   {nome:"COPEL/RN", cliente:"GE", suop:"EVAIR", real:3, plano:3},
-  {nome:"TRAIRI/CE", cliente:"GE", suop:"EVAIR", real:3, plano:3},
+  {nome:"TRAIRI/CE", cliente:"GE", suop:"EVAIR", real:6, plano:6},
   {nome:"SÃO FERNANDO/RN", cliente:"NORDEX", suop:"MAGALHÃES", real:6, plano:6},
   {nome:"SÃO VITOR/BA", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
   {nome:"BAIXA DO FEIJÃO/RN", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
@@ -154,7 +153,6 @@ var parques = [
   {nome:"SANTO AGOSTINHO/RN", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
   {nome:"DELTA/PI", cliente:"SIEMENS", suop:"WILDNER", real:10, plano:10},
   {nome:"VENTOS DO PIAUÍ/PI", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
-  {nome:"TRAIRI/CE (novo)", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
   {nome:"GALPÃO SIMÕES FILHO/BA", cliente:"SIEMENS", suop:"-", real:0, plano:2}
 ];
 function badgeClass(c){ return {GE:'ge',NORDEX:'nordex',SIEMENS:'siemens'}[c] || 'ge'; }
@@ -222,8 +220,8 @@ new Chart(document.getElementById('chartSuop'), {
 var rankingParque = [
   ["LDV3/PI",83,83,1],
   ["OITIS/PI",82,79,0],
-  ["COPEL/RN",35,32,1],
   ["TRAIRI/CE",38,32,0],
+  ["COPEL/RN",35,32,1],
   ["UMBURANAS/BA",31,31,0],
   ["CAMPO LARGO/BA",25,25,0],
   ["VENTOS DA BAHIA/BA",25,25,0],
@@ -251,7 +249,8 @@ var rankingCliente = [
   ["LM",11,11,0],
   ["EÓLICAS BABILÔNIA",5,5,0],
   ["ELETROBRAS",4,4,0],
-  ["VESTAS",2,2,0]
+  ["VESTAS",2,2,0],
+  ["SIEMENS",3,0,0]
 ];
 new Chart(document.getElementById('chartRankingCliente'), {
   type:'bar',
@@ -281,8 +280,8 @@ new Chart(document.getElementById('chartEvolucao'), {
     scales:{x:{ticks:{font:{size:10}}, grid:{display:false}}, y:{beginAtZero:true, grid:{color:'#2a3746'}}}}
 });
 
-var motivoCliente = [16,3,16,26,15,24,10,21,21,6,25,10,38,15,20,29,42,28,30,34,33,25,50,59,71,34,42,41,44,25,16];
-var motivoExtreme = [11,5,5,7,14,22,17,14,11,17,16,8,7,7,15,11,22,19,10,12,7,9,9,18,19,19,28,56,34,22,11];
+var motivoCliente = [16,3,16,26,15,24,10,21,21,6,25,10,38,15,20,29,42,28,30,34,33,25,50,59,71,34,42,41,44,25,19];
+var motivoExtreme = [11,5,5,7,14,22,17,14,11,17,16,8,7,7,15,11,22,19,10,12,7,9,9,18,19,19,28,56,34,22,8];
 var motivoTotais = motivoCliente.map(function(v,i){ return v + motivoExtreme[i]; });
 var somaCliente = motivoCliente.reduce(function(a,b){return a+b;},0);
 var somaExtreme = motivoExtreme.reduce(function(a,b){return a+b;},0);
@@ -332,4 +331,8 @@ new Chart(document.getElementById('chartMotivo'), {
       var pct = total ? Math.round(val/total*100) : 0;
       return ctx.dataset.label + ': ' + val + ' (' + pct + '%)';
     }}}},
-    scales:{x:{stacked:true, ticks:{
+    scales:{x:{stacked:true, ticks:{font:{size:10}}, grid:{display:false}}, y:{stacked:true, beginAtZero:true, grid:{color:'#2a3746'}}}}
+});
+</script>
+</body>
+</html>
