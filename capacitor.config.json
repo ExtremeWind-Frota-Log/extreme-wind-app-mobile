@@ -1,5 +1,9 @@
 {
   "appId": "br.com.extremewind.painel",
   "appName": "Extreme Wind",
-  "webDir": "www"
+  "webDir": "www",
+  "server": {
+    "url": "https://extremewind-frota-log.github.io/extreme-wind-app-mobile/",
+    "cleartext": false
+  }
 }
