@@ -71,10 +71,10 @@
 
 <div class="panel active" id="panel-ativos">
 <div class="kpis">
-  <div class="kpi"><div class="label">Tecnicos ativos</div><div class="value">43</div><div class="sub">em campo agora</div></div>
+  <div class="kpi"><div class="label">Tecnicos ativos</div><div class="value">45</div><div class="sub">em campo agora</div></div>
   <div class="kpi"><div class="label">Planejado (headcount)</div><div class="value">45</div><div class="sub">meta de equipes</div></div>
-  <div class="kpi"><div class="label">Projetos aguardando inicio</div><div class="value red">1</div><div class="sub">Galpao Simoes Filho/BA</div></div>
-  <div class="kpi"><div class="label">Parques ativos</div><div class="value">11<span class="sub" style="font-size:16px;"> / 12</span></div><div class="sub">1 parque vazio</div></div>
+  <div class="kpi"><div class="label">Projetos aguardando inicio</div><div class="value">0</div><div class="sub">nenhum parque aguardando</div></div>
+  <div class="kpi"><div class="label">Parques ativos</div><div class="value">12<span class="sub" style="font-size:16px;"> / 12</span></div><div class="sub">todos os parques com equipe</div></div>
 </div>
 <div class="grid">
   <div class="card"><h2>Real vs. Plano por parque <span>tecnicos</span></h2><canvas id="chartParques"></canvas></div>
@@ -92,8 +92,7 @@
 </div>
 <div class="section-title">Alertas</div>
 <div class="alerts">
-  <div class="alert crit">GALPÃO SIMÕES FILHO/BA - 0 de 2 técnicos planejados. Parque totalmente descoberto.</div>
-  <div class="alert info">DELTA/PI - concentra 23% de todo o headcount real (10 de 43) em 4 sub-equipes; maior parque em volume de gente.</div>
+  <div class="alert info">DELTA/PI - concentra 22% de todo o headcount real (10 de 45) em 4 sub-equipes; maior parque em volume de gente.</div>
 </div>
 <div class="section-title">Sugestoes de melhoria</div>
 <ul class="improve">
@@ -108,10 +107,10 @@
 
 <div class="panel" id="panel-historico">
 <div class="kpis">
-  <div class="kpi"><div class="label">Mobilizacoes</div><div class="value">694</div><div class="sub">51.4% dos eventos</div></div>
-  <div class="kpi"><div class="label">Desmobilizacoes</div><div class="value">651</div><div class="sub">48.2% dos eventos</div></div>
+  <div class="kpi"><div class="label">Mobilizacoes</div><div class="value">696</div><div class="sub">51.4% dos eventos</div></div>
+  <div class="kpi"><div class="label">Desmobilizacoes</div><div class="value">651</div><div class="sub">48.1% dos eventos</div></div>
   <div class="kpi"><div class="label">Cancelamentos</div><div class="value amber">6</div><div class="sub">0.4% dos eventos</div></div>
-  <div class="kpi"><div class="label">Total de eventos</div><div class="value">1351</div><div class="sub">jan/24 a jul/26</div></div>
+  <div class="kpi"><div class="label">Total de eventos</div><div class="value">1353</div><div class="sub">jan/24 a jul/26</div></div>
 </div>
 <div class="grid2">
   <div class="card"><h2>Ranking por parque <span>top 10</span></h2><canvas id="chartRankingParque"></canvas></div>
@@ -153,7 +152,7 @@ var parques = [
   {nome:"SANTO AGOSTINHO/RN", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
   {nome:"DELTA/PI", cliente:"SIEMENS", suop:"WILDNER", real:10, plano:10},
   {nome:"VENTOS DO PIAUÍ/PI", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
-  {nome:"GALPÃO SIMÕES FILHO/BA", cliente:"SIEMENS", suop:"-", real:0, plano:2}
+  {nome:"Intermarítima/BA", cliente:"SIEMENS", suop:"WILDNER", real:2, plano:2}
 ];
 function badgeClass(c){ return {GE:'ge',NORDEX:'nordex',SIEMENS:'siemens'}[c] || 'ge'; }
 var tbody = document.getElementById('tbodyParques');
@@ -243,14 +242,13 @@ new Chart(document.getElementById('chartRankingParque'), {
 
 var rankingCliente = [
   ["GE",391,382,4],
-  ["GAMESA",195,170,1],
+  ["SIEMENS",200,170,1],
   ["NORDEX / LWS",62,56,0],
   ["SINOMA BLADES",21,21,1],
   ["LM",11,11,0],
   ["EÓLICAS BABILÔNIA",5,5,0],
   ["ELETROBRAS",4,4,0],
-  ["VESTAS",2,2,0],
-  ["SIEMENS",3,0,0]
+  ["VESTAS",2,2,0]
 ];
 new Chart(document.getElementById('chartRankingCliente'), {
   type:'bar',
@@ -265,7 +263,7 @@ new Chart(document.getElementById('chartRankingCliente'), {
 });
 
 var meses = ["Jan/24","Fev/24","Mar/24","Abr/24","Mai/24","Jun/24","Jul/24","Ago/24","Set/24","Out/24","Nov/24","Dez/24","Jan/25","Fev/25","Mar/25","Abr/25","Mai/25","Jun/25","Jul/25","Ago/25","Set/25","Out/25","Nov/25","Dez/25","Jan/26","Fev/26","Mar/26","Abr/26","Mai/26","Jun/26","Jul/26"];
-var mob = [22,7,5,27,16,23,10,13,22,12,11,5,35,13,17,17,40,32,17,12,13,23,43,9,79,37,31,40,33,18,12];
+var mob = [22,7,5,27,16,23,10,13,22,12,11,5,35,13,17,17,40,32,17,12,13,23,43,9,79,37,31,40,33,18,14];
 var desmob = [5,1,16,6,13,23,17,20,9,11,30,13,10,9,18,23,24,15,23,34,27,11,15,68,11,16,39,56,44,29,15];
 var canc = [0,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,1,0,0];
 new Chart(document.getElementById('chartEvolucao'), {
@@ -280,7 +278,7 @@ new Chart(document.getElementById('chartEvolucao'), {
     scales:{x:{ticks:{font:{size:10}}, grid:{display:false}}, y:{beginAtZero:true, grid:{color:'#2a3746'}}}}
 });
 
-var motivoCliente = [16,3,16,26,15,24,10,21,21,6,25,10,38,15,20,29,42,28,30,34,33,25,50,59,71,34,42,41,44,25,19];
+var motivoCliente = [16,3,16,26,15,24,10,21,21,6,25,10,38,15,20,29,42,28,30,34,33,25,50,59,71,34,42,41,44,25,21];
 var motivoExtreme = [11,5,5,7,14,22,17,14,11,17,16,8,7,7,15,11,22,19,10,12,7,9,9,18,19,19,28,56,34,22,8];
 var motivoTotais = motivoCliente.map(function(v,i){ return v + motivoExtreme[i]; });
 var somaCliente = motivoCliente.reduce(function(a,b){return a+b;},0);
