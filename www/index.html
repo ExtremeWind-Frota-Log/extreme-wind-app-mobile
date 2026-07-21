@@ -151,6 +151,7 @@
       <div class="menu-label">Dashboards</div>
       <div class="menu-item" data-view="equipes"><span class="ic">&#128101;</span> Controle de Equipes</div>
       <div class="menu-item" data-view="frota"><span class="ic">&#128663;</span> Frota — Manutenção</div>
+      <div class="menu-item" data-view="boletos"><span class="ic">&#129534;</span> Controle de Boletos</div>
     </nav>
 
     <div class="sidebar-footer">
@@ -204,6 +205,16 @@
             </div>
             <div class="go">Ver detalhamento por veículo e plano de ação →</div>
           </div>
+
+          <div class="card" data-view="boletos">
+            <div class="card-title">&#129534; Controle de Boletos</div>
+            <div class="kpirow">
+              <div><div class="n">9<span style="font-size:14px; color:var(--muted);"> / 12</span></div><div class="l">À vencer (U/L)</div></div>
+              <div><div class="n" style="color:var(--nok)">5<span style="font-size:14px; color:var(--muted);"> / 1</span></div><div class="l">Multas (U/L)</div></div>
+              <div><div class="n" style="color:var(--warn)">2<span style="font-size:14px; color:var(--muted);"> / 1</span></div><div class="l">Contestação (U/L)</div></div>
+            </div>
+            <div class="go">Ver indicadores por locadora e atualizações semanais →</div>
+          </div>
         </div>
 
         <div class="note-box">
@@ -213,6 +224,7 @@
 
       <iframe id="view-equipes" src="dashboard-resumo-equipes.html" title="Controle de Equipes"></iframe>
       <iframe id="view-frota" src="dashboard-frota-manutencao.html" title="Frota - Manutenção"></iframe>
+      <iframe id="view-boletos" src="dashboard-boletos.html" title="Controle de Boletos"></iframe>
     </div>
   </main>
 </div>
@@ -223,7 +235,8 @@
   const TITLES = {
     home: { title: "Início", path: "Extreme Wind / Logística & Frotas" },
     equipes: { title: "Controle de Equipes", path: "Extreme Wind / Logística & Frotas / Controle de Equipes" },
-    frota: { title: "Frota — Manutenção", path: "Extreme Wind / Logística & Frotas / Frota - Manutenção" }
+    frota: { title: "Frota — Manutenção", path: "Extreme Wind / Logística & Frotas / Frota - Manutenção" },
+    boletos: { title: "Controle de Boletos", path: "Extreme Wind / Logística & Frotas / Controle de Boletos" }
   };
 
   function showView(view){
@@ -231,6 +244,7 @@
     document.getElementById("view-home").classList.toggle("active", view === "home");
     document.getElementById("view-equipes").classList.toggle("active", view === "equipes");
     document.getElementById("view-frota").classList.toggle("active", view === "frota");
+    document.getElementById("view-boletos").classList.toggle("active", view === "boletos");
     document.getElementById("topTitle").textContent = TITLES[view].title;
     document.getElementById("topPath").textContent = TITLES[view].path;
   }
