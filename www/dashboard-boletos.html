@@ -42,6 +42,11 @@
   .loc-badge{flex:1; display:flex; flex-direction:column; align-items:center; border-radius:6px; padding:10px 6px;}
   .loc-badge .n{font-size:20px; font-weight:700;}
   .loc-badge .l{font-size:11px; text-transform:uppercase; letter-spacing:.04em; opacity:.85; margin-top:2px;}
+
+  .locadoras-sm{display:flex; gap:6px; margin-top:8px;}
+  .loc-badge-sm{flex:1; display:flex; flex-direction:column; align-items:center; border-radius:5px; padding:4px 6px;}
+  .loc-badge-sm .n{font-size:12.5px; font-weight:700;}
+  .loc-badge-sm .l{font-size:8.5px; text-transform:uppercase; letter-spacing:.03em; opacity:.85; margin-top:1px;}
   .loc-localiza{background:rgba(18,191,168,.20); color:var(--teal);}
   .loc-unidas{background:rgba(28,140,232,.20); color:var(--steel);}
 
@@ -88,7 +93,10 @@
       <div class="loc-badge loc-unidas"><span class="n">9</span><span class="l">Unidas</span></div>
       <div class="loc-badge loc-localiza"><span class="n">12</span><span class="l">Localiza</span></div>
     </div>
-    <div class="foot" id="proximoSub">Próximo a vencer — Unidas: 22/07/2026 · Localiza: 25/07/2026</div>
+    <div class="locadoras-sm" id="proximoSub">
+      <div class="loc-badge-sm loc-unidas"><span class="n">22/07/2026</span><span class="l">Próx. Unidas</span></div>
+      <div class="loc-badge-sm loc-localiza"><span class="n">25/07/2026</span><span class="l">Próx. Localiza</span></div>
+    </div>
   </div>
   <div class="kpi" style="background:rgba(216,154,43,.14);">
     <div class="label">Multas em Aberto</div>
