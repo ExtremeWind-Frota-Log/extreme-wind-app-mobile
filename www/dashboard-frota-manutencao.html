@@ -155,11 +155,12 @@
   </div>
   <div class="kpi">
     <div class="label">Conformidade Geral &amp; Ações Pendentes</div>
-    <div class="value" style="color:var(--ok)">88%</div>
-    <div class="foot">WK 30 · 20 ações pendentes no total</div>
+    <div class="value" style="color:var(--ok)">87%</div>
+    <div class="foot">WK 30 · 22 ações pendentes no total</div>
     <div class="locadoras">
-      <div class="loc-badge" style="background:rgba(224,72,60,.18); color:var(--nok)"><span class="n">5</span><span class="l">Emergencial</span></div>
-      <div class="loc-badge" style="background:rgba(28,140,232,.20); color:var(--steel)"><span class="n">15</span><span class="l">Programado</span></div>
+      <div class="loc-badge" style="background:rgba(224,72,60,.18); color:var(--nok)"><span class="n">6</span><span class="l">Emergencial</span></div>
+      <div class="loc-badge" style="background:rgba(28,140,232,.20); color:var(--steel)"><span class="n">10</span><span class="l">Programado</span></div>
+      <div class="loc-badge" style="background:rgba(150,110,20,.20); color:#a9761c"><span class="n">6</span><span class="l">Administrativas</span></div>
     </div>
   </div>
   <div class="kpi">
@@ -923,7 +924,7 @@
 const rows = [
 ["TYA7G48","LOCALIZA","3","BAIXA DO FEIJÃO/RN","Siemens","19/02/2026","5,07","N/OK","N/OK","OK","OK","N/OK","OK","OK","10,74","OK","N/A"],
 ["TER0D54","LOCALIZA","1","COPEL/RN","GE Blade","06/12/2025","7,57","N/OK","OK","OK","OK","OK","OK","OK","13,90","OK","N/A"],
-["TYD9E80","LOCALIZA","1","DELTA 1/MA","Siemens","23/01/2026","5,97","OK","OK","OK","OK","OK","OK","OK","9,24","OK","N/A"],
+["TYD9E80","LOCALIZA","1","DELTA 1/MA","Siemens","23/01/2026","5,97","OK","OK","OK","N/OK","OK","OK","OK","9,24","OK","N/A"],
 ["TYA9D45","UNIDAS","1","DELTA 2/MA","Siemens","08/09/2025","10,53","OK","OK","OK","OK","OK","OK","OK","11,18","OK","N/A"],
 ["TEN7C94","UNIDAS","1","DELTA 3/MA","Siemens","01/07/2025","12,83","N/OK","OK","OK","OK","OK","OK","OK","9,03","OK","N/A"],
 ["TXZ5J79","LOCALIZA","1","DELTA 4/MA","Siemens","21/02/2026","5,00","OK","N/OK","-","OK","OK","OK","OK","9,19","OK","N/A"],
@@ -1088,11 +1089,11 @@ const histData = [
   { wk:"WK23", geral:90.5, cats:[87.5,75.0,100.0,90.0,100.0] },
   { wk:"WK24", geral:93.0, cats:[82.4,93.3,94.7,94.7,100.0] },
   { wk:"WK25", geral:88.9, cats:[87.5,72.2,100.0,85.0,100.0] },
-  { wk:"WK26", geral:94.1, cats:[88.2,92.9,94.7,100.0,94.7] },
-  { wk:"WK27", geral:96.0, cats:[93.3,92.9,100.0,100.0,93.8] },
-  { wk:"WK28", geral:97.3, cats:[93.3,93.3,100.0,100.0,100.0] },
-  { wk:"WK29", geral:94.7, cats:[100.0,93.3,86.7,93.3,100.0] },
-  { wk:"WK30", geral:93.8, cats:[100.0,93.8,81.2,93.8,100.0] },
+  { wk:"WK26", geral:92.7, cats:[88.2,85.7,94.7,100.0,94.7] },
+  { wk:"WK27", geral:94.6, cats:[93.3,85.7,100.0,100.0,93.8] },
+  { wk:"WK28", geral:96.0, cats:[93.3,86.7,100.0,100.0,100.0] },
+  { wk:"WK29", geral:93.3, cats:[100.0,86.7,86.7,93.3,100.0] },
+  { wk:"WK30", geral:92.5, cats:[100.0,87.5,81.2,93.8,100.0] },
 ];
 const HIST_CAT_LABELS = ["KM Troca","Saldo Extra","Checklist","Revisão","Estepe Extra","Medição Pneus","Rastreador","Consumo","Doc Postado","Doc Entregue"];
 
@@ -1170,7 +1171,6 @@ toggleHist.addEventListener("click", () => {
 
 // Plano de Ação — WK29 (aba BASE DESHBOARD, colunas V–AD, linhas 1231–1262)
 const acaoData = [
-  { acao:"PLANO DE AÇÃO WK30", tipo:"", parque:"", quem:"EMERGENCIAL", status:"5", obs:"FINALIZADO" },
   { acao:"PNEUS Diants. ABAIXO DE 2,7mm", tipo:"CORRETIVA", parque:"TRAIRI", quem:"JOÃO/WILLIAM DUARTE", status:"21/07/2026", obs:"" },
   { acao:"REVISÃO*", tipo:"PREVENTIVA", parque:"SÃO VITOR", quem:"JOÃO/MATEUS G.", status:"!!!", obs:"" },
   { acao:"S/Estepe Extra(furado)", tipo:"PREVENTIVA", parque:"OITIS 1", quem:"JOÃO/ÉDIPO", status:"!!!", obs:"Pneu estepe extra está em uso, condutor informa que irá tentar uma substituição." },
@@ -1185,14 +1185,12 @@ const acaoData = [
   { acao:"SALDO CONTRATO ESTOURADO", tipo:"ADMINISTRATIVA", parque:"VDP", quem:"JOÃO/PROTÁZIO", status:"ACOMPANHAR", obs:"SALDO EXTRA- EM PROJETO PARA RECUPERAR" },
   { acao:"SALDO CONTRATO ESTOURADO", tipo:"ADMINISTRATIVA", parque:"DELTA 4", quem:"JOÃO/WAGNER", status:"ACOMPANHAR", obs:"SALDO EXTRA- EM PROJETO PARA RECUPERAR" },
   { acao:"SALDO CONTRATO ESTOURADO", tipo:"ADMINISTRATIVA", parque:"INTERMARÍTIMA/BA", quem:"JOÃO", status:"ACOMPANHAR", obs:"RECÉM-MOBILIZADO" },
-  { acao:"AÇÕES ADMINISTRATIVAS", tipo:"", parque:"", quem:"", status:"", obs:"" },
   { acao:"Para-brisa Inf. Água", tipo:"ADMINISTRATIVA", parque:"SF1", quem:"JOÃO", status:"", obs:"PLANEJAR SUBSTITUIÇÃO" },
   { acao:"Pneu estepe extra foto repetida", tipo:"ADMINISTRATIVA", parque:"DELTA 2", quem:"JOÃO/RODRIGO", status:"?", obs:"" },
   { acao:"TESTE/INSTALAÇÃO RAPTOR", tipo:"ADMINISTRATIVA", parque:"SÃO VITOR", quem:"JOÃO", status:"21/07/2026", obs:"" },
   { acao:"Placa \"encoberta\" por enforca gato", tipo:"ADMINISTRATIVA", parque:"SF1", quem:"JOÃO", status:"21/07/2026", obs:"" },
   { acao:"Alinhamento na Região(Capotaria)BANC. DO CONDT. FURAD. C/CINZAS DE CIGARRO", tipo:"ADMINISTRATIVA", parque:"ST.AGOSTINHO", quem:"JOÃO", status:"21/07/2026", obs:"" },
   { acao:"Alinhar forma de medição c/ paquímetro.", tipo:"ADMINISTRATIVA", parque:"", quem:"", status:"", obs:"" },
-  { acao:"AÇÕES RESOLVIDAS", tipo:"", parque:"", quem:"", status:"", obs:"" },
   { acao:"S/Estepe Extra", tipo:"PREVENTIVA", parque:"COPEL", quem:"JOÃO/SERPA", status:"", obs:"" },
   { acao:"MAL FUNC. DO AR-CONDICIONADO", tipo:"ADMINISTRATIVA", parque:"SF1", quem:"JOÃO/ANTÔNIO", status:"46223", obs:"Supervisor foi informado/Acompanhar c/ condutor." },
   { acao:"Pneus na faixa de 2,7mm/Óleo,radiador ou freio Não Conforme?", tipo:"ADMINISTRATIVA", parque:"DELTA 1", quem:"JOÃO/DE ASSIS", status:"!!!", obs:"" },
