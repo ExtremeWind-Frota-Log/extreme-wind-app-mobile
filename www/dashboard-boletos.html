@@ -36,6 +36,7 @@
   .kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:16px; margin-bottom:28px;}
   .kpi{background:var(--panel); border:1px solid var(--line); border-left:4px solid var(--brand); border-radius:10px; padding:20px;}
   .kpi .label{color:var(--muted); font-size:12.5px; text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px;}
+  .kpi .foot{font-size:12px; color:var(--muted); margin-top:10px;}
 
   .locadoras{display:flex; gap:8px; margin-top:10px;}
   .loc-badge{flex:1; display:flex; flex-direction:column; align-items:center; border-radius:6px; padding:10px 6px;}
@@ -86,13 +87,7 @@
       <div class="loc-badge loc-unidas"><span class="n">9</span><span class="l">Unidas</span></div>
       <div class="loc-badge loc-localiza"><span class="n">12</span><span class="l">Localiza</span></div>
     </div>
-  </div>
-  <div class="kpi">
-    <div class="label">Próximo à Vencer</div>
-    <div class="locadoras">
-      <div class="loc-badge loc-unidas"><span class="n" style="font-size:15px;">22/07/2026</span><span class="l">Unidas</span></div>
-      <div class="loc-badge loc-localiza"><span class="n" style="font-size:15px;">25/07/2026</span><span class="l">Localiza</span></div>
-    </div>
+    <div class="foot" id="proximoSub">Próximo a vencer — Unidas: 22/07/2026 · Localiza: 25/07/2026</div>
   </div>
   <div class="kpi" style="background:rgba(216,154,43,.14);">
     <div class="label">Multas em Aberto</div>
