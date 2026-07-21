@@ -126,6 +126,14 @@
   .dot{width:9px; height:9px; border-radius:50%; display:inline-block;}
 
   .note{font-size:12px; color:var(--muted); margin-top:18px; border-top:1px solid var(--line); padding-top:12px;}
+
+  /* Ajuste para caber sem barra de rolagem lateral */
+  #detTable{table-layout:auto; width:100%; font-size:11px;}
+  #detTable th, #detTable td{white-space:normal; word-break:break-word; padding:5px 5px;}
+  #detTable th{font-size:10.5px;}
+  #acaoTable{table-layout:fixed; width:100%;}
+  #acaoTable th, #acaoTable td{white-space:normal; word-break:break-word;}
+  #acaoTable td[style*="max-width"]{max-width:none !important;}
 </style>
 </head>
 <body>
@@ -188,7 +196,7 @@
   <div class="count-hint" id="countHint">16 de 16 veículos exibidos</div>
 
   <div class="tablewrap">
-  <table>
+  <table id="detTable">
     <thead>
       <tr id="headerRow">
         <th data-key="0" data-type="text">Placa <span class="arrow"></span></th>
@@ -557,7 +565,7 @@
     <div class="tablewrap">
       <table class="conftable" id="acaoTable">
         <thead>
-          <tr><th style="text-align:left">Ação</th><th style="text-align:left">Tipo</th><th style="text-align:left">Parque</th><th style="text-align:left">Quem?</th><th>Status / Prazo</th><th style="text-align:left">Observação</th></tr>
+          <tr><th style="text-align:left; width:21%">Ação</th><th style="text-align:left; width:11%">Tipo</th><th style="text-align:left; width:14%">Parque</th><th style="text-align:left; width:15%">Quem?</th><th style="width:13%">Status / Prazo</th><th style="text-align:left; width:26%">Observação</th></tr>
         </thead>
         <tbody id="acaoTableBody">
     <tr>
