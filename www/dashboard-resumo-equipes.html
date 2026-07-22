@@ -201,17 +201,10 @@ trTot.innerHTML = '<td>Total Geral</td><td></td><td></td><td class="num">'+totRe
 tbody.appendChild(trTot);
 
 function aggregate(key){ var m={}; parques.forEach(function(p){ m[p[key]]=(m[p[key]]||0)+p.real; }); return m; }
-var clienteAgg = aggregate('cliente');
-new Chart(document.getElementById('chartCliente'), {
-  type:'doughnut',
-  data:{labels:Object.keys(clienteAgg), datasets:[{data:Object.values(clienteAgg), backgroundColor:['#1C8CE8','#9b59b6','#12A874'], borderColor:'#0F2A40', borderWidth:2}]},
-  options:{responsive:true, plugins:{legend:{position:'bottom', labels:{boxWidth:12, font:{size:11}}}}}
-});
-var suopAgg = aggregate('suop');
-var suopQtdLabelsPlugin = {
-  id: 'suopQtdLabels',
+var doughnutQtdLabelsPlugin = {
+  id: 'doughnutQtdLabels',
   afterDatasetsDraw: function(chart){
-    if(chart.canvas.id !== 'chartSuop') return;
+    if(chart.canvas.id !== 'chartSuop' && chart.canvas.id !== 'chartCliente') return;
     var ctx = chart.ctx;
     var meta = chart.getDatasetMeta(0);
     meta.data.forEach(function(arc, i){
@@ -228,7 +221,16 @@ var suopQtdLabelsPlugin = {
     });
   }
 };
-Chart.register(suopQtdLabelsPlugin);
+Chart.register(doughnutQtdLabelsPlugin);
+
+var clienteAgg = aggregate('cliente');
+new Chart(document.getElementById('chartCliente'), {
+  type:'doughnut',
+  data:{labels:Object.keys(clienteAgg), datasets:[{data:Object.values(clienteAgg), backgroundColor:['#1C8CE8','#9b59b6','#12A874'], borderColor:'#0F2A40', borderWidth:2}]},
+  options:{responsive:true, plugins:{legend:{position:'bottom', labels:{boxWidth:12, font:{size:11}}},
+    tooltip:{callbacks:{label:function(ctx){ return ctx.label + ': ' + ctx.parsed + ' tecnicos'; }}}}}
+});
+var suopAgg = aggregate('suop');
 new Chart(document.getElementById('chartSuop'), {
   type:'doughnut',
   data:{labels:Object.keys(suopAgg), datasets:[{data:Object.values(suopAgg), backgroundColor:['#D89A2B','#1C8CE8','#12A874','#E0483C'], borderColor:'#0F2A40', borderWidth:2}]},
