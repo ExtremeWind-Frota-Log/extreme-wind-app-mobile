@@ -35,6 +35,7 @@
 
   .kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:16px; margin-bottom:28px;}
   .kpi{background:var(--panel); border:1px solid var(--line); border-left:4px solid var(--brand); border-radius:10px; padding:20px;}
+  .kpi-warn{background:rgba(216,154,43,.34); border-left:4px solid var(--warn);}
   .kpi .label{color:var(--muted); font-size:12.5px; text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px;}
   .kpi .foot{font-size:12px; color:var(--muted); margin-top:10px;}
 
@@ -80,7 +81,7 @@
 </header>
 
 <div class="kpis" id="kpisBoletos">
-  <div class="kpi">
+  <div class="kpi kpi-warn">
     <div class="label">Boletos/Multas pendentes Download</div>
     <div class="locadoras">
       <div class="loc-badge loc-unidas"><span class="n">0</span><span class="l">Unidas</span></div>
@@ -98,7 +99,7 @@
       <div class="loc-badge-sm loc-localiza"><span class="n">25/07/2026</span><span class="l">Próx. Localiza</span></div>
     </div>
   </div>
-  <div class="kpi" style="background:rgba(216,154,43,.14);">
+  <div class="kpi kpi-warn">
     <div class="label">Multas em Aberto</div>
     <div class="locadoras">
       <div class="loc-badge loc-unidas"><span class="n">5</span><span class="l">Unidas</span></div>
@@ -112,14 +113,14 @@
       <div class="loc-badge loc-localiza"><span class="n">1</span><span class="l">Localiza</span></div>
     </div>
   </div>
-  <div class="kpi">
+  <div class="kpi kpi-warn">
     <div class="label">Contestar</div>
     <div class="locadoras">
       <div class="loc-badge loc-unidas"><span class="n">0</span><span class="l">Unidas</span></div>
       <div class="loc-badge loc-localiza"><span class="n">0</span><span class="l">Localiza</span></div>
     </div>
   </div>
-  <div class="kpi">
+  <div class="kpi kpi-warn">
     <div class="label">Sinistros em Aberto</div>
     <div class="locadoras">
       <div class="loc-badge loc-unidas"><span class="n">0</span><span class="l">Unidas</span></div>
