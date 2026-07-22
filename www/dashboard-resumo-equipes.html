@@ -107,8 +107,7 @@
   <div class="kpi"><div class="label">Planejado (headcount)</div><div class="value">45</div><div class="sub">meta de equipes</div></div>
   <div class="kpi"><div class="label">Deficit total</div><div class="value red">0</div><div class="sub">abaixo do plano</div></div>
   <div class="kpi"><div class="label">Parques ativos</div><div class="value">11<span class="sub" style="font-size:16px;"> / 11</span></div><div class="sub">0 parques vazios</div></div>
-<div class="grid">
-  <div class="card"><h2>Real vs. Plano por parque <span>tecnicos</span></h2><canvas id="chartParques"></canvas></div>
+<div class="grid2">
   <div class="card"><h2>Por cliente <span>tecnicos ativos</span></h2><canvas id="chartCliente"></canvas></div>
   <div class="card"><h2>Por supervisor (SUOP) <span>tecnicos ativos</span></h2><canvas id="chartSuop"></canvas></div>
 </div>
@@ -201,16 +200,6 @@ trTot.style.fontWeight='700'; trTot.style.borderTop='2px solid #2a3746';
 trTot.innerHTML = '<td>Total Geral</td><td></td><td></td><td class="num">'+totReal+'</td><td class="num">'+totPlano+'</td><td class="num">'+(totReal-totPlano)+'</td>';
 tbody.appendChild(trTot);
 
-new Chart(document.getElementById('chartParques'), {
-  type:'bar',
-  data:{ labels: parques.map(function(p){return p.nome;}),
-    datasets:[
-      {label:'Real', data:parques.map(function(p){return p.real;}), backgroundColor:'#1C8CE8', borderRadius:4},
-      {label:'Plano', data:parques.map(function(p){return p.plano;}), backgroundColor:'#3a4759', borderRadius:4}
-    ]},
-  options:{responsive:true, plugins:{legend:{position:'top', labels:{boxWidth:12}}},
-    scales:{x:{ticks:{font:{size:10}}, grid:{display:false}}, y:{beginAtZero:true, grid:{color:'#2a3746'}}}}
-});
 function aggregate(key){ var m={}; parques.forEach(function(p){ m[p[key]]=(m[p[key]]||0)+p.real; }); return m; }
 var clienteAgg = aggregate('cliente');
 new Chart(document.getElementById('chartCliente'), {
