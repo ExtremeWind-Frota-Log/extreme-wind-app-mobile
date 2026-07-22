@@ -59,6 +59,8 @@
   th{background:var(--panel2); text-align:left; padding:9px 12px; color:var(--muted); font-weight:600; white-space:nowrap;}
   td{padding:9px 12px; border-bottom:1px solid var(--line); white-space:normal; word-break:break-word; vertical-align:top;}
   tr:hover td{background:#153A57;}
+  tr.row-warn td{background:rgba(216,154,43,.16);}
+  tr.row-warn:hover td{background:rgba(216,154,43,.30);}
   .tag{display:inline-block; padding:2px 9px; border-radius:20px; font-size:11px; font-weight:700; white-space:nowrap;}
   .tag-ok{background:rgba(18,168,116,.18); color:var(--ok);}
   .tag-warn{background:rgba(216,154,43,.18); color:var(--warn);}
@@ -141,12 +143,12 @@
   <table>
     <thead><tr><th>Placa</th><th>Locadora</th><th>Parque</th><th>Vencimento</th><th>Motivo</th><th>Motivo Cobrança Extra</th></tr></thead>
     <tbody id="detMultas">
-    <tr><td>TXD5H40</td><td>UNIDAS</td><td>LOCAÇÃO EURO (ADOLPHO MAFRA)</td><td>26/07/2026</td><td>-</td><td>MULTA</td></tr>
-    <tr><td>TDX6D11</td><td>UNIDAS</td><td>CAMPO LARGO/BA</td><td>25/07/2026</td><td>-</td><td>MULTA</td></tr>
-    <tr><td>???</td><td>UNIDAS</td><td>???</td><td>25/07/2026</td><td>-</td><td>MULTA</td></tr>
-    <tr><td>TJO8C31</td><td>UNIDAS</td><td>???</td><td>24/07/2026</td><td>-</td><td>MULTA</td></tr>
-    <tr><td>TJO8C31</td><td>UNIDAS</td><td>???</td><td>22/07/2026</td><td>-</td><td>MULTA</td></tr>
-    <tr><td>TYA7G48</td><td>LOCALIZA</td><td>LDV INSP.INTERNA /PI</td><td>25/07/2026</td><td>-</td><td>MULTA</td></tr>
+    <tr class="row-warn"><td>TXD5H40</td><td>UNIDAS</td><td>LOCAÇÃO EURO (ADOLPHO MAFRA)</td><td>26/07/2026</td><td>-</td><td>MULTA</td></tr>
+    <tr class="row-warn"><td>TDX6D11</td><td>UNIDAS</td><td>CAMPO LARGO/BA</td><td>25/07/2026</td><td>-</td><td>MULTA</td></tr>
+    <tr class="row-warn"><td>???</td><td>UNIDAS</td><td>???</td><td>25/07/2026</td><td>-</td><td>MULTA</td></tr>
+    <tr class="row-warn"><td>TJO8C31</td><td>UNIDAS</td><td>???</td><td>24/07/2026</td><td>-</td><td>MULTA</td></tr>
+    <tr class="row-warn"><td>TJO8C31</td><td>UNIDAS</td><td>???</td><td>22/07/2026</td><td>-</td><td>MULTA</td></tr>
+    <tr class="row-warn"><td>TYA7G48</td><td>LOCALIZA</td><td>LDV INSP.INTERNA /PI</td><td>25/07/2026</td><td>-</td><td>MULTA</td></tr>
     </tbody>
   </table>
   </div>
