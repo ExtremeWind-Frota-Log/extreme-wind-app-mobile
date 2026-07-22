@@ -153,6 +153,12 @@
 </style>
 <script>
   (function(){
+    // Dentro do app (index.html carrega cada dashboard num iframe) ja existe
+    // o menu lateral proprio -- escondemos este pra nao duplicar.
+    if (window.self !== window.top) {
+      document.getElementById('ewNav').style.display = 'none';
+      return;
+    }
     var btn=document.getElementById('ewNavBtn'), panel=document.getElementById('ewNavPanel');
     btn.addEventListener('click', function(e){ e.stopPropagation(); panel.style.display = panel.style.display==='none'?'block':'none'; });
     document.addEventListener('click', function(){ panel.style.display='none'; });
