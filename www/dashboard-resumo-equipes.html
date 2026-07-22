@@ -120,7 +120,7 @@
   </table>
   </div>
 </div>
-<div class="section-title">Técnicos Mobilizados</div>
+<div class="section-title">Técnicos Mobilizados <span style="font-weight:400;font-size:12px;color:#93a3b8;">(acima de 90 dias, maior → menor)</span></div>
 <div class="card">
   <div class="scrollx">
   <table>
@@ -197,51 +197,19 @@ trTot.innerHTML = '<td>Total Geral</td><td></td><td></td><td class="num">'+totRe
 tbody.appendChild(trTot);
 
 var tecnicosAtivos = [
-  {mat:"189", nome:"FRANCSICO AVILA LIMA DA SILVA", acumulado:77, parque:"BAIXA DO FEIJÃO/RN", suop:"WILDNER"},
-  {mat:"221", nome:"JAIR DUTRA JUNIOR", acumulado:147, parque:"BAIXA DO FEIJÃO/RN", suop:"WILDNER"},
-  {mat:"46", nome:"WILLAMES LEANDRO SILVA DA HORA", acumulado:77, parque:"BAIXA DO FEIJÃO/RN", suop:"WILDNER"},
-  {mat:"30", nome:"FELIPE DE LIMA SERPA", acumulado:206, parque:"COPEL/RN", suop:"EVAIR"},
   {mat:"292", nome:"FRANCISCO ELINALDO SILVA QUINTO", acumulado:236, parque:"COPEL/RN", suop:"EVAIR"},
-  {mat:"304", nome:"SERGIO MATEUS DA SILVA MARTINS", acumulado:156, parque:"COPEL/RN", suop:"EVAIR"},
-  {mat:"980", nome:"ANTÔNIO ERIVANDO AGOSTINHO DA SILVA", acumulado:21, parque:"DELTA/PI", suop:"WILDNER"},
-  {mat:"220", nome:"FRANCISCO DE ASSIS NUNES DA SILVA", acumulado:37, parque:"DELTA/PI", suop:"WILDNER"},
-  {mat:"91", nome:"GUSTAVO HENRIQUE ALVES DA SILVA", acumulado:18, parque:"DELTA/PI", suop:"WILDNER"},
-  {mat:"239", nome:"JOAO PAULO SILVA SANTOS", acumulado:64, parque:"DELTA/PI", suop:"WILDNER"},
-  {mat:"111", nome:"JOSE MILTON ANDRADE DA SILVA", acumulado:35, parque:"DELTA/PI", suop:"WILDNER"},
-  {mat:"329", nome:"MARCOS JOSE MUNIZ", acumulado:64, parque:"DELTA/PI", suop:"WILDNER"},
-  {mat:"307", nome:"MARCOS ROBERTO RODRIGUES SARAIVA", acumulado:19, parque:"DELTA/PI", suop:"WILDNER"},
-  {mat:"381", nome:"RODRIGO BUENO DE CAMARGO", acumulado:64, parque:"DELTA/PI", suop:"WILDNER"},
-  {mat:"379", nome:"WADSON MARCELO PINTO LINDOSO", acumulado:65, parque:"DELTA/PI", suop:"WILDNER"},
-  {mat:"375", nome:"WAGNER DOS SANTOS SILVA", acumulado:64, parque:"DELTA/PI", suop:"WILDNER"},
-  {mat:"106", nome:"ALEX SALES DA CUNHA", acumulado:1, parque:"INTERMARÍTIMA/BA", suop:"WILDNER"},
-  {mat:"355", nome:"VICTOR HUGO GOMES", acumulado:1, parque:"INTERMARÍTIMA/BA", suop:"WILDNER"},
-  {mat:"49", nome:"JOHN LENON VIEIRA ALVES", acumulado:81, parque:"OITIS/PI", suop:"EVAIR"},
+  {mat:"30", nome:"FELIPE DE LIMA SERPA", acumulado:206, parque:"COPEL/RN", suop:"EVAIR"},
   {mat:"899", nome:"PEDRO LUCAS DA CRUZ DA SILVA", acumulado:197, parque:"OITIS/PI", suop:"EVAIR"},
-  {mat:"295", nome:"SANDRELINO MACIEL DE FREITAS", acumulado:194, parque:"OITIS/PI", suop:"EVAIR"},
-  {mat:"318", nome:"ANTONIO ERIVAGUINO ALVES MOTA", acumulado:31, parque:"SANTO AGOSTINHO/RN", suop:"WILDNER"},
-  {mat:"285", nome:"DIEGO BARBOSA DA SILVA", acumulado:37, parque:"SANTO AGOSTINHO/RN", suop:"WILDNER"},
-  {mat:"353", nome:"ÉDIPO CARDOSO DE OLIVEIRA", acumulado:129, parque:"SANTO AGOSTINHO/RN", suop:"WILDNER"},
-  {mat:"369", nome:"ALESSANDRO OLIVEIRA GUIMARÃES DA SILVA", acumulado:87, parque:"SÃO FERNANDO/RN", suop:"MAGALHÃES"},
-  {mat:"983", nome:"ANTONIO CESAR SILVA CASTRO", acumulado:142, parque:"SÃO FERNANDO/RN", suop:"MAGALHÃES"},
-  {mat:"364", nome:"APARECIDO PINTO LAUREANO", acumulado:30, parque:"SÃO FERNANDO/RN", suop:"MAGALHÃES"},
-  {mat:"969", nome:"JOSE WEDESON MENEZES DA COSTA", acumulado:23, parque:"SÃO FERNANDO/RN", suop:"MAGALHÃES"},
   {mat:"958", nome:"MAURICIO CESAR DE ANDRADE DE MOURA", acumulado:196, parque:"SÃO FERNANDO/RN", suop:"MAGALHÃES"},
-  {mat:"953", nome:"WILLIAM CASSIANO DO NASCIMENTO", acumulado:72, parque:"SÃO FERNANDO/RN", suop:"MAGALHÃES"},
-  {mat:"308", nome:"ELIELSON SANTOS DA SILVA", acumulado:18, parque:"SÃO VITOR/BA", suop:"WILDNER"},
-  {mat:"43", nome:"MATEUS GOMES DA SILVA", acumulado:19, parque:"SÃO VITOR/BA", suop:"WILDNER"},
-  {mat:"248", nome:"MEZAC MARQUES DA ROCHA", acumulado:19, parque:"SÃO VITOR/BA", suop:"WILDNER"},
-  {mat:"225", nome:"CARLOS ITALO COLIMODIO DOS SANTOS", acumulado:15, parque:"TRAIRI/CE", suop:"EVAIR"},
-  {mat:"377", nome:"JOAB BEZERRA DE SALES", acumulado:4, parque:"TRAIRI/CE", suop:"WILDNER"},
-  {mat:"29", nome:"JONATO DIAS FEITOZA", acumulado:41, parque:"TRAIRI/CE", suop:"EVAIR"},
-  {mat:"233", nome:"SAMUEL SANTOS ARAUJO", acumulado:4, parque:"TRAIRI/CE", suop:"WILDNER"},
-  {mat:"197", nome:"TIAGO CARVALHO BALBINO", acumulado:4, parque:"TRAIRI/CE", suop:"WILDNER"},
-  {mat:"374", nome:"WILLIAM DUARTE COSTA", acumulado:41, parque:"TRAIRI/CE", suop:"EVAIR"},
+  {mat:"295", nome:"SANDRELINO MACIEL DE FREITAS", acumulado:194, parque:"OITIS/PI", suop:"EVAIR"},
+  {mat:"304", nome:"SERGIO MATEUS DA SILVA MARTINS", acumulado:156, parque:"COPEL/RN", suop:"EVAIR"},
+  {mat:"221", nome:"JAIR DUTRA JUNIOR", acumulado:147, parque:"BAIXA DO FEIJÃO/RN", suop:"WILDNER"},
+  {mat:"983", nome:"ANTONIO CESAR SILVA CASTRO", acumulado:142, parque:"SÃO FERNANDO/RN", suop:"MAGALHÃES"},
+  {mat:"353", nome:"ÉDIPO CARDOSO DE OLIVEIRA", acumulado:129, parque:"SANTO AGOSTINHO/RN", suop:"WILDNER"},
+  {mat:"141", nome:"FRANCISCO LUCAS DE OLIVEIRA RODRIGUES", acumulado:123, parque:"VENTOS DO PIAUÍ/PI", suop:"WILDNER"},
   {mat:"296", nome:"ALDEMIR CORREIA DE JESUS", acumulado:107, parque:"TUCANO/BA", suop:"WILDNER"},
   {mat:"192", nome:"JEFERSON APARECIDO ANTENOR", acumulado:103, parque:"TUCANO/BA", suop:"WILDNER"},
-  {mat:"48", nome:"LERNITON SILVA DE ANDRADE", acumulado:94, parque:"TUCANO/BA", suop:"WILDNER"},
-  {mat:"259", nome:"FABIANO MEDEIROS DE ALMEIDA", acumulado:56, parque:"VENTOS DO PIAUÍ/PI", suop:"WILDNER"},
-  {mat:"141", nome:"FRANCISCO LUCAS DE OLIVEIRA RODRIGUES", acumulado:123, parque:"VENTOS DO PIAUÍ/PI", suop:"WILDNER"},
-  {mat:"376", nome:"VICTOR HENRIQUE DE LIRA TAVARES", acumulado:57, parque:"VENTOS DO PIAUÍ/PI", suop:"WILDNER"}
+  {mat:"48", nome:"LERNITON SILVA DE ANDRADE", acumulado:94, parque:"TUCANO/BA", suop:"WILDNER"}
 ];
 var tbodyTec = document.getElementById('tbodyTecnicos');
 tecnicosAtivos.forEach(function(t){
