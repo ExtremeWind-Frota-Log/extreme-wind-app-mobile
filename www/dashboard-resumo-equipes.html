@@ -156,19 +156,19 @@
 <div class="footer">Painel 1: CONTROLE DE EQUIPES. Painel 2: DADOS/RESUMOS (aba DASHBOARD original). 22/07/2026.</div>
 
 <script>
+var historicoInited = false;
 document.querySelectorAll('.tab').forEach(function(t){
   t.addEventListener('click', function(){
     document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active');});
     document.querySelectorAll('.panel').forEach(function(x){x.classList.remove('active');});
     t.classList.add('active');
     document.getElementById('panel-'+t.dataset.tab).classList.add('active');
-    // Os graficos do painel Historico sao criados enquanto o painel esta com
-    // display:none (0x0px) -- sem isso o Chart.js nunca redesenha ao trocar de aba
-    // (falha mais visivel no app mobile/webview do que no navegador desktop).
-    if (t.dataset.tab === 'historico') {
-      [chartRankingParque, chartRankingCliente, chartEvolucao, chartMotivo].forEach(function(c){
-        if (c) { c.resize(); c.update(); }
-      });
+    // Os graficos do painel Historico so sao criados na 1a vez que a aba fica visivel.
+    // Criar Chart.js num canvas ainda com display:none da 0x0px e o grafico nunca
+    // aparece depois (falha mais visivel no app mobile/webview do que no desktop).
+    if (t.dataset.tab === 'historico' && !historicoInited) {
+      historicoInited = true;
+      initHistoricoCharts();
     }
   });
 });
@@ -264,6 +264,7 @@ new Chart(document.getElementById('chartSuop'), {
     tooltip:{callbacks:{label:function(ctx){ return ctx.label + ': ' + ctx.parsed + ' tecnicos'; }}}}}
 });
 
+function initHistoricoCharts(){
 var rankingParque = [
   ["LDV3/PI",83,83,1],
   ["OITIS/PI",82,79,0],
@@ -379,6 +380,7 @@ var chartMotivo = new Chart(document.getElementById('chartMotivo'), {
     }}}},
     scales:{x:{stacked:true, ticks:{font:{size:10}}, grid:{display:false}}, y:{stacked:true, beginAtZero:true, grid:{color:'#2a3746'}}}}
 });
+}
 </script>
 </body>
 </html>
