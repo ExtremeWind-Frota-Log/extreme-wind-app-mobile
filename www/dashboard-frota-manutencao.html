@@ -163,13 +163,12 @@
   </div>
   <div class="kpi">
     <div class="label">Conformidade Geral &amp; Ações Pendentes</div>
-    <div class="value" style="color:var(--ok)">87%</div>
+    <div class="value" style="color:var(--warn)">87%</div>
     <div class="foot">WK 30 · 21 ações pendentes no total</div>
-    <div class="locadoras" style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-      <div class="loc-badge" style="background:rgba(224,72,60,.18); color:var(--nok)"><span class="n">6</span><span class="l">Emergencial</span></div>
-      <div class="loc-badge" style="background:rgba(216,154,43,.24); color:var(--warn)"><span class="n">10</span><span class="l">Programado</span></div>
+    <div class="locadoras" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+      <div class="loc-badge" style="background:rgba(224,72,60,.18); color:var(--nok)"><span class="n">6</span><span class="l">Emergenciais</span></div>
+      <div class="loc-badge" style="background:rgba(216,154,43,.24); color:var(--warn)"><span class="n">10</span><span class="l">Programadas</span></div>
       <div class="loc-badge" style="background:rgba(92,122,147,.24); color:var(--na)"><span class="n">5</span><span class="l">Administrativas</span></div>
-      <div class="loc-badge" style="background:rgba(18,168,116,.18); color:var(--ok)"><span class="n">3</span><span class="l">Resol</span></div>
     </div>
   </div>
   <div class="kpi">
@@ -180,7 +179,7 @@
 </div>
 
 <div class="panel">
-  <h2 style="margin-bottom:14px">Veículos — Detalhamento (Semana 29)</h2>
+  <h2 style="margin-bottom:14px">Veículos — Detalhamento (Semana 30)</h2>
 
   <div class="toolbar">
     <div class="search">
@@ -553,14 +552,14 @@
 
 <div class="panel">
   <div class="panel-header">
-    <h2 style="margin-bottom:0">Plano de Ação — Semana 29</h2>
+    <h2 style="margin-bottom:0">Plano de Ação — Semana 30</h2>
     <button class="toggle-btn" id="toggleAcao" aria-expanded="false">Expandir <span class="chev">▾</span></button>
   </div>
   <div class="collapsible" id="acaoBody">
     <div class="locadoras" style="max-width:420px; margin:6px 0 16px">
-      <div class="loc-badge" style="background:rgba(224,72,60,.18); color:var(--nok)"><span class="n">4</span><span class="l">Emergencial</span></div>
-      <div class="loc-badge" style="background:rgba(28,140,232,.20); color:var(--steel)"><span class="n">8</span><span class="l">Programado</span></div>
-      <div class="loc-badge" style="background:rgba(18,168,116,.18); color:var(--ok)"><span class="n">1</span><span class="l">Finalizado</span></div>
+      <div class="loc-badge" style="background:rgba(224,72,60,.18); color:var(--nok)"><span class="n">6</span><span class="l">Emergencial</span></div>
+      <div class="loc-badge" style="background:rgba(28,140,232,.20); color:var(--steel)"><span class="n">10</span><span class="l">Programado</span></div>
+      <div class="loc-badge" style="background:rgba(18,168,116,.18); color:var(--ok)"><span class="n">0</span><span class="l">Finalizado</span></div>
     </div>
     <div class="tablewrap">
       <table class="conftable" id="acaoTable">
@@ -766,7 +765,9 @@
       <span><span class="dot" style="background:var(--ok)"></span> Finalizado</span>
       <span><span class="dot" style="background:var(--na)"></span> Indefinido</span>
     </div>
-    <div class="note">Fonte: aba BASE DESHBOARD, 23 blocos semanais identificados (WK08–WK30). "Média Geral" calculada como a média de Checklist, Revisão, Estepe Extra, Rastreador+Bloqueador e Medição Pneus por bloco semanal, direto dos dados brutos (nao depende de tabela dinamica/pivot). Semanas com rótulo original inconsistente na planilha, número inferido pela posição sequencial (confirme antes de usar externamente): WK12, WK13, WK14.</div>
+    <div class="note">
+      Fonte: aba BASE DESHBOARD, 23 blocos semanais identificados (WK08–WK30). "Média Geral" calculada como a média de Checklist, Revisão, Estepe Extra, Rastreador+Bloqueador e Medição Pneus por bloco semanal, direto dos dados brutos (nao depende de tabela dinamica/pivot). Semanas com rótulo original inconsistente na planilha, número inferido pela posição sequencial (confirme antes de usar externamente): WK12, WK13, WK14.
+    </div>
   </div>
 </div>
 
@@ -816,32 +817,36 @@
     <text x="600" y="84" fill="#D89A2B" font-size="11.5" font-weight="700" text-anchor="end" font-family="Segoe UI,Arial,sans-serif">Meta 90%</text>
 
     <!-- area fill under the smoothed trend curve -->
-    <path d="M140,76 C166.7,71.3 246.7,56.2 300,48 C353.3,39.8 410,25.8 460,27 C510,28.2 576.7,50.3 600,55 L600,160 L140,160 Z" fill="url(#areaGrad)"></path>
+    <path d="M70.0,78.8 C92.1,73.4 158.3,55.0 202.5,46.6 C246.7,38.2 290.8,26.7 335.0,28.4 C379.2,30.2 423.3,42.4 467.5,57.1 C511.7,71.8 577.9,106.7 600.0,116.6 L600.0,160 L70.0,160 Z" fill="url(#areaGrad)"></path>
 
     <!-- smoothed trend line -->
-    <path d="M140,76 C166.7,71.3 246.7,56.2 300,48 C353.3,39.8 410,25.8 460,27 C510,28.2 576.7,50.3 600,55" fill="none" stroke="#00679A" stroke-width="3" stroke-linecap="round"></path>
+    <path d="M70.0,78.8 C92.1,73.4 158.3,55.0 202.5,46.6 C246.7,38.2 290.8,26.7 335.0,28.4 C379.2,30.2 423.3,42.4 467.5,57.1 C511.7,71.8 577.9,106.7 600.0,116.6" fill="none" stroke="#00679A" stroke-width="3" stroke-linecap="round"></path>
 
     <!-- points -->
     <g font-family="Segoe UI,Arial,sans-serif">
-      <circle cx="140" cy="76" r="5.5" fill="#0F2A40" stroke="#12A874" stroke-width="2.5" filter="url(#ptShadow)"></circle>
-      <text x="140" y="64" fill="#EAF1F7" font-size="13.5" font-weight="700" text-anchor="middle">92%</text>
+      <circle cx="70.0" cy="78.8" r="5.5" fill="#0F2A40" stroke="#12A874" stroke-width="2.5" filter="url(#ptShadow)"></circle>
+      <text x="70.0" y="66.8" fill="#EAF1F7" font-size="13.5" font-weight="700" text-anchor="middle">92%</text>
 
-      <circle cx="300" cy="48" r="5.5" fill="#0F2A40" stroke="#12A874" stroke-width="2.5" filter="url(#ptShadow)"></circle>
-      <text x="300" y="36" fill="#EAF1F7" font-size="13.5" font-weight="700" text-anchor="middle">96%</text>
+      <circle cx="202.5" cy="46.6" r="5.5" fill="#0F2A40" stroke="#12A874" stroke-width="2.5" filter="url(#ptShadow)"></circle>
+      <text x="202.5" y="34.6" fill="#EAF1F7" font-size="13.5" font-weight="700" text-anchor="middle">96%</text>
 
-      <circle cx="460" cy="27" r="5.5" fill="#0F2A40" stroke="#12A874" stroke-width="2.5" filter="url(#ptShadow)"></circle>
-      <text x="460" y="15" fill="#EAF1F7" font-size="13.5" font-weight="700" text-anchor="middle">99%</text>
+      <circle cx="335.0" cy="28.4" r="5.5" fill="#0F2A40" stroke="#12A874" stroke-width="2.5" filter="url(#ptShadow)"></circle>
+      <text x="335.0" y="16.4" fill="#EAF1F7" font-size="13.5" font-weight="700" text-anchor="middle">99%</text>
 
-      <circle cx="600" cy="55" r="5.5" fill="#0F2A40" stroke="#12A874" stroke-width="2.5" filter="url(#ptShadow)"></circle>
-      <text x="600" y="43" fill="#EAF1F7" font-size="13.5" font-weight="700" text-anchor="middle">95%</text>
+      <circle cx="467.5" cy="57.1" r="5.5" fill="#0F2A40" stroke="#12A874" stroke-width="2.5" filter="url(#ptShadow)"></circle>
+      <text x="467.5" y="45.1" fill="#EAF1F7" font-size="13.5" font-weight="700" text-anchor="middle">95%</text>
+
+      <circle cx="600.0" cy="116.6" r="5.5" fill="#0F2A40" stroke="#D89A2B" stroke-width="2.5" filter="url(#ptShadow)"></circle>
+      <text x="600.0" y="104.6" fill="#EAF1F7" font-size="13.5" font-weight="700" text-anchor="middle">86%</text>
     </g>
 
     <!-- x labels -->
     <g fill="#8FA9C0" font-size="12" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif">
-      <text x="140" y="182">WK 26</text>
-      <text x="300" y="182">WK 27</text>
-      <text x="460" y="182">WK 28</text>
-      <text x="600" y="182">WK 29</text>
+      <text x="70.0" y="182">WK 26</text>
+      <text x="202.5" y="182">WK 27</text>
+      <text x="335.0" y="182">WK 28</text>
+      <text x="467.5" y="182">WK 29</text>
+      <text x="600.0" y="182">WK 30</text>
     </g>
   </svg>
 </div>
@@ -850,7 +855,7 @@
 
 <div class="panel">
   <div class="panel-header">
-    <h2>Conformidade por Categoria — Tendência Semanal (WK 26–29)</h2>
+    <h2>Conformidade por Categoria — Tendência Semanal (WK 26–30)</h2>
     <button class="toggle-btn" id="toggleConf" aria-expanded="false">Expandir <span class="chev">▾</span></button>
   </div>
   <div class="collapsible" id="confBody">
@@ -858,23 +863,23 @@
   <table class="conftable">
     <thead>
       <tr>
-        <th>Categoria</th><th>WK 26</th><th>WK 27</th><th>WK 28</th><th>WK 29</th><th>Ações (WK29)</th>
+        <th>Categoria</th><th>WK 26</th><th>WK 27</th><th>WK 28</th><th>WK 29</th><th>WK 30</th>
       </tr>
     </thead>
     <tbody>
-      <tr><td>KM Ponto de Troca</td><td class="nd">–</td><td class="nd">–</td><td class="nd">–</td><td class="cell-warn cur">81%</td><td>3</td></tr>
-      <tr><td>Saldo Extra</td><td class="nd">–</td><td class="nd">–</td><td class="nd">–</td><td class="cell-nok cur">63%</td><td>5</td></tr>
-      <tr><td>Checklist</td><td class="cell-warn">89%</td><td class="cell-ok">94%</td><td class="cell-ok">94%</td><td class="cell-ok cur">94%</td><td>1</td></tr>
-      <tr><td>Revisão</td><td class="cell-warn">79%</td><td class="cell-ok">94%</td><td class="cell-ok">100%</td><td class="cell-ok cur">94%</td><td>1</td></tr>
-      <tr><td>Estepe Extra</td><td class="cell-ok">95%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok cur">94%</td><td>1</td></tr>
-      <tr><td>Medição Pneus</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok cur">94%</td><td>1</td></tr>
-      <tr><td>Rastreador + Bloqueador</td><td class="cell-ok">95%</td><td class="cell-ok">94%</td><td class="cell-ok">100%</td><td class="cell-ok cur">100%</td><td>0</td></tr>
-      <tr><td>Consumo KM/L</td><td class="nd">–</td><td class="nd">–</td><td class="nd">–</td><td class="cell-ok cur">100%</td><td>0</td></tr>
-      <tr><td>Doc Postado (MOB)</td><td class="nd">–</td><td class="nd">–</td><td class="nd">–</td><td class="cell-ok cur">100%</td><td>0</td></tr>
-      <tr><td>Doc Entregue Cliente</td><td class="nd">–</td><td class="nd">–</td><td class="nd">–</td><td class="cell-ok cur">100%</td><td>0</td></tr>
+      <tr><td>KM Ponto de Troca</td><td class="cell-warn">71%</td><td class="cell-warn">71%</td><td class="cell-warn">73%</td><td class="cell-warn">73%</td><td class="cell-warn cur">75%</td></tr>
+      <tr><td>Saldo Extra</td><td class="nd">–</td><td class="cell-nok">69%</td><td class="cell-nok">67%</td><td class="cell-nok">67%</td><td class="cell-nok cur">63%</td></tr>
+      <tr><td>Checklist</td><td class="cell-warn">90%</td><td class="cell-ok">94%</td><td class="cell-ok">94%</td><td class="cell-ok">100%</td><td class="cell-ok cur">94%</td></tr>
+      <tr><td>Revisão</td><td class="cell-warn">79%</td><td class="cell-ok">94%</td><td class="cell-ok">100%</td><td class="cell-ok">93%</td><td class="cell-warn cur">81%</td></tr>
+      <tr><td>Estepe Extra</td><td class="cell-ok">95%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-warn">87%</td><td class="cell-warn cur">81%</td></tr>
+      <tr><td>Medição Pneus</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok">93%</td><td class="cell-warn cur">81%</td></tr>
+      <tr><td>Rastreador + Bloqueador</td><td class="cell-ok">95%</td><td class="cell-ok">94%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok cur">94%</td></tr>
+      <tr><td>Consumo KM/L</td><td class="nd">–</td><td class="nd">–</td><td class="nd">–</td><td class="nd">–</td><td class="nd cur">–</td></tr>
+      <tr><td>Doc Postado (MOB)</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok cur">100%</td></tr>
+      <tr><td>Doc Entregue Cliente</td><td class="cell-ok">100%</td><td class="nd">–</td><td class="nd">–</td><td class="nd">–</td><td class="nd cur">–</td></tr>
     </tbody>
     <tfoot>
-      <tr><td>Média Geral</td><td class="cell-ok">92%</td><td class="cell-ok">96%</td><td class="cell-ok">99%</td><td class="cell-ok cur">95%</td><td>12</td></tr>
+      <tr><td>Média Geral</td><td class="cell-ok">92%</td><td class="cell-ok">96%</td><td class="cell-ok">99%</td><td class="cell-ok">95%</td><td class="cell-warn cur">86%</td></tr>
     </tfoot>
   </table>
   </div>
@@ -891,7 +896,7 @@
 
 <div class="panel">
   <div class="panel-header">
-    <h2 style="margin-bottom:0">Histórico Semanal Completo — WK 08 a WK 29</h2>
+    <h2 style="margin-bottom:0">Histórico Semanal Completo — WK 08 a WK 30</h2>
     <button class="toggle-btn" id="toggleHist" aria-expanded="false">Expandir <span class="chev">▾</span></button>
   </div>
   <div class="collapsible" id="histBody">
@@ -919,13 +924,13 @@
       <span><span class="dot" style="background:var(--na)"></span> – sem dado</span>
     </div>
     <div class="note">
-      Fonte: aba BASE DESHBOARD, 21 blocos semanais identificados (WK08–WK29, linhas 4–1257). WK08 não possuía linha de "%" de conformidade na planilha (dado indisponível). "Média Geral" calculada como a média de Checklist, Revisão, Estepe Extra, Rastreador+Bloqueador e Medição Pneus — o mesmo critério já usado na planilha; para WK26–29 foram mantidos os valores oficiais já exibidos no restante do dashboard (92%, 96%, 99%, 95%) para não gerar conflito de número. As semanas WK12–WK14 tinham rótulo ambíguo na fonte original e foram inferidas pela posição sequencial entre WK11 e WK15 — vale confirmar com a origem antes de usar externamente.
+      Fonte: aba BASE DESHBOARD, tabela "RESUMO" (cálculo oficial por fórmula da própria planilha) para Checklist, Revisão, Estepe Extra, Medição Pneus, Rastreador+Bloqueador e Média Geral, disponível nas semanas WK22–WK30. KM Ponto de Troca, Saldo Extra, Consumo, Doc Postado e Doc Entregue não têm tabela oficial na planilha e são sempre calculados por contagem bruta OK/N-OK de cada veículo no bloco semanal; esse mesmo cálculo bruto também cobre Checklist/Revisão/Estepe/Pneus/Rastreador nas semanas sem tabela RESUMO (WK08–WK21). Semanas com rótulo original inconsistente na planilha, número inferido pela posição sequencial (confirme antes de usar externamente): WK12, WK13, WK14.
     </div>
   </div>
 </div>
 
 <div class="note">
-  Fonte: planilha "Controle de Frota" — aba BASE DESHBOARD, bloco da Semana 29 (linhas 1227–1257). "Meses" calculado a partir da Data Início até a data de atualização (08/07/2026).
+  Fonte: planilha "Controle de Frota" — aba BASE DESHBOARD, bloco da Semana 30. "Meses" calculado a partir da Data Início até a data de atualização (a célula "ATUALIZAÇÃO" da planilha ainda mostra 14/07/2026 — se você já rodou o checklist desta semana, vale atualizar essa célula na planilha).
   Dados extraídos automaticamente; confira os valores antes de compartilhar. Uso interno do setor — link privado, não indexado publicamente; não repasse fora da equipe sem necessidade.
 </div>
 
@@ -936,12 +941,12 @@ const rows = [
 ["TYD9E80","LOCALIZA","1","DELTA 1/MA","Siemens","23/01/2026","6,00","OK","OK","OK","N/OK","OK","OK","OK","9,24","OK","N/A"],
 ["TYA9D45","UNIDAS","1","DELTA 2/MA","Siemens","08/09/2025","10,57","OK","OK","OK","OK","OK","OK","OK","11,18","OK","N/A"],
 ["TEN7C94","UNIDAS","1","DELTA 3/MA","Siemens","01/07/2025","12,87","N/OK","OK","OK","OK","OK","OK","OK","9,03","OK","N/A"],
-["TXZ5J79","LOCALIZA","1","DELTA 4/MA","Siemens","21/02/2026","5,03","OK","N/OK","-","OK","OK","OK","OK","9,19","OK","N/A"],
+["TXZ5J79","LOCALIZA","1","DELTA 4/MA","Siemens","21/02/2026","5,03","OK","N/OK","OK","OK","OK","OK","OK","9,19","OK","N/A"],
 ["TET3C50","UNIDAS","2","SÃO FERNANDO 1/RN","Nordex","06/02/2026","5,53","N/OK","OK","OK","OK","OK","OK","OK","10,11","N/A","N/A"],
 ["TWY4C61","UNIDAS","2","SÃO FERNANDO 2/RN","Nordex","18/08/2025","11,27","OK","OK","OK","OK","OK","OK","OK","10,21","N/A","N/A"],
 ["TXY8H30","LOCALIZA","2","ST. AGOSTINHO/RN","Siemens","20/02/2026","5,07","OK","N/OK","OK","OK","N/OK","OK","OK","10,11","N/A","N/A"],
 ["TXQ6B16","LOCALIZA","2","TRAIRÍ/CE","GE Blade","13/11/2025","8,37","OK","OK","OK","OK","OK","N/OK","OK","14,10","OK","N/A"],
-["TYW6D70","LOCALIZA","1","Oitis 1/PI","GE Blade","13/05/2026","2,33","OK","N/OK","-","OK","N/OK","OK","OK","13,64","OK","N/A"],
+["TYW6D70","LOCALIZA","1","Oitis 1/PI","GE Blade","13/05/2026","2,33","OK","N/OK","OK","OK","N/OK","OK","OK","13,64","OK","N/A"],
 ["TXC6E97","LOCALIZA","2","TRAIRÍ 2/CE","Siemens","26/11/2025","7,93","OK","OK","OK","OK","OK","OK","OK","9,98","OK","N/A"],
 ["TYD9F24","LOCALIZA","1","SÃO VITOR/BA","Siemens","13/02/2026","5,30","OK","OK","OK","N/OK","OK","OK","OK","10,65","N/A","N/A"],
 ["TYG1E23","LOCALIZA","2","TUCANO/BA","Siemens","23/01/2026","6,00","OK","OK","OK","OK","OK","OK","OK","10,69","OK","N/A"],
@@ -1080,29 +1085,29 @@ toggleBtn.addEventListener("click", () => {
 
 // Histórico completo WK08–WK29 — cats: [KM Troca, Saldo Extra, Checklist, Revisão, Estepe Extra, Medição Pneus, Rastreador, Consumo, Doc Postado, Doc Entregue]
 const histData = [
-  { wk:"WK08", geral:87.2, cats:[80.8,88.9,84.6,96.3,85.2] },
-  { wk:"WK09", geral:90.8, cats:[96.8,81.8,96.7,97.0,81.8] },
-  { wk:"WK10", geral:87.8, cats:[83.9,82.4,93.5,91.2,88.2] },
-  { wk:"WK11", geral:87.2, cats:[78.8,81.8,96.7,90.9,87.9] },
-  { wk:"WK12", geral:90.6, cats:[90.6,78.1,100.0,96.9,87.5] },
-  { wk:"WK13", geral:86.4, cats:[79.2,65.5,100.0,100.0,87.5] },
-  { wk:"WK14", geral:87.9, cats:[79.2,72.7,100.0,100.0,87.5] },
-  { wk:"WK15", geral:94.9, cats:[100.0,84.6,100.0,100.0,89.7] },
-  { wk:"WK16", geral:91.6, cats:[87.5,84.6,96.4,92.9,96.4] },
-  { wk:"WK17", geral:96.2, cats:[100.0,84.6,100.0,96.3,100.0] },
-  { wk:"WK18", geral:95.8, cats:[100.0,91.7,95.8,91.7,100.0] },
-  { wk:"WK19", geral:95.3, cats:[93.3,91.7,91.3,100.0,100.0] },
-  { wk:"WK20", geral:92.5, cats:[100.0,71.4,91.3,100.0,100.0] },
-  { wk:"WK21", geral:90.6, cats:[89.5,72.7,100.0,90.9,100.0] },
-  { wk:"WK22", geral:89.6, cats:[84.2,72.7,100.0,90.9,100.0] },
-  { wk:"WK23", geral:90.5, cats:[87.5,75.0,100.0,90.0,100.0] },
-  { wk:"WK24", geral:93.0, cats:[82.4,93.3,94.7,94.7,100.0] },
-  { wk:"WK25", geral:88.9, cats:[87.5,72.2,100.0,85.0,100.0] },
-  { wk:"WK26", geral:92.7, cats:[88.2,85.7,94.7,100.0,94.7] },
-  { wk:"WK27", geral:94.6, cats:[93.3,85.7,100.0,100.0,93.8] },
-  { wk:"WK28", geral:96.0, cats:[93.3,86.7,100.0,100.0,100.0] },
-  { wk:"WK29", geral:93.3, cats:[100.0,86.7,86.7,93.3,100.0] },
-  { wk:"WK30", geral:92.5, cats:[100.0,87.5,87.5,87.5,100.0] },
+  { wk:"WK08", geral:87.2, cats:[88.9,70.4,80.8,88.9,84.6,96.3,85.2,null,95.2,100.0] },
+  { wk:"WK09", geral:90.8, cats:[87.9,57.6,96.8,81.8,96.7,97.0,81.8,null,94.4,100.0] },
+  { wk:"WK10", geral:87.8, cats:[88.2,76.5,83.9,82.4,93.5,91.2,88.2,null,100.0,100.0] },
+  { wk:"WK11", geral:87.2, cats:[90.9,69.7,78.8,81.8,96.7,90.9,87.9,null,100.0,100.0] },
+  { wk:"WK12", geral:90.6, cats:[84.4,71.9,90.6,78.1,100.0,96.9,87.5,null,100.0,100.0] },
+  { wk:"WK13", geral:86.4, cats:[79.3,79.3,79.2,65.5,100.0,100.0,87.5,null,100.0,100.0] },
+  { wk:"WK14", geral:87.9, cats:[81.0,57.1,79.2,72.7,100.0,100.0,87.5,null,100.0,100.0] },
+  { wk:"WK15", geral:94.9, cats:[88.0,68.0,100.0,84.6,100.0,100.0,89.7,null,100.0,100.0] },
+  { wk:"WK16", geral:91.6, cats:[88.5,65.4,87.5,84.6,96.4,92.9,96.4,null,100.0,100.0] },
+  { wk:"WK17", geral:96.2, cats:[88.5,65.4,100.0,84.6,100.0,96.3,100.0,null,100.0,100.0] },
+  { wk:"WK18", geral:95.8, cats:[91.7,62.5,100.0,91.7,95.8,91.7,100.0,null,100.0,100.0] },
+  { wk:"WK19", geral:95.3, cats:[81.0,null,93.3,91.7,91.3,100.0,100.0,null,100.0,100.0] },
+  { wk:"WK20", geral:92.5, cats:[81.0,null,100.0,71.4,91.3,100.0,100.0,null,100.0,100.0] },
+  { wk:"WK21", geral:90.6, cats:[81.8,null,89.5,72.7,100.0,90.9,100.0,null,100.0,100.0] },
+  { wk:"WK22", geral:82.9, cats:[81.8,null,61.9,71.4,90.5,76.2,100,null,100.0,100.0] },
+  { wk:"WK23", geral:91.0, cats:[80.0,null,90.0,75.0,95.2,95.0,100,null,100.0,100.0] },
+  { wk:"WK24", geral:85.0, cats:[80.0,null,80.0,65.0,90.0,90.0,100,null,100.0,100.0] },
+  { wk:"WK25", geral:89.0, cats:[80.0,null,90.0,70.0,100,85.0,100,null,100.0,100.0] },
+  { wk:"WK26", geral:91.6, cats:[71.4,null,89.5,78.9,94.7,100,94.7,null,100.0,100.0] },
+  { wk:"WK27", geral:96.2, cats:[71.4,69.2,93.8,93.8,100,100,93.8,null,100.0,null] },
+  { wk:"WK28", geral:98.8, cats:[73.3,66.7,93.8,100,100,100,100,null,100.0,null] },
+  { wk:"WK29", geral:94.7, cats:[73.3,66.7,100,93.3,86.7,93.3,100,null,100.0,null] },
+  { wk:"WK30", geral:86.2, cats:[75.0,62.5,93.8,81.2,81.2,81.2,93.8,null,100.0,null] },
 ];
 const HIST_CAT_LABELS = ["KM Troca","Saldo Extra","Checklist","Revisão","Estepe Extra","Medição Pneus","Rastreador","Consumo","Doc Postado","Doc Entregue"];
 
@@ -1199,11 +1204,7 @@ const acaoData = [
   { acao:"TESTE/INSTALAÇÃO RAPTOR", tipo:"ADMINISTRATIVA", parque:"SÃO VITOR", quem:"JOÃO", status:"21/07/2026", obs:"" },
   { acao:"Placa \"encoberta\" por enforca gato", tipo:"ADMINISTRATIVA", parque:"SF1", quem:"JOÃO", status:"21/07/2026", obs:"" },
   { acao:"Alinhamento na Região(Capotaria)BANC. DO CONDT. FURAD. C/CINZAS DE CIGARRO", tipo:"ADMINISTRATIVA", parque:"ST.AGOSTINHO", quem:"JOÃO", status:"21/07/2026", obs:"" },
-  { acao:"Alinhar forma de medição c/ paquímetro.", tipo:"ADMINISTRATIVA", parque:"", quem:"", status:"", obs:"" },
-  { acao:"S/Estepe Extra", tipo:"PREVENTIVA", parque:"COPEL", quem:"JOÃO/SERPA", status:"", obs:"" },
-  { acao:"MAL FUNC. DO AR-CONDICIONADO", tipo:"ADMINISTRATIVA", parque:"SF1", quem:"JOÃO/ANTÔNIO", status:"46223", obs:"Supervisor foi informado/Acompanhar c/ condutor." },
-  { acao:"Pneus na faixa de 2,7mm/Óleo,radiador ou freio Não Conforme?", tipo:"ADMINISTRATIVA", parque:"DELTA 1", quem:"JOÃO/DE ASSIS", status:"!!!", obs:"" },
-  { acao:"SETA RETROVISOR", tipo:"ADMINISTRATIVA", parque:"ST.AGOSTINHO", quem:"JOÃO", status:"NA DESMOB", obs:"" }
+  { acao:"Alinhar forma de medição c/ paquímetro.", tipo:"ADMINISTRATIVA", parque:"", quem:"", status:"", obs:"" }
 ];
 
 function acaoStatusTag(s){
