@@ -162,6 +162,14 @@ document.querySelectorAll('.tab').forEach(function(t){
     document.querySelectorAll('.panel').forEach(function(x){x.classList.remove('active');});
     t.classList.add('active');
     document.getElementById('panel-'+t.dataset.tab).classList.add('active');
+    // Os graficos do painel Historico sao criados enquanto o painel esta com
+    // display:none (0x0px) -- sem isso o Chart.js nunca redesenha ao trocar de aba
+    // (falha mais visivel no app mobile/webview do que no navegador desktop).
+    if (t.dataset.tab === 'historico') {
+      [chartRankingParque, chartRankingCliente, chartEvolucao, chartMotivo].forEach(function(c){
+        if (c) { c.resize(); c.update(); }
+      });
+    }
   });
 });
 Chart.defaults.color = '#93a3b8';
@@ -268,7 +276,7 @@ var rankingParque = [
   ["SINOMA FÁBRICA/BA",21,21,1],
   ["VSM/RN",21,21,0]
 ];
-new Chart(document.getElementById('chartRankingParque'), {
+var chartRankingParque = new Chart(document.getElementById('chartRankingParque'), {
   type:'bar',
   data:{ labels: rankingParque.map(function(p){return p[0];}),
     datasets:[
@@ -290,7 +298,7 @@ var rankingCliente = [
   ["ELETROBRAS",4,4,0],
   ["VESTAS",2,2,0]
 ];
-new Chart(document.getElementById('chartRankingCliente'), {
+var chartRankingCliente = new Chart(document.getElementById('chartRankingCliente'), {
   type:'bar',
   data:{ labels: rankingCliente.map(function(p){return p[0];}),
     datasets:[
@@ -306,7 +314,7 @@ var meses = ["Jan/24","Fev/24","Mar/24","Abr/24","Mai/24","Jun/24","Jul/24","Ago
 var mob = [22,7,5,27,16,23,10,13,22,12,11,5,35,13,17,17,40,32,17,12,13,23,43,9,79,37,31,40,33,18,14];
 var desmob = [5,1,16,6,13,23,17,20,9,11,30,13,10,9,18,23,24,15,23,34,27,11,15,68,11,16,39,56,44,29,15];
 var canc = [0,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,1,0,0];
-new Chart(document.getElementById('chartEvolucao'), {
+var chartEvolucao = new Chart(document.getElementById('chartEvolucao'), {
   type:'line',
   data:{ labels: meses,
     datasets:[
@@ -355,7 +363,7 @@ var pctLabelsPlugin = {
 };
 Chart.register(pctLabelsPlugin);
 
-new Chart(document.getElementById('chartMotivo'), {
+var chartMotivo = new Chart(document.getElementById('chartMotivo'), {
   type:'bar',
   data:{ labels: meses,
     datasets:[
