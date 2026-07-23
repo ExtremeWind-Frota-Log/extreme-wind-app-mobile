@@ -126,6 +126,21 @@
   .tag-warn{background:rgba(216,154,43,.18); color:var(--warn);}
   .tag-na{background:rgba(92,122,147,.18); color:var(--na);}
 
+  /* No mobile, tabela "Veiculos - Detalhamento" esconde as colunas menos
+     usadas no dia a dia (Setor, Cliente, Inicio, KM Troca, Saldo Extra,
+     Doc Postado, Doc Entregue) -- ficam disponiveis no desktop. */
+  @media (max-width:820px){
+    #detTable th:nth-child(3), #detTable td:nth-child(3),
+    #detTable th:nth-child(5), #detTable td:nth-child(5),
+    #detTable th:nth-child(6), #detTable td:nth-child(6),
+    #detTable th:nth-child(8), #detTable td:nth-child(8),
+    #detTable th:nth-child(9), #detTable td:nth-child(9),
+    #detTable th:nth-child(16), #detTable td:nth-child(16),
+    #detTable th:nth-child(17), #detTable td:nth-child(17){
+      display:none;
+    }
+  }
+
   .legend{display:flex; gap:16px; flex-wrap:wrap; font-size:12px; color:var(--muted); margin-top:10px;}
   .legend span{display:inline-flex; align-items:center; gap:6px;}
   .dot{width:9px; height:9px; border-radius:50%; display:inline-block;}
