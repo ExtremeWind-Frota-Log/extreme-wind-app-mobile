@@ -126,6 +126,12 @@
   .tag-warn{background:rgba(216,154,43,.18); color:var(--warn);}
   .tag-na{background:rgba(92,122,147,.18); color:var(--na);}
 
+  /* Titulo "Conformidade por Categoria": no desktop mostra a janela cheia
+     (ex.: WK 26-30); no mobile (regra abaixo) mostra so as 2 semanas que
+     de fato ficam visiveis na tabela (vigente + anterior). */
+  .wk-full{ display:inline; }
+  .wk-mobile{ display:none; }
+
   /* No mobile, tabela "Veiculos - Detalhamento" esconde as colunas menos
      usadas no dia a dia (Setor, Cliente, Inicio, KM Troca, Saldo Extra,
      Doc Postado, Doc Entregue) -- ficam disponiveis no desktop. */
@@ -167,6 +173,10 @@
     #confCatTable th:nth-child(4), #confCatTable td:nth-child(4){
       display:none;
     }
+    /* Titulo: no mobile mostra so a semana vigente + anterior, que sao as
+       2 unicas colunas visiveis na tabela acima. */
+    .wk-full{ display:none; }
+    .wk-mobile{ display:inline; }
     /* Historico Semanal Completo: so Semana + Media Geral no mobile
        (esconde as 7 colunas de categoria, 2a a 8a). */
     #histTable th:nth-child(n+2):nth-child(-n+8),
@@ -941,7 +951,7 @@
 
 <div class="panel">
   <div class="panel-header">
-    <h2>Conformidade por Categoria — Tendência Semanal (WK 26–30)</h2>
+    <h2>Conformidade por Categoria — Tendência Semanal <span class="wk-full">(WK 26–30)</span><span class="wk-mobile">(WK 29–30)</span></h2>
     <button class="toggle-btn" id="toggleConf" aria-expanded="false">Expandir <span class="chev">▾</span></button>
   </div>
   <div class="collapsible" id="confBody">
