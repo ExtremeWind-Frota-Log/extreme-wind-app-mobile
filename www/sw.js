@@ -4,7 +4,7 @@
 // pro cache quando estiver offline. Para imagens/assets estaticos, usa cache-first
 // (nao mudam com frequencia).
 
-const CACHE_NAME = "extreme-wind-v1";
+const CACHE_NAME = "extreme-wind-v2";
 const PRECACHE_URLS = [
   "./",
   "./index.html",
@@ -21,7 +21,13 @@ const PRECACHE_URLS = [
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS)).catch(() => {})
+    caches.open(CACHE_NAME).then((cache) =>
+      Promise.all(
+        PRECACHE_URLS.map((url) =>
+          fetch(url, { cache: "no-store" }).then((res) => cache.put(url, res)).catch(() => {})
+        )
+      )
+    )
   );
   self.skipWaiting();
 });
@@ -44,7 +50,7 @@ self.addEventListener("fetch", (event) => {
   if (isHTML) {
     // network-first: dados de hoje em primeiro lugar, cache so como reserva offline
     event.respondWith(
-      fetch(req)
+      fetch(req, { cache: "no-store" })
         .then((res) => {
           const copy = res.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
