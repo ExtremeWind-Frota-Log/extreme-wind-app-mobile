@@ -1306,11 +1306,36 @@ function parseDataStatus(txt){
   return d;
 }
 
+function formatarDataBR(d){
+  const dd = String(d.getDate()).padStart(2,"0");
+  const mm = String(d.getMonth()+1).padStart(2,"0");
+  return `${dd}/${mm}/${d.getFullYear()}`;
+}
+
+// Acao com data vencida (anterior a hoje) ou sem nenhuma data preenchida
+// (status em branco) passa a valer como "hoje" -- recalculado toda vez que
+// o painel e aberto, entao continua se auto-atualizando dia a dia sozinho.
+function normalizarStatusVencidoOuSemData(hoje){
+  const hojeStr = formatarDataBR(hoje);
+  acaoData.forEach(a => {
+    const status = (a.status || "").trim();
+    if(status === ""){
+      a.status = hojeStr;
+      return;
+    }
+    const d = parseDataStatus(status);
+    if(d && d.getTime() < hoje.getTime()){
+      a.status = hojeStr;
+    }
+  });
+}
+
 // Prioridade do Plano de Acao: 1) data de hoje no topo, 2) Urgente (!!!) em
 // seguida, 3) as demais em ordem crescente de data (sem data data por ultimo).
 function ordenarAcaoData(){
   const hoje = new Date();
   hoje.setHours(0,0,0,0);
+  normalizarStatusVencidoOuSemData(hoje);
   acaoData.forEach((a, i) => { a._idx = i; });
   acaoData.sort((a, b) => {
     const da = parseDataStatus(a.status), db = parseDataStatus(b.status);
