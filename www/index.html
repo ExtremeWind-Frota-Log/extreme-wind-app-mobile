@@ -280,7 +280,22 @@
 
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", function(){
-      navigator.serviceWorker.register("./sw.js").catch(function(){});
+      navigator.serviceWorker.register("./sw.js").then(function(reg){
+        // Checa se tem versao nova toda vez que o app volta pro primeiro plano
+        // (sem isso, no app instalado o SW so verifica de tempos em tempos).
+        document.addEventListener("visibilitychange", function(){
+          if (document.visibilityState === "visible") { reg.update().catch(function(){}); }
+        });
+      }).catch(function(){});
+    });
+
+    // Quando um novo Service Worker assume o controle, recarrega a pagina
+    // automaticamente -- sem isso, so pegava a versao nova na 2a abertura do app.
+    var ewSwRefreshing = false;
+    navigator.serviceWorker.addEventListener("controllerchange", function(){
+      if (ewSwRefreshing) return;
+      ewSwRefreshing = true;
+      window.location.reload();
     });
   }
 </script>
