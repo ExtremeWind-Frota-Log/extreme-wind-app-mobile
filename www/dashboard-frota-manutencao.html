@@ -143,6 +143,12 @@
     #acaoTable th:nth-child(2), #acaoTable td:nth-child(2){
       display:none;
     }
+    /* Detalhamento e Plano de Acao: menos padding lateral no mobile pra
+       tabela aproveitar mais a largura, quase ate a borda do quadro. */
+    #panelDetalhamento, #panelPlanoAcao{
+      padding-left:8px;
+      padding-right:8px;
+    }
   }
 
   .legend{display:flex; gap:16px; flex-wrap:wrap; font-size:12px; color:var(--muted); margin-top:10px;}
@@ -234,7 +240,7 @@
   </div>
 </div>
 
-<div class="panel">
+<div class="panel" id="panelDetalhamento">
   <h2 style="margin-bottom:14px">Veículos — Detalhamento (Semana 30)</h2>
 
   <div class="toolbar">
@@ -606,7 +612,7 @@
 
 <div style="height:24px"></div>
 
-<div class="panel">
+<div class="panel" id="panelPlanoAcao">
   <div class="panel-header">
     <h2 style="margin-bottom:0">Plano de Ação — Semana 30</h2>
     <button class="toggle-btn" id="toggleAcao" aria-expanded="false">Expandir <span class="chev">▾</span></button>
