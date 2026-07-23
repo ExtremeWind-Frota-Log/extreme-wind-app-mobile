@@ -143,10 +143,6 @@
   <div class="card"><h2>Ranking por parque <span>top 10</span></h2><canvas id="chartRankingParque"></canvas></div>
   <div class="card"><h2>Ranking por cliente <span>total historico</span></h2><canvas id="chartRankingCliente"></canvas></div>
 </div>
-<div class="card" style="margin-bottom:20px;">
-  <h2>Evolucao mensal de eventos <span>jan/24 a jul/26</span></h2>
-  <div class="scrollx"><canvas id="chartEvolucao" style="min-width:900px;"></canvas></div>
-</div>
 <div class="card">
   <h2>Solicitacoes por motivo (mensal) <span>Cliente x Extreme - percentual do mes em cada barra</span></h2>
   <div id="motivoResumo" style="margin:-4px 0 10px; color:#93a3b8; font-size:12px;"></div>
@@ -313,20 +309,6 @@ var chartRankingCliente = new Chart(document.getElementById('chartRankingCliente
 });
 
 var meses = ["Jan/24","Fev/24","Mar/24","Abr/24","Mai/24","Jun/24","Jul/24","Ago/24","Set/24","Out/24","Nov/24","Dez/24","Jan/25","Fev/25","Mar/25","Abr/25","Mai/25","Jun/25","Jul/25","Ago/25","Set/25","Out/25","Nov/25","Dez/25","Jan/26","Fev/26","Mar/26","Abr/26","Mai/26","Jun/26","Jul/26"];
-var mob = [22,7,5,27,16,23,10,13,22,12,11,5,35,13,17,17,40,32,17,12,13,23,43,9,79,37,31,40,33,18,14];
-var desmob = [5,1,16,6,13,23,17,20,9,11,30,13,10,9,18,23,24,15,23,34,27,11,15,68,11,16,39,56,44,29,15];
-var canc = [0,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,1,0,0];
-var chartEvolucao = new Chart(document.getElementById('chartEvolucao'), {
-  type:'line',
-  data:{ labels: meses,
-    datasets:[
-      {label:'Mobilizacao', data:mob, borderColor:'#1C8CE8', backgroundColor:'#1C8CE8', tension:.25, pointRadius:2},
-      {label:'Desmobilizacao', data:desmob, borderColor:'#9b59b6', backgroundColor:'#9b59b6', tension:.25, pointRadius:2},
-      {label:'Cancelamento', data:canc, borderColor:'#E0483C', backgroundColor:'#E0483C', tension:.25, pointRadius:2}
-    ]},
-  options:{responsive:true, plugins:{legend:{position:'top', labels:{boxWidth:12, font:{size:11}}}},
-    scales:{x:{ticks:{font:{size:10}}, grid:{display:false}}, y:{beginAtZero:true, grid:{color:'#2a3746'}}}}
-});
 
 var motivoCliente = [16,3,16,26,15,24,10,21,21,6,25,10,38,15,20,29,42,28,30,34,33,25,50,59,71,34,42,41,44,25,21];
 var motivoExtreme = [11,5,5,7,14,22,17,14,11,17,16,8,7,7,15,11,22,19,10,12,7,9,9,18,19,19,28,56,34,22,8];
