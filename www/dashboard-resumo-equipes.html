@@ -308,17 +308,22 @@ var chartRankingCliente = new Chart(document.getElementById('chartRankingCliente
     scales:{x:{stacked:true, grid:{color:'#2a3746'}}, y:{stacked:true, grid:{display:false}}}}
 });
 
-var meses = ["Jan/24","Fev/24","Mar/24","Abr/24","Mai/24","Jun/24","Jul/24","Ago/24","Set/24","Out/24","Nov/24","Dez/24","Jan/25","Fev/25","Mar/25","Abr/25","Mai/25","Jun/25","Jul/25","Ago/25","Set/25","Out/25","Nov/25","Dez/25","Jan/26","Fev/26","Mar/26","Abr/26","Mai/26","Jun/26","Jul/26"];
+var mesesTodos = ["Jan/24","Fev/24","Mar/24","Abr/24","Mai/24","Jun/24","Jul/24","Ago/24","Set/24","Out/24","Nov/24","Dez/24","Jan/25","Fev/25","Mar/25","Abr/25","Mai/25","Jun/25","Jul/25","Ago/25","Set/25","Out/25","Nov/25","Dez/25","Jan/26","Fev/26","Mar/26","Abr/26","Mai/26","Jun/26","Jul/26"];
+var motivoClienteTodos = [16,3,16,26,15,24,10,21,21,6,25,10,38,15,20,29,42,28,30,34,33,25,50,59,71,34,42,41,44,25,21];
+var motivoExtremeTodos = [11,5,5,7,14,22,17,14,11,17,16,8,7,7,15,11,22,19,10,12,7,9,9,18,19,19,28,56,34,22,8];
 
-var motivoCliente = [16,3,16,26,15,24,10,21,21,6,25,10,38,15,20,29,42,28,30,34,33,25,50,59,71,34,42,41,44,25,21];
-var motivoExtreme = [11,5,5,7,14,22,17,14,11,17,16,8,7,7,15,11,22,19,10,12,7,9,9,18,19,19,28,56,34,22,8];
+// Mes atual + ultimos 12 meses (13 barras no total)
+var JANELA_MESES = 13;
+var meses = mesesTodos.slice(-JANELA_MESES);
+var motivoCliente = motivoClienteTodos.slice(-JANELA_MESES);
+var motivoExtreme = motivoExtremeTodos.slice(-JANELA_MESES);
 var motivoTotais = motivoCliente.map(function(v,i){ return v + motivoExtreme[i]; });
 var somaCliente = motivoCliente.reduce(function(a,b){return a+b;},0);
 var somaExtreme = motivoExtreme.reduce(function(a,b){return a+b;},0);
 var somaGeralMotivo = somaCliente + somaExtreme;
 var pctClienteGeral = (somaCliente/somaGeralMotivo*100).toFixed(1);
 var pctExtremeGeral = (somaExtreme/somaGeralMotivo*100).toFixed(1);
-document.getElementById('motivoResumo').textContent = 'Historico completo: Cliente ' + pctClienteGeral + '% (' + somaCliente + ') | Extreme ' + pctExtremeGeral + '% (' + somaExtreme + ') de ' + somaGeralMotivo + ' solicitacoes';
+document.getElementById('motivoResumo').textContent = 'Ultimos 12 meses + mes atual: Cliente ' + pctClienteGeral + '% (' + somaCliente + ') | Extreme ' + pctExtremeGeral + '% (' + somaExtreme + ') de ' + somaGeralMotivo + ' solicitacoes';
 
 var pctLabelsPlugin = {
   id: 'pctLabelsMotivo',
