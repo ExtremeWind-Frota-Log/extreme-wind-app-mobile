@@ -42,9 +42,14 @@
   .kpi .foot{font-size:12.5px; color:var(--muted); margin-top:6px;}
 
   .locadoras{display:flex; gap:8px; margin-top:10px;}
-  .loc-badge{flex:1; display:flex; flex-direction:column; align-items:center; border-radius:6px; padding:8px 6px;}
+  .loc-badge{flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; border-radius:6px; padding:8px 4px; overflow:hidden;}
   .loc-badge .n{font-size:18px; font-weight:700;}
-  .loc-badge .l{font-size:11px; text-transform:uppercase; letter-spacing:.04em; opacity:.85;}
+  .loc-badge .l{font-size:11px; text-transform:uppercase; letter-spacing:.02em; opacity:.85; text-align:center; overflow-wrap:break-word; word-break:break-word; hyphens:auto;}
+  @media (max-width:480px){
+    .loc-badge{padding:8px 3px;}
+    .loc-badge .n{font-size:16px;}
+    .loc-badge .l{font-size:9.5px; letter-spacing:0;}
+  }
   .loc-localiza{background:rgba(18,191,168,.20); color:var(--teal);}
   .loc-unidas{background:rgba(28,140,232,.20); color:var(--steel);}
 
