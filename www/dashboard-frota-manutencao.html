@@ -168,9 +168,9 @@
       display:none;
     }
     /* Historico Semanal Completo: so Semana + Media Geral no mobile
-       (esconde as 10 colunas de categoria, 2a a 11a). */
-    #histTable th:nth-child(n+2):nth-child(-n+11),
-    #histTable td:nth-child(n+2):nth-child(-n+11){
+       (esconde as 7 colunas de categoria, 2a a 8a). */
+    #histTable th:nth-child(n+2):nth-child(-n+8),
+    #histTable td:nth-child(n+2):nth-child(-n+8){
       display:none;
     }
   }
@@ -1195,7 +1195,10 @@ const histData = [
   { wk:"WK29", geral:94.7, cats:[73.3,66.7,100,93.3,86.7,93.3,100,null,100.0,null] },
   { wk:"WK30", geral:86.2, cats:[75.0,62.5,93.8,81.2,81.2,81.2,93.8,null,100.0,null] },
 ];
-const HIST_CAT_LABELS = ["KM Troca","Saldo Extra","Checklist","Revisão","Estepe Extra","Medição Pneus","Rastreador","Consumo","Doc Postado","Doc Entregue"];
+// Consumo, Doc Postado e Doc Entregue removidos desta tabela por pedido do
+// usuario (continuam existindo em "Conformidade por Categoria", que e uma
+// tabela gerada separadamente no Python e nao usa esta lista).
+const HIST_CAT_LABELS = ["KM Troca","Saldo Extra","Checklist","Revisão","Estepe Extra","Medição Pneus","Rastreador"];
 
 function histCellClass(v){
   if(v === null || v === undefined) return "nd";
@@ -1253,7 +1256,7 @@ function renderHistTable(){
 
   const tbody = document.getElementById("histTableBody");
   tbody.innerHTML = histData.map(d => {
-    const catCells = d.cats.map(v => `<td class="${histCellClass(v)}">${histCellText(v)}</td>`).join("");
+    const catCells = d.cats.slice(0,7).map(v => `<td class="${histCellClass(v)}">${histCellText(v)}</td>`).join("");
     return `<tr><td style="text-align:left;color:var(--muted)">${d.wk}</td>${catCells}<td class="${histCellClass(d.geral)}" style="font-weight:700">${histCellText(d.geral)}</td></tr>`;
   }).join("");
 }
