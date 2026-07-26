@@ -182,6 +182,12 @@
   <div style="position:relative; height:280px;">
     <canvas id="chartEvolucao"></canvas>
   </div>
+  <div class="tablewrap" style="margin-top:16px">
+  <table>
+    <thead><tr><th>Mês</th><th>Requisições (total)</th><th>Entregues (Log.)</th></tr></thead>
+    <tbody id="evolucaoTableBody"></tbody>
+  </table>
+  </div>
 </div>
 
 <div class="panel" id="panelPlanoAcao">
@@ -237,11 +243,11 @@
   var evolucaoReq = [100, 83, 106, 76, 58, 83, 27, 0, 0, 0, 0, 0];
   var evolucaoEnt = [96, 76, 103, 72, 58, 73, 15, 0, 0, 0, 0, 0];
   new Chart(document.getElementById("chartEvolucao"), {
-    type:"bar",
+    type:"line",
     data:{ labels: evolucaoMeses,
       datasets:[
-        {label:"Requisições", data:evolucaoReq, backgroundColor:"#1C8CE8"},
-        {label:"Entregues (Log.)", data:evolucaoEnt, backgroundColor:"#12A874"}
+        {label:"Requisições", data:evolucaoReq, borderColor:"#1C8CE8", backgroundColor:"#1C8CE8", pointBackgroundColor:"#1C8CE8", tension:0.35, fill:false},
+        {label:"Entregues (Log.)", data:evolucaoEnt, borderColor:"#12A874", backgroundColor:"#12A874", pointBackgroundColor:"#12A874", tension:0.35, fill:false}
       ]},
     options:{responsive:true, maintainAspectRatio:false,
       plugins:{legend:{position:"top", labels:{boxWidth:12, font:{size:11}, color:"#EAF1F7"}}},
@@ -250,6 +256,13 @@
         y:{beginAtZero:true, ticks:{color:"#8FA9C0"}, grid:{color:"#1E4363"}}
       }}
   });
+
+  var evolucaoTableBody = document.getElementById("evolucaoTableBody");
+  var evolucaoTableRows = "";
+  for (var i = 0; i < evolucaoMeses.length; i++) {
+    evolucaoTableRows += "<tr><td>" + evolucaoMeses[i] + "</td><td>" + evolucaoReq[i] + "</td><td>" + evolucaoEnt[i] + "</td></tr>";
+  }
+  evolucaoTableBody.innerHTML = evolucaoTableRows || '<tr><td colspan="3" style="color:var(--muted); text-align:center;">Sem dados</td></tr>';
 
   var toggleAcao = document.getElementById("toggleAcao");
   var acaoBody = document.getElementById("acaoBody");
