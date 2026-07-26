@@ -4,12 +4,19 @@
 // pro cache quando estiver offline. Para imagens/assets estaticos, usa cache-first
 // (nao mudam com frequencia).
 
-const CACHE_NAME = "extreme-wind-v2";
+// Bump este numero (v2 -> v3 -> v4...) sempre que o menu/estrutura do
+// index.html mudar de forma relevante -- forca todo cliente que ja tinha o
+// app/site aberto a descartar o cache antigo e buscar tudo de novo na
+// proxima visita, em vez de ficar preso numa versao antiga do menu.
+const CACHE_NAME = "extreme-wind-v3";
 const PRECACHE_URLS = [
   "./",
   "./index.html",
+  "./dashboard-nossas-demandas.html",
   "./dashboard-resumo-equipes.html",
   "./dashboard-frota-manutencao.html",
+  "./dashboard-boletos.html",
+  "./dashboard-envios-logisticos.html",
   "./manifest.json",
   "./assets/icon-192.png",
   "./assets/icon-512.png",
