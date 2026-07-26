@@ -41,6 +41,19 @@
   .kpi .label{color:var(--muted); font-size:12.5px; text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px;}
   .kpi .n{font-size:30px; font-weight:700;}
 
+  /* Caixas preenchidas (mesmo padrao usado nos badges de destaque do site:
+     fundo solido na cor da categoria, texto branco) -- Almoxarifado=azul,
+     Entregues/Logistica=verde, Canceladas=vermelho. */
+  .kpi-fill-blue{background:var(--brand); border-left-color:var(--brand);}
+  .kpi-fill-blue .label{color:rgba(255,255,255,.8);}
+  .kpi-fill-blue .n{color:#fff;}
+  .kpi-fill-green{background:var(--ok); border-left-color:var(--ok);}
+  .kpi-fill-green .label{color:rgba(255,255,255,.8);}
+  .kpi-fill-green .n{color:#fff;}
+  .kpi-fill-red{background:var(--nok); border-left-color:var(--nok);}
+  .kpi-fill-red .label{color:rgba(255,255,255,.85);}
+  .kpi-fill-red .n{color:#fff;}
+
   .aberto{display:flex; gap:10px; margin-bottom:24px; flex-wrap:wrap;}
   .aberto-badge{flex:1; min-width:150px; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:14px 16px;}
   .aberto-badge .n{font-size:22px; font-weight:700;}
@@ -137,15 +150,15 @@
     <div class="label">Total 2026</div>
     <div class="n" id="kpiTotal">533</div>
   </div>
-  <div class="kpi">
+  <div class="kpi kpi-fill-blue">
     <div class="label">Requisições Almoxarifado 2026</div>
     <div class="n" id="kpiAlmox">502</div>
   </div>
-  <div class="kpi kpi-ok">
+  <div class="kpi kpi-fill-green">
     <div class="label">Entregues 2026 (Log.)</div>
     <div class="n" id="kpiEntregues">493</div>
   </div>
-  <div class="kpi kpi-nok">
+  <div class="kpi kpi-fill-red">
     <div class="label">Canceladas 2026 (Almox.)</div>
     <div class="n" id="kpiCanceladas">31</div>
   </div>
