@@ -184,7 +184,7 @@
   </div>
   <div class="tablewrap" style="margin-top:16px">
   <table>
-    <thead><tr><th>Mês</th><th>Requisições (total)</th><th>Entregues (Log.)</th></tr></thead>
+    <thead><tr><th>Mês</th><th>Requisições (total)</th><th>Entregues (Log.)</th><th>Canceladas</th></tr></thead>
     <tbody id="evolucaoTableBody"></tbody>
   </table>
   </div>
@@ -239,9 +239,9 @@
 <div class="note" id="fonteNote">Fonte: planilha "Controle_Logistico_Requisicoes.xlsx", aba DASHBOARD (ROBSON). Dados extraídos automaticamente; confira os valores na fonte antes de compartilhar. Uso interno do setor — link privado, não indexado publicamente; não repasse fora da equipe sem necessidade.</div>
 
 <script>
-  var evolucaoMeses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
-  var evolucaoReq = [100, 83, 106, 76, 58, 83, 27, 0, 0, 0, 0, 0];
-  var evolucaoEnt = [96, 76, 103, 72, 58, 73, 15, 0, 0, 0, 0, 0];
+  var evolucaoMeses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul"];
+  var evolucaoReq = [100, 83, 106, 76, 58, 83, 27];
+  var evolucaoEnt = [96, 76, 103, 72, 58, 73, 15];
   new Chart(document.getElementById("chartEvolucao"), {
     type:"line",
     data:{ labels: evolucaoMeses,
@@ -260,9 +260,11 @@
   var evolucaoTableBody = document.getElementById("evolucaoTableBody");
   var evolucaoTableRows = "";
   for (var i = 0; i < evolucaoMeses.length; i++) {
-    evolucaoTableRows += "<tr><td>" + evolucaoMeses[i] + "</td><td>" + evolucaoReq[i] + "</td><td>" + evolucaoEnt[i] + "</td></tr>";
+    var cancelados = evolucaoReq[i] - evolucaoEnt[i];
+    evolucaoTableRows += "<tr><td>" + evolucaoMeses[i] + "</td><td>" + evolucaoReq[i] + "</td><td>" + evolucaoEnt[i] +
+      "</td><td style=\"color:var(--nok); font-weight:600;\">" + cancelados + "</td></tr>";
   }
-  evolucaoTableBody.innerHTML = evolucaoTableRows || '<tr><td colspan="3" style="color:var(--muted); text-align:center;">Sem dados</td></tr>';
+  evolucaoTableBody.innerHTML = evolucaoTableRows || '<tr><td colspan="4" style="color:var(--muted); text-align:center;">Sem dados</td></tr>';
 
   var toggleAcao = document.getElementById("toggleAcao");
   var acaoBody = document.getElementById("acaoBody");
