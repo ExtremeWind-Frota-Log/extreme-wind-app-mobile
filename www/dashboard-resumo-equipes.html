@@ -219,6 +219,17 @@ document.querySelectorAll('.tab').forEach(function(t){
     }
   });
 });
+// Acesso direto pela aba "Buscar Tecnico" do menu Visao (index.html abre este
+// arquivo num iframe com "#busca" na URL) -- ja abre nessa aba, sem precisar
+// passar por "Equipes ativas" primeiro.
+if (location.hash === '#busca') {
+  var tabBusca = document.querySelector('.tab[data-tab="busca"]');
+  if (tabBusca) {
+    tabBusca.click();
+    var inputBusca = document.getElementById('buscaTecInput');
+    if (inputBusca) { setTimeout(function(){ inputBusca.focus(); }, 50); }
+  }
+}
 Chart.defaults.color = '#93a3b8';
 Chart.defaults.font.family = "'Segoe UI',Arial,sans-serif";
 
