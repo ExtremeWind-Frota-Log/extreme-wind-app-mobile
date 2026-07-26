@@ -507,22 +507,39 @@ var CLIENTES_TEC = ["GE", "SIEMENS", "NORDEX / LWS", "VESTAS", "ELETROBRAS", "EÃ
     }
 
     var thead = document.getElementById('theadTecAnoCliente');
-    thead.innerHTML = '<th>Ano</th>' + CLIENTES_TEC.map(function(c){ return '<th class="num">'+c+'</th>'; }).join('') + '<th class="num">Total</th>';
+    thead.innerHTML = '<th>Ano</th>' + CLIENTES_TEC.map(function(c){ return '<th class="num">'+c+'</th>'; }).join('');
     var tbodyAC = document.getElementById('tbodyTecAnoCliente');
     tbodyAC.innerHTML = '';
     var anosCliente = Object.keys(tec.dias_ano_cliente || {}).sort();
+    var totalPorCliente = {};
+    CLIENTES_TEC.forEach(function(c){ totalPorCliente[c] = 0; });
     anosCliente.forEach(function(ano){
       var porCliente = tec.dias_ano_cliente[ano] || {};
-      var totalAno = 0;
       var cells = CLIENTES_TEC.map(function(c){
         var v = porCliente[c] || 0;
-        totalAno += v;
+        totalPorCliente[c] += v;
         return '<td class="num">'+(v || '-')+'</td>';
       }).join('');
       var tr = document.createElement('tr');
-      tr.innerHTML = '<td>'+ano+'</td>'+cells+'<td class="num" style="font-weight:700;">'+totalAno+'</td>';
+      tr.innerHTML = '<td>'+ano+'</td>'+cells;
       tbodyAC.appendChild(tr);
     });
+    var grandTotal = CLIENTES_TEC.reduce(function(s,c){ return s + totalPorCliente[c]; }, 0);
+    if(anosCliente.length){
+      var trTotalCli = document.createElement('tr');
+      trTotalCli.style.fontWeight = '700'; trTotalCli.style.borderTop = '2px solid #2a3746';
+      trTotalCli.innerHTML = '<td>Total</td>' + CLIENTES_TEC.map(function(c){
+        return '<td class="num">'+(totalPorCliente[c] || '-')+'</td>';
+      }).join('');
+      tbodyAC.appendChild(trTotalCli);
+
+      var trPctCli = document.createElement('tr');
+      trPctCli.innerHTML = '<td style="color:var(--muted);">%</td>' + CLIENTES_TEC.map(function(c){
+        var pct = grandTotal ? Math.round(totalPorCliente[c] / grandTotal * 100) : 0;
+        return '<td class="num" style="color:var(--muted);">'+(totalPorCliente[c] ? pct+'%' : '-')+'</td>';
+      }).join('');
+      tbodyAC.appendChild(trPctCli);
+    }
 
     var negativos = tec.negativos || [];
     var tbodyNeg = document.getElementById('tbodyTecNegativos');
