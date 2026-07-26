@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>Dashboard Envios Logísticos</title>
+<link rel="icon" type="image/png" href="assets/icone-helice-color.png">
+<style>
+  :root{
+    /* Paleta fria, sólida — baseada no azul da logo Extreme Wind (hélice/marca) */
+    --brand:#00679A;      /* azul-marinho da helice/marca, conferido na logo oficial */
+    --brand-dark:#055384; /* azul mais profundo, para chrome/header */
+    --brand-deep:#021C2C; /* quase-preto azulado, fundo da página */
+    --steel:#1C8CE8;      /* azul vívido, acentos secundários */
+    --teal:#12BFA8;       /* verde-azulado vívido, terceiro acento */
+
+    --bg:#081C2C; --panel:#0F2A40; --panel2:#123350; --line:#1E4363;
+    --text:#EAF1F7; --muted:#8FA9C0;
+
+    --ok:#12A874; --nok:#E0483C; --warn:#D89A2B; --na:#5C7A93;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:Segoe UI,Arial,sans-serif; background:var(--bg); color:var(--text);
+    padding:24px; line-height:1.4; zoom:1.15;
+  }
+  @media (max-width:820px){
+    body{zoom:1; padding:14px;}
+    header{gap:10px;}
+  }
+  header{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:24px; border-bottom:1px solid var(--line); padding-bottom:18px;}
+  .brand{display:flex; align-items:center; gap:14px;}
+  .brand svg{display:block;}
+  .brand h1{font-size:19px; margin:0; letter-spacing:.02em;}
+  .brand .sub{color:var(--muted); font-size:12.5px; margin-top:2px;}
+  .badge-week{background:var(--brand); color:#fff; font-weight:600; padding:7px 16px; border-radius:6px; font-size:13px;}
+
+  .kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-bottom:24px;}
+  .kpi{background:var(--panel); border:1px solid var(--line); border-left:4px solid var(--brand); border-radius:10px; padding:20px;}
+  .kpi-ok{border-left:4px solid var(--teal);}
+  .kpi-warn{background:rgba(216,154,43,.20); border-left:4px solid var(--warn);}
+  .kpi-nok{border-left:4px solid var(--nok);}
+  .kpi .label{color:var(--muted); font-size:12.5px; text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px;}
+  .kpi .n{font-size:30px; font-weight:700;}
+
+  .aberto{display:flex; gap:10px; margin-bottom:24px; flex-wrap:wrap;}
+  .aberto-badge{flex:1; min-width:150px; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:14px 16px;}
+  .aberto-badge .n{font-size:22px; font-weight:700;}
+  .aberto-badge .l{font-size:11.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; margin-top:2px;}
+  .aberto-badge.total{background:var(--brand); border-color:var(--brand);}
+  .aberto-badge.total .l{color:rgba(255,255,255,.8);}
+
+  .panel{background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:18px; margin-bottom:20px;}
+  .panel h2{font-size:15px; margin:0 0 4px; color:var(--text);}
+  .panel .panel-note{font-size:11.5px; color:var(--muted); margin:0 0 14px;}
+
+  .panel-header{display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:4px;}
+  .toggle-btn{
+    background:var(--brand); color:#fff; border:none; border-radius:6px; padding:8px 16px;
+    font-size:13px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;
+    white-space:nowrap; transition:background .15s;
+  }
+  .toggle-btn:hover{background:var(--steel);}
+  .toggle-btn .chev{transition:transform .2s; display:inline-block;}
+  .toggle-btn[aria-expanded="true"] .chev{transform:rotate(180deg);}
+
+  .collapsible{display:none; animation:expand .18s ease-out;}
+  .collapsible.open{display:block;}
+  @keyframes expand{from{opacity:0; transform:translateY(-6px);} to{opacity:1; transform:translateY(0);}}
+
+  table{width:100%; border-collapse:collapse; font-size:12.5px;}
+  .tablewrap{overflow-x:auto;}
+  th{background:var(--panel2); text-align:left; padding:9px 12px; color:var(--muted); font-weight:600; white-space:nowrap;}
+  td{padding:9px 12px; border-bottom:1px solid var(--line); white-space:normal; word-break:break-word; vertical-align:top;}
+  tr:hover td{background:#153A57;}
+  tr.row-warn td{background:rgba(216,154,43,.20);}
+  tr.row-warn:hover td{background:rgba(216,154,43,.32);}
+  .tag{display:inline-block; padding:2px 9px; border-radius:20px; font-size:11px; font-weight:700; white-space:nowrap;}
+  .tag-ok{background:rgba(18,168,116,.18); color:var(--ok);}
+  .tag-warn{background:rgba(216,154,43,.18); color:var(--warn);}
+  .tag-nok{background:rgba(224,72,60,.18); color:var(--nok);}
+  .tag-na{background:rgba(92,122,147,.24); color:var(--na);}
+
+  .note{font-size:12px; color:var(--muted); margin-top:18px; border-top:1px solid var(--line); padding-top:12px;}
+</style>
+</head>
+<body>
+<div id="ewNav" style="position:fixed; top:14px; right:14px; z-index:999; font-family:Segoe UI,Arial,sans-serif;">
+  <button id="ewNavBtn" aria-label="Menu de navegação" style="width:42px; height:42px; border-radius:8px; border:1px solid #1E4363; background:#123350; color:#EAF1F7; font-size:18px; cursor:pointer;">&#9776;</button>
+  <div id="ewNavPanel" style="display:none; position:absolute; top:48px; right:0; background:#0F2A40; border:1px solid #1E4363; border-radius:10px; padding:8px; min-width:210px; box-shadow:0 8px 24px rgba(0,0,0,.45);">
+    <a href="index.html" class="ew-nav-item">&#8962; Início</a>
+    <a href="dashboard-resumo-equipes.html" class="ew-nav-item">&#128101; Controle de Equipes</a>
+    <a href="dashboard-frota-manutencao.html" class="ew-nav-item">&#128663; Frota — Manutenção</a>
+    <a href="dashboard-boletos.html" class="ew-nav-item">&#129534; Controle de Boletos</a>
+    <a href="dashboard-envios-logisticos.html" class="ew-nav-item">&#128230; Envios Logísticos</a>
+  </div>
+</div>
+<style>
+  .ew-nav-item{display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:6px; color:#8FA9C0; text-decoration:none; font-size:13px; font-weight:600;}
+  .ew-nav-item:hover{background:rgba(255,255,255,.08); color:#EAF1F7;}
+  .ew-nav-item.current{background:#00679A; color:#fff;}
+</style>
+<script>
+  (function(){
+    // Dentro do app (index.html carrega cada dashboard num iframe) ja existe
+    // o menu lateral proprio -- escondemos este pra nao duplicar.
+    if (window.self !== window.top) {
+      document.getElementById('ewNav').style.display = 'none';
+      return;
+    }
+    var btn=document.getElementById('ewNavBtn'), panel=document.getElementById('ewNavPanel');
+    btn.addEventListener('click', function(e){ e.stopPropagation(); panel.style.display = panel.style.display==='none'?'block':'none'; });
+    document.addEventListener('click', function(){ panel.style.display='none'; });
+    panel.addEventListener('click', function(e){ e.stopPropagation(); });
+    var here = (location.pathname.split('/').pop() || 'index.html');
+    Array.prototype.forEach.call(panel.querySelectorAll('a'), function(a){
+      if(a.getAttribute('href') === here) a.classList.add('current');
+    });
+  })();
+</script>
+
+<header>
+  <div class="brand">
+    <img src="assets/icone-helice-color.png" alt="" style="height:60px; width:auto; display:block;">
+    <div>
+      <img src="assets/logo-extreme-wind-white.png" alt="Extreme Wind" style="height:30px; width:auto; display:block; margin-bottom:6px;">
+      <div class="sub">Dashboard de Envios Logísticos — Uso interno</div>
+      <div class="sub" style="margin-top:4px;">Requisições de materiais (Almoxarifado → Logística)</div>
+    </div>
+  </div>
+  <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap">
+    <div class="badge-week" id="badgeAtualizado">Atualizado 26/07/2026</div>
+    <button class="toggle-btn" id="navAcao" style="background:var(--nok)">Plano de Ação</button>
+  </div>
+</header>
+
+<div class="kpis" id="kpisEnvios">
+  <div class="kpi">
+    <div class="label">Total 2026</div>
+    <div class="n" id="kpiTotal">533</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Requisições Almoxarifado 2026</div>
+    <div class="n" id="kpiAlmox">502</div>
+  </div>
+  <div class="kpi kpi-ok">
+    <div class="label">Entregues 2026 (Log.)</div>
+    <div class="n" id="kpiEntregues">493</div>
+  </div>
+  <div class="kpi kpi-nok">
+    <div class="label">Canceladas 2026 (Almox.)</div>
+    <div class="n" id="kpiCanceladas">31</div>
+  </div>
+</div>
+
+<div class="panel">
+  <h2>Resumo — Requisições em Aberto 2026</h2>
+  <p class="panel-note">Situações que ainda aguardam ação (Almoxarifado ou Logística)</p>
+  <div class="aberto" id="abertoBadges">
+    <div class="aberto-badge"><div class="n" id="abEmSeparacao">1</div><div class="l">Em separação</div></div>
+    <div class="aberto-badge"><div class="n" id="abAguardandoColeta">0</div><div class="l">Aguardando coleta</div></div>
+    <div class="aberto-badge"><div class="n" id="abEmTrajeto">8</div><div class="l">Em trajeto</div></div>
+    <div class="aberto-badge total"><div class="n" id="abTotal">9</div><div class="l">Total em aberto</div></div>
+  </div>
+</div>
+
+<div class="panel">
+  <h2>Evolução Mensal 2026 — Requisições x Entregues (Logística)</h2>
+  <p class="panel-note" id="evolucaoNote">Base: mês da Data da Requisição (Sheet1, coluna B). *2024 não tem nenhum registro; 2025 só tem dado real em 3 meses (fev/out/dez) — médias parciais.</p>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Mês</th><th>Requisições (total)</th><th>Entregues (Log.)</th></tr></thead>
+    <tbody id="evolucaoRows">
+    <tr><td>Jan</td><td>100</td><td>96</td></tr>
+    <tr><td>Fev</td><td>83</td><td>76</td></tr>
+    <tr><td>Mar</td><td>106</td><td>103</td></tr>
+    <tr><td>Abr</td><td>76</td><td>72</td></tr>
+    <tr><td>Mai</td><td>58</td><td>58</td></tr>
+    <tr><td>Jun</td><td>83</td><td>73</td></tr>
+    <tr><td>Jul</td><td>27</td><td>15</td></tr>
+    <tr><td>Ago</td><td>0</td><td>0</td></tr>
+    <tr><td>Set</td><td>0</td><td>0</td></tr>
+    <tr><td>Out</td><td>0</td><td>0</td></tr>
+    <tr><td>Nov</td><td>0</td><td>0</td></tr>
+    <tr><td>Dez</td><td>0</td><td>0</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="panel" id="panelPlanoAcao">
+  <div class="panel-header">
+    <h2 style="margin-bottom:0">Plano de Ação — Detalhe por Requisição (2026)</h2>
+    <button class="toggle-btn" id="toggleAcao" aria-expanded="false">Expandir <span class="chev">▾</span></button>
+  </div>
+  <p class="panel-note">Itens em aberto hoje, um por linha. Divergências entre Almoxarifado e Logística entram aqui como atividade de quem precisa corrigir.</p>
+
+  <div class="collapsible" id="acaoBody">
+  <div class="aberto" style="max-width:420px; margin:6px 0 16px">
+    <div class="aberto-badge"><div class="n" id="acaoCountAlmox">5</div><div class="l">Ações Almoxarifado</div></div>
+    <div class="aberto-badge"><div class="n" id="acaoCountLog">8</div><div class="l">Ações Logística</div></div>
+  </div>
+
+  <h3 style="font-size:12.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:0 0 8px;">Ações Almoxarifado</h3>
+  <div class="tablewrap" style="margin-bottom:20px">
+  <table>
+    <thead><tr><th>Projeto</th><th>Responsável</th><th>Prazo para Entrega</th><th>Destinatário</th><th>Status</th></tr></thead>
+    <tbody id="acoesAlmox">
+    <tr><td>COPEL</td><td>POLLYANA</td><td>27/07/2026</td><td>SERGIO MATEUS</td><td>A separar</td></tr>
+    <tr class="row-warn"><td>OITIS</td><td>POLLYANA</td><td>27/07/2026</td><td>JOHN LENNON</td><td>Divergência: atualizar p/ Enviado</td></tr>
+    <tr class="row-warn"><td>OITIS</td><td>POLLYANA</td><td>27/07/2026</td><td>SANDRELINO</td><td>Divergência: atualizar p/ Enviado</td></tr>
+    <tr class="row-warn"><td>OITIS</td><td>POLLYANA</td><td>27/07/2026</td><td>PEDRO LUCAS</td><td>Divergência: atualizar p/ Enviado</td></tr>
+    <tr class="row-warn"><td>ADM</td><td>POLLYANA</td><td>27/07/2026</td><td>MARIA DEUSARINA</td><td>Divergência: atualizar p/ Enviado</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3 style="font-size:12.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:0 0 8px;">Ações Logística</h3>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Projeto</th><th>Responsável</th><th>Prazo para Entrega</th><th>Destinatário</th><th>Data de Entrega</th><th>Status</th></tr></thead>
+    <tbody id="acoesLog">
+    <tr><td>COPEL</td><td>EVAIR</td><td>22/07/2026</td><td>FELIPE SERPA</td><td></td><td>Em trajeto</td></tr>
+    <tr><td>COPEL</td><td>THAYNÁ</td><td>22/07/2026</td><td>FELIPE SERPA</td><td></td><td>Em trajeto</td></tr>
+    <tr><td>OITIS</td><td>POLLYANA</td><td>27/07/2026</td><td>JOHN LENNON</td><td></td><td>Em trajeto</td></tr>
+    <tr><td>OITIS</td><td>POLLYANA</td><td>27/07/2026</td><td>SANDRELINO</td><td></td><td>Em trajeto</td></tr>
+    <tr><td>OITIS</td><td>POLLYANA</td><td>27/07/2026</td><td>PEDRO LUCAS</td><td></td><td>Em trajeto</td></tr>
+    <tr><td>ADM</td><td>POLLYANA</td><td>27/07/2026</td><td>MARIA DEUSARINA</td><td></td><td>Em trajeto</td></tr>
+    <tr><td>SFN1</td><td>POLLYANA</td><td>24/07/2026</td><td>WEDDON</td><td>26/07/2026</td><td>Aguardando assinatura</td></tr>
+    <tr><td>SFN1</td><td>POLLYANA</td><td>27/07/2026</td><td>APARECIDO</td><td>26/07/2026</td><td>Aguardando assinatura</td></tr>
+    </tbody>
+  </table>
+  </div>
+  </div>
+</div>
+
+<div class="note" id="fonteNote">Fonte: planilha "Controle_Logistico_Requisicoes.xlsx", aba DASHBOARD (ROBSON). Dados extraídos automaticamente; confira os valores na fonte antes de compartilhar. Uso interno do setor — link privado, não indexado publicamente; não repasse fora da equipe sem necessidade.</div>
+
+<script>
+  var toggleAcao = document.getElementById("toggleAcao");
+  var acaoBody = document.getElementById("acaoBody");
+  toggleAcao.addEventListener("click", function(){
+    var isOpen = acaoBody.classList.toggle("open");
+    toggleAcao.setAttribute("aria-expanded", isOpen);
+    toggleAcao.innerHTML = isOpen ? 'Recolher <span class="chev">▾</span>' : 'Expandir <span class="chev">▾</span>';
+  });
+  document.getElementById("navAcao").addEventListener("click", function(){
+    if(!acaoBody.classList.contains("open")){
+      acaoBody.classList.add("open");
+      toggleAcao.setAttribute("aria-expanded", true);
+      toggleAcao.innerHTML = 'Recolher <span class="chev">▾</span>';
+    }
+    acaoBody.closest(".panel").scrollIntoView({ behavior:"smooth", block:"start" });
+  });
+</script>
+</body>
+</html>

@@ -68,6 +68,7 @@
     <a href="dashboard-resumo-equipes.html" class="ew-nav-item">&#128101; Controle de Equipes</a>
     <a href="dashboard-frota-manutencao.html" class="ew-nav-item">&#128663; Frota — Manutenção</a>
     <a href="dashboard-boletos.html" class="ew-nav-item">&#129534; Controle de Boletos</a>
+    <a href="dashboard-envios-logisticos.html" class="ew-nav-item">&#128230; Envios Logísticos</a>
   </div>
 </div>
 <style>
@@ -103,10 +104,10 @@
 
 <div class="panel active" id="panel-ativos">
 <div class="kpis">
-  <div class="kpi"><div class="label">Tecnicos ativos</div><div class="value">45</div><div class="sub">em campo agora</div></div>
-  <div class="kpi"><div class="label">Planejado (headcount)</div><div class="value">45</div><div class="sub">meta de equipes</div></div>
+  <div class="kpi"><div class="label">Tecnicos ativos</div><div class="value">41</div><div class="sub">em campo agora</div></div>
+  <div class="kpi"><div class="label">Planejado (headcount)</div><div class="value">41</div><div class="sub">meta de equipes</div></div>
   <div class="kpi"><div class="label">Deficit total</div><div class="value red">0</div><div class="sub">abaixo do plano</div></div>
-  <div class="kpi"><div class="label">Parques ativos</div><div class="value">11<span class="sub" style="font-size:16px;"> / 11</span></div><div class="sub">0 parques vazios</div></div>
+  <div class="kpi"><div class="label">Parques ativos</div><div class="value">10<span class="sub" style="font-size:16px;"> / 10</span></div><div class="sub">0 parques vazios</div></div>
 </div>
 <div class="grid2">
   <div class="card"><h2>Por cliente <span>tecnicos ativos</span></h2><canvas id="chartCliente"></canvas></div>
@@ -134,10 +135,10 @@
 
 <div class="panel" id="panel-historico">
 <div class="kpis">
-  <div class="kpi"><div class="label">Mobilizacoes</div><div class="value">702</div><div class="sub">51.4% dos eventos</div></div>
-  <div class="kpi"><div class="label">Desmobilizacoes</div><div class="value">657</div><div class="sub">48.1% dos eventos</div></div>
+  <div class="kpi"><div class="label">Mobilizacoes</div><div class="value">702</div><div class="sub">51.3% dos eventos</div></div>
+  <div class="kpi"><div class="label">Desmobilizacoes</div><div class="value">661</div><div class="sub">48.3% dos eventos</div></div>
   <div class="kpi"><div class="label">Cancelamentos</div><div class="value amber">6</div><div class="sub">0.4% dos eventos</div></div>
-  <div class="kpi"><div class="label">Total de eventos</div><div class="value">1365</div><div class="sub">jan/24 a jul/26</div></div>
+  <div class="kpi"><div class="label">Total de eventos</div><div class="value">1369</div><div class="sub">jan/24 a jul/26</div></div>
 </div>
 <div class="grid2">
   <div class="card"><h2>Ranking por parque <span>top 10</span></h2><div style="height:360px;"><canvas id="chartRankingParque" style="max-height:360px;"></canvas></div></div>
@@ -181,8 +182,7 @@ var parques = [
   {nome:"BAIXA DO FEIJÃO/RN", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
   {nome:"SANTO AGOSTINHO/RN", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
   {nome:"TUCANO/BA", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
-  {nome:"DELTA/PI", cliente:"SIEMENS", suop:"WILDNER", real:10, plano:10},
-  {nome:"VENTOS DO PIAUÍ/PI", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
+  {nome:"DELTA/PI", cliente:"SIEMENS", suop:"WILDNER", real:9, plano:9},
   {nome:"INTERMARÍTIMA/BA", cliente:"SIEMENS", suop:"WILDNER", real:2, plano:2}
 ];
 function badgeClass(c){ return {GE:'ge',NORDEX:'nordex',SIEMENS:'siemens'}[c] || 'ge'; }
@@ -202,15 +202,19 @@ trTot.innerHTML = '<td>Total Geral</td><td></td><td></td><td class="num">'+totRe
 tbody.appendChild(trTot);
 
 var tecnicosAtivos = [
-  {mat:"292", nome:"FRANCISCO ELINALDO SILVA QUINTO", acumulado:238, parque:"COPEL/RN", suop:"EVAIR"},
-  {mat:"30", nome:"FELIPE DE LIMA SERPA", acumulado:208, parque:"COPEL/RN", suop:"EVAIR"},
-  {mat:"899", nome:"PEDRO LUCAS DA CRUZ DA SILVA", acumulado:199, parque:"OITIS/PI", suop:"EVAIR"},
-  {mat:"958", nome:"MAURICIO CESAR DE ANDRADE DE MOURA", acumulado:198, parque:"SÃO FERNANDO/RN", suop:"MAGALHÃES"},
-  {mat:"295", nome:"SANDRELINO MACIEL DE FREITAS", acumulado:196, parque:"OITIS/PI", suop:"EVAIR"},
-  {mat:"304", nome:"SERGIO MATEUS DA SILVA MARTINS", acumulado:158, parque:"COPEL/RN", suop:"EVAIR"},
-  {mat:"221", nome:"JAIR DUTRA JUNIOR", acumulado:149, parque:"BAIXA DO FEIJÃO/RN", suop:"WILDNER"},
-  {mat:"983", nome:"ANTONIO CESAR SILVA CASTRO", acumulado:144, parque:"SÃO FERNANDO/RN", suop:"MAGALHÃES"},
-  {mat:"141", nome:"FRANCISCO LUCAS DE OLIVEIRA RODRIGUES", acumulado:125, parque:"VENTOS DO PIAUÍ/PI", suop:"WILDNER"}
+  {mat:"292", nome:"FRANCISCO ELINALDO SILVA QUINTO", acumulado:241, parque:"COPEL/RN", suop:"EVAIR"},
+  {mat:"30", nome:"FELIPE DE LIMA SERPA", acumulado:211, parque:"COPEL/RN", suop:"EVAIR"},
+  {mat:"899", nome:"PEDRO LUCAS DA CRUZ DA SILVA", acumulado:202, parque:"OITIS/PI", suop:"EVAIR"},
+  {mat:"958", nome:"MAURICIO CESAR DE ANDRADE DE MOURA", acumulado:201, parque:"SÃO FERNANDO/RN", suop:"MAGALHÃES"},
+  {mat:"295", nome:"SANDRELINO MACIEL DE FREITAS", acumulado:199, parque:"OITIS/PI", suop:"EVAIR"},
+  {mat:"304", nome:"SERGIO MATEUS DA SILVA MARTINS", acumulado:161, parque:"COPEL/RN", suop:"EVAIR"},
+  {mat:"221", nome:"JAIR DUTRA JUNIOR", acumulado:152, parque:"BAIXA DO FEIJÃO/RN", suop:"WILDNER"},
+  {mat:"983", nome:"ANTONIO CESAR SILVA CASTRO", acumulado:147, parque:"SÃO FERNANDO/RN", suop:"MAGALHÃES"},
+  {mat:"353", nome:"ÉDIPO CARDOSO DE OLIVEIRA", acumulado:134, parque:"TUCANO/BA", suop:"WILDNER"},
+  {mat:"296", nome:"ALDEMIR CORREIA DE JESUS", acumulado:112, parque:"SANTO AGOSTINHO/RN", suop:"WILDNER"},
+  {mat:"192", nome:"JEFERSON APARECIDO ANTENOR", acumulado:108, parque:"SANTO AGOSTINHO/RN", suop:"WILDNER"},
+  {mat:"48", nome:"LERNITON SILVA DE ANDRADE", acumulado:99, parque:"SANTO AGOSTINHO/RN", suop:"WILDNER"},
+  {mat:"369", nome:"ALESSANDRO OLIVEIRA GUIMARÃES DA SILVA", acumulado:92, parque:"SÃO FERNANDO/RN", suop:"MAGALHÃES"}
 ];
 var tbodyTec = document.getElementById('tbodyTecnicos');
 tecnicosAtivos.forEach(function(t){
@@ -295,7 +299,7 @@ var chartRankingParque = new Chart(document.getElementById('chartRankingParque')
 
 var rankingCliente = [
   ["GE",391,382,4],
-  ["SIEMENS",206,176,1],
+  ["SIEMENS",206,180,1],
   ["NORDEX / LWS",62,56,0],
   ["SINOMA BLADES",21,21,1],
   ["LM",11,11,0],
@@ -318,7 +322,7 @@ var chartRankingCliente = new Chart(document.getElementById('chartRankingCliente
 });
 
 var mesesTodos = ["Jan/24","Fev/24","Mar/24","Abr/24","Mai/24","Jun/24","Jul/24","Ago/24","Set/24","Out/24","Nov/24","Dez/24","Jan/25","Fev/25","Mar/25","Abr/25","Mai/25","Jun/25","Jul/25","Ago/25","Set/25","Out/25","Nov/25","Dez/25","Jan/26","Fev/26","Mar/26","Abr/26","Mai/26","Jun/26","Jul/26"];
-var motivoClienteTodos = [16,3,16,26,15,24,10,21,21,6,25,10,38,15,20,29,42,28,30,34,33,25,50,59,71,34,42,41,44,25,21];
+var motivoClienteTodos = [16,3,16,26,15,24,10,21,21,6,25,10,38,15,20,29,42,28,30,34,33,25,50,59,71,34,42,41,44,25,25];
 var motivoExtremeTodos = [11,5,5,7,14,22,17,14,11,17,16,8,7,7,15,11,22,19,10,12,7,9,9,18,19,19,28,56,34,22,20];
 
 // Mes atual + ultimos 12 meses (13 barras no total)

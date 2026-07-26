@@ -153,6 +153,9 @@
       <div class="menu-item" data-view="equipes"><span class="ic">&#128101;</span> Controle de Equipes</div>
       <div class="menu-item" data-view="frota"><span class="ic">&#128663;</span> Frota — Manutenção</div>
       <div class="menu-item" data-view="boletos"><span class="ic">&#129534;</span> Controle de Boletos</div>
+
+      <div class="menu-label">Envios Logísticos</div>
+      <div class="menu-item" data-view="envios"><span class="ic">&#128230;</span> Envios Logísticos</div>
     </nav>
 
     <div class="sidebar-footer">
@@ -190,9 +193,9 @@
           <div class="card" data-view="equipes">
             <div class="card-title">&#128101; Controle de Equipes</div>
             <div class="kpirow">
-              <div><div class="n">45</div><div class="l">Ativos hoje</div></div>
+              <div><div class="n">41</div><div class="l">Ativos hoje</div></div>
               <div><div class="n" style="color:var(--nok)">0</div><div class="l">Déficit</div></div>
-              <div><div class="n">11/11</div><div class="l">Parques</div></div>
+              <div><div class="n">10/10</div><div class="l">Parques</div></div>
             </div>
             <div class="go">Ver equipes ativas e histórico de mobilização →</div>
           </div>
@@ -216,6 +219,16 @@
             </div>
             <div class="go">Ver indicadores por locadora e atualizações semanais →</div>
           </div>
+
+          <div class="card" data-view="envios">
+            <div class="card-title">&#128230; Envios Logísticos</div>
+            <div class="kpirow">
+              <div><div class="n">502</div><div class="l">Requisições 2026</div></div>
+              <div><div class="n" style="color:var(--ok)">493</div><div class="l">Entregues (Log.)</div></div>
+              <div><div class="n" style="color:var(--nok)">9</div><div class="l">Em aberto</div></div>
+            </div>
+            <div class="go">Ver requisições de materiais e plano de ação →</div>
+          </div>
         </div>
 
         <div class="note-box">
@@ -226,6 +239,7 @@
       <iframe id="view-equipes" src="dashboard-resumo-equipes.html" title="Controle de Equipes"></iframe>
       <iframe id="view-frota" src="dashboard-frota-manutencao.html" title="Frota - Manutenção"></iframe>
       <iframe id="view-boletos" src="dashboard-boletos.html" title="Controle de Boletos"></iframe>
+      <iframe id="view-envios" src="dashboard-envios-logisticos.html" title="Envios Logísticos"></iframe>
     </div>
   </main>
 </div>
@@ -237,7 +251,8 @@
     home: { title: "Início", path: "Extreme Wind / Logística & Frotas" },
     equipes: { title: "Controle de Equipes", path: "Extreme Wind / Logística & Frotas / Controle de Equipes" },
     frota: { title: "Frota — Manutenção", path: "Extreme Wind / Logística & Frotas / Frota - Manutenção" },
-    boletos: { title: "Controle de Boletos", path: "Extreme Wind / Logística & Frotas / Controle de Boletos" }
+    boletos: { title: "Controle de Boletos", path: "Extreme Wind / Logística & Frotas / Controle de Boletos" },
+    envios: { title: "Envios Logísticos", path: "Extreme Wind / Logística & Frotas / Envios Logísticos" }
   };
 
   function showView(view){
@@ -246,6 +261,7 @@
     document.getElementById("view-equipes").classList.toggle("active", view === "equipes");
     document.getElementById("view-frota").classList.toggle("active", view === "frota");
     document.getElementById("view-boletos").classList.toggle("active", view === "boletos");
+    document.getElementById("view-envios").classList.toggle("active", view === "envios");
     document.getElementById("topTitle").textContent = TITLES[view].title;
     document.getElementById("topPath").textContent = TITLES[view].path;
   }
