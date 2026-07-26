@@ -42,18 +42,18 @@
   .kpi .label{color:var(--muted); font-size:12.5px; text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px;}
   .kpi .n{font-size:30px; font-weight:700;}
 
-  /* Caixas preenchidas (mesmo padrao usado nos badges de destaque do site:
-     fundo solido na cor da categoria, texto branco) -- Almoxarifado=azul,
-     Entregues/Logistica=verde, Canceladas=vermelho. */
-  .kpi-fill-blue{background:var(--brand); border-left-color:var(--brand);}
-  .kpi-fill-blue .label{color:rgba(255,255,255,.8);}
-  .kpi-fill-blue .n{color:#fff;}
-  .kpi-fill-green{background:var(--ok); border-left-color:var(--ok);}
-  .kpi-fill-green .label{color:rgba(255,255,255,.8);}
-  .kpi-fill-green .n{color:#fff;}
-  .kpi-fill-red{background:var(--nok); border-left-color:var(--nok);}
-  .kpi-fill-red .label{color:rgba(255,255,255,.85);}
-  .kpi-fill-red .n{color:#fff;}
+  /* Caixas preenchidas -- mesmo padrao de tint suave usado nas caixas de
+     Frota/Boletos (ex.: .kpi-warn / .loc-badge): fundo com opacidade baixa
+     na cor da categoria + texto na mesma cor, nao preenchimento solido. */
+  .kpi-fill-blue{background:rgba(28,140,232,.20); border-left-color:var(--steel);}
+  .kpi-fill-blue .label{color:var(--steel);}
+  .kpi-fill-blue .n{color:var(--steel);}
+  .kpi-fill-green{background:rgba(18,168,116,.20); border-left-color:var(--ok);}
+  .kpi-fill-green .label{color:var(--ok);}
+  .kpi-fill-green .n{color:var(--ok);}
+  .kpi-fill-red{background:rgba(224,72,60,.20); border-left-color:var(--nok);}
+  .kpi-fill-red .label{color:var(--nok);}
+  .kpi-fill-red .n{color:var(--nok);}
 
   .aberto{display:flex; gap:10px; margin-bottom:24px; flex-wrap:wrap;}
   .aberto-badge{flex:1; min-width:150px; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:14px 16px;}
