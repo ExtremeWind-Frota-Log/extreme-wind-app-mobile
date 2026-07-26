@@ -95,7 +95,7 @@
 </script>
 <img src="assets/logo-extreme-wind-white.png" alt="Extreme Wind" style="height:38px; width:auto; display:block; margin-bottom:14px;">
 <h1>Dashboard - Extreme Wind</h1>
-<div class="subtitle">Diario de Bordo - dados consolidados em 23/07/2026</div>
+<div class="subtitle">Diario de Bordo - dados consolidados em 26/07/2026</div>
 <div class="tabs">
   <div class="tab active" data-tab="ativos">Equipes ativas (hoje)</div>
   <div class="tab" data-tab="historico">Historico mobilizacao/desmobilizacao</div>
@@ -134,10 +134,10 @@
 
 <div class="panel" id="panel-historico">
 <div class="kpis">
-  <div class="kpi"><div class="label">Mobilizacoes</div><div class="value">696</div><div class="sub">51.4% dos eventos</div></div>
-  <div class="kpi"><div class="label">Desmobilizacoes</div><div class="value">651</div><div class="sub">48.1% dos eventos</div></div>
+  <div class="kpi"><div class="label">Mobilizacoes</div><div class="value">702</div><div class="sub">51.4% dos eventos</div></div>
+  <div class="kpi"><div class="label">Desmobilizacoes</div><div class="value">657</div><div class="sub">48.1% dos eventos</div></div>
   <div class="kpi"><div class="label">Cancelamentos</div><div class="value amber">6</div><div class="sub">0.4% dos eventos</div></div>
-  <div class="kpi"><div class="label">Total de eventos</div><div class="value">1353</div><div class="sub">jan/24 a jul/26</div></div>
+  <div class="kpi"><div class="label">Total de eventos</div><div class="value">1365</div><div class="sub">jan/24 a jul/26</div></div>
 </div>
 <div class="grid2">
   <div class="card"><h2>Ranking por parque <span>top 10</span></h2><div style="height:360px;"><canvas id="chartRankingParque" style="max-height:360px;"></canvas></div></div>
@@ -150,7 +150,7 @@
 </div>
 </div>
 
-<div class="footer">Painel 1: CONTROLE DE EQUIPES. Painel 2: DADOS/RESUMOS (aba DASHBOARD original). 23/07/2026.</div>
+<div class="footer">Painel 1: CONTROLE DE EQUIPES. Painel 2: DADOS/RESUMOS (aba DASHBOARD original). 26/07/2026.</div>
 
 <script>
 var historicoInited = false;
@@ -179,8 +179,8 @@ var parques = [
   {nome:"SÃO FERNANDO/RN", cliente:"NORDEX", suop:"MAGALHÃES", real:6, plano:6},
   {nome:"SÃO VITOR/BA", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
   {nome:"BAIXA DO FEIJÃO/RN", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
-  {nome:"TUCANO/BA", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
   {nome:"SANTO AGOSTINHO/RN", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
+  {nome:"TUCANO/BA", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
   {nome:"DELTA/PI", cliente:"SIEMENS", suop:"WILDNER", real:10, plano:10},
   {nome:"VENTOS DO PIAUÍ/PI", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
   {nome:"INTERMARÍTIMA/BA", cliente:"SIEMENS", suop:"WILDNER", real:2, plano:2}
@@ -202,19 +202,15 @@ trTot.innerHTML = '<td>Total Geral</td><td></td><td></td><td class="num">'+totRe
 tbody.appendChild(trTot);
 
 var tecnicosAtivos = [
-  {mat:"292", nome:"FRANCISCO ELINALDO SILVA QUINTO", acumulado:236, parque:"COPEL/RN", suop:"EVAIR"},
-  {mat:"30", nome:"FELIPE DE LIMA SERPA", acumulado:206, parque:"COPEL/RN", suop:"EVAIR"},
-  {mat:"899", nome:"PEDRO LUCAS DA CRUZ DA SILVA", acumulado:197, parque:"OITIS/PI", suop:"EVAIR"},
-  {mat:"958", nome:"MAURICIO CESAR DE ANDRADE DE MOURA", acumulado:196, parque:"SÃO FERNANDO/RN", suop:"MAGALHÃES"},
-  {mat:"295", nome:"SANDRELINO MACIEL DE FREITAS", acumulado:194, parque:"OITIS/PI", suop:"EVAIR"},
-  {mat:"304", nome:"SERGIO MATEUS DA SILVA MARTINS", acumulado:156, parque:"COPEL/RN", suop:"EVAIR"},
-  {mat:"221", nome:"JAIR DUTRA JUNIOR", acumulado:147, parque:"BAIXA DO FEIJÃO/RN", suop:"WILDNER"},
-  {mat:"983", nome:"ANTONIO CESAR SILVA CASTRO", acumulado:142, parque:"SÃO FERNANDO/RN", suop:"MAGALHÃES"},
-  {mat:"353", nome:"ÉDIPO CARDOSO DE OLIVEIRA", acumulado:129, parque:"SANTO AGOSTINHO/RN", suop:"WILDNER"},
-  {mat:"141", nome:"FRANCISCO LUCAS DE OLIVEIRA RODRIGUES", acumulado:123, parque:"VENTOS DO PIAUÍ/PI", suop:"WILDNER"},
-  {mat:"296", nome:"ALDEMIR CORREIA DE JESUS", acumulado:107, parque:"TUCANO/BA", suop:"WILDNER"},
-  {mat:"192", nome:"JEFERSON APARECIDO ANTENOR", acumulado:103, parque:"TUCANO/BA", suop:"WILDNER"},
-  {mat:"48", nome:"LERNITON SILVA DE ANDRADE", acumulado:94, parque:"TUCANO/BA", suop:"WILDNER"}
+  {mat:"292", nome:"FRANCISCO ELINALDO SILVA QUINTO", acumulado:238, parque:"COPEL/RN", suop:"EVAIR"},
+  {mat:"30", nome:"FELIPE DE LIMA SERPA", acumulado:208, parque:"COPEL/RN", suop:"EVAIR"},
+  {mat:"899", nome:"PEDRO LUCAS DA CRUZ DA SILVA", acumulado:199, parque:"OITIS/PI", suop:"EVAIR"},
+  {mat:"958", nome:"MAURICIO CESAR DE ANDRADE DE MOURA", acumulado:198, parque:"SÃO FERNANDO/RN", suop:"MAGALHÃES"},
+  {mat:"295", nome:"SANDRELINO MACIEL DE FREITAS", acumulado:196, parque:"OITIS/PI", suop:"EVAIR"},
+  {mat:"304", nome:"SERGIO MATEUS DA SILVA MARTINS", acumulado:158, parque:"COPEL/RN", suop:"EVAIR"},
+  {mat:"221", nome:"JAIR DUTRA JUNIOR", acumulado:149, parque:"BAIXA DO FEIJÃO/RN", suop:"WILDNER"},
+  {mat:"983", nome:"ANTONIO CESAR SILVA CASTRO", acumulado:144, parque:"SÃO FERNANDO/RN", suop:"MAGALHÃES"},
+  {mat:"141", nome:"FRANCISCO LUCAS DE OLIVEIRA RODRIGUES", acumulado:125, parque:"VENTOS DO PIAUÍ/PI", suop:"WILDNER"}
 ];
 var tbodyTec = document.getElementById('tbodyTecnicos');
 tecnicosAtivos.forEach(function(t){
@@ -299,7 +295,7 @@ var chartRankingParque = new Chart(document.getElementById('chartRankingParque')
 
 var rankingCliente = [
   ["GE",391,382,4],
-  ["SIEMENS",200,170,1],
+  ["SIEMENS",206,176,1],
   ["NORDEX / LWS",62,56,0],
   ["SINOMA BLADES",21,21,1],
   ["LM",11,11,0],
@@ -323,7 +319,7 @@ var chartRankingCliente = new Chart(document.getElementById('chartRankingCliente
 
 var mesesTodos = ["Jan/24","Fev/24","Mar/24","Abr/24","Mai/24","Jun/24","Jul/24","Ago/24","Set/24","Out/24","Nov/24","Dez/24","Jan/25","Fev/25","Mar/25","Abr/25","Mai/25","Jun/25","Jul/25","Ago/25","Set/25","Out/25","Nov/25","Dez/25","Jan/26","Fev/26","Mar/26","Abr/26","Mai/26","Jun/26","Jul/26"];
 var motivoClienteTodos = [16,3,16,26,15,24,10,21,21,6,25,10,38,15,20,29,42,28,30,34,33,25,50,59,71,34,42,41,44,25,21];
-var motivoExtremeTodos = [11,5,5,7,14,22,17,14,11,17,16,8,7,7,15,11,22,19,10,12,7,9,9,18,19,19,28,56,34,22,8];
+var motivoExtremeTodos = [11,5,5,7,14,22,17,14,11,17,16,8,7,7,15,11,22,19,10,12,7,9,9,18,19,19,28,56,34,22,20];
 
 // Mes atual + ultimos 12 meses (13 barras no total)
 var JANELA_MESES = 13;
