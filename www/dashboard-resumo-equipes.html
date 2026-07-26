@@ -187,6 +187,7 @@ var parques = [
   {nome:"TRAIRI/CE", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
   {nome:"INTERMARÍTIMA/BA", cliente:"SIEMENS", suop:"WILDNER", real:2, plano:2}
 ];
+var emDesmobQtd = 2;
 function badgeClass(c){ return {GE:'ge',NORDEX:'nordex',SIEMENS:'siemens'}[c] || 'ge'; }
 var tbody = document.getElementById('tbodyParques');
 parques.forEach(function(p){
@@ -198,6 +199,12 @@ parques.forEach(function(p){
 });
 var totReal = parques.reduce(function(s,p){return s+p.real;},0);
 var totPlano = parques.reduce(function(s,p){return s+p.plano;},0);
+if (emDesmobQtd > 0) {
+  var trDesmob = document.createElement('tr');
+  trDesmob.style.color = '#f0ad4e';
+  trDesmob.innerHTML = '<td>EM DESMOBILIZAÇÃO</td><td></td><td>Responsável: Robson Lins</td><td class="num">'+emDesmobQtd+'</td><td class="num">-</td><td class="num">-</td>';
+  tbody.appendChild(trDesmob);
+}
 var trTot = document.createElement('tr');
 trTot.style.fontWeight='700'; trTot.style.borderTop='2px solid #2a3746';
 trTot.innerHTML = '<td>Total Geral</td><td></td><td></td><td class="num">'+totReal+'</td><td class="num">'+totPlano+'</td><td class="num">'+(totReal-totPlano)+'</td>';
