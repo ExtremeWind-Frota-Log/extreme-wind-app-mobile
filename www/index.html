@@ -160,6 +160,7 @@
       <div class="menu-item" data-view="frota"><span class="ic">&#128663;</span> Frota — Manutenção</div>
       <div class="menu-item" data-view="boletos"><span class="ic">&#129534;</span> Controle de Boletos</div>
       <div class="menu-item" data-view="envios"><span class="ic">&#128230;</span> Envios Logísticos</div>
+      <div class="menu-item" data-view="reembolso"><span class="ic">&#128176;</span> Reembolso</div>
     </nav>
 
     <div class="sidebar-footer">
@@ -177,7 +178,7 @@
           <div class="path" id="topPath">Extreme Wind / Logística &amp; Frotas</div>
         </div>
       </div>
-      <div class="badge" id="topBadge">Atualizado 26/07/2026</div>
+      <div class="badge" id="topBadge">Atualizado 27/07/2026</div>
     </div>
 
     <div class="view">
@@ -209,7 +210,7 @@
             <div class="kpirow">
               <div><div class="n">16</div><div class="l">Veículos</div></div>
               <div><div class="n" style="color:var(--ok)">95%</div><div class="l">Conformidade</div></div>
-              <div><div class="n" style="color:var(--nok)">17</div><div class="l">Ações pendentes</div></div>
+              <div><div class="n" style="color:var(--nok)">15</div><div class="l">Ações pendentes</div></div>
             </div>
             <div class="go">Ver detalhamento por veículo e plano de ação →</div>
           </div>
@@ -217,7 +218,7 @@
           <div class="card" data-view="boletos">
             <div class="card-title">&#129534; Controle de Boletos</div>
             <div class="kpirow">
-              <div><div class="n">8<span style="font-size:14px; color:var(--muted);"> / 12</span></div><div class="l">À vencer (U/L)</div></div>
+              <div><div class="n">8<span style="font-size:14px; color:var(--muted);"> / 10</span></div><div class="l">À vencer (U/L)</div></div>
               <div><div class="n" style="color:var(--nok)">0<span style="font-size:14px; color:var(--muted);"> / 1</span></div><div class="l">Multas (U/L)</div></div>
               <div><div class="n" style="color:var(--warn)">2<span style="font-size:14px; color:var(--muted);"> / 1</span></div><div class="l">Contestação (U/L)</div></div>
             </div>
@@ -233,6 +234,16 @@
             </div>
             <div class="go">Ver requisições de materiais e plano de ação →</div>
           </div>
+
+          <div class="card" data-view="reembolso">
+            <div class="card-title">&#128176; Reembolso</div>
+            <div class="kpirow">
+              <div><div class="n">R$ 9.025</div><div class="l">Total mês atual</div></div>
+              <div><div class="n">R$ 1.056</div><div class="l">Semana atual (parcial)</div></div>
+              <div><div class="n">R$ 152.094</div><div class="l">Acumulado 2026</div></div>
+            </div>
+            <div class="go">Ver reembolsos por responsável e categoria →</div>
+          </div>
         </div>
 
         <div class="note-box">
@@ -246,6 +257,7 @@
       <iframe id="view-frota" src="dashboard-frota-manutencao.html" title="Frota - Manutenção"></iframe>
       <iframe id="view-boletos" src="dashboard-boletos.html" title="Controle de Boletos"></iframe>
       <iframe id="view-envios" src="dashboard-envios-logisticos.html" title="Envios Logísticos"></iframe>
+      <iframe id="view-reembolso" src="dashboard-reembolso.html" title="Reembolso"></iframe>
     </div>
   </main>
 </div>
@@ -260,7 +272,8 @@
     equipes: { title: "Controle de Equipes", path: "Extreme Wind / Logística & Frotas / Controle de Equipes" },
     frota: { title: "Frota — Manutenção", path: "Extreme Wind / Logística & Frotas / Frota - Manutenção" },
     boletos: { title: "Controle de Boletos", path: "Extreme Wind / Logística & Frotas / Controle de Boletos" },
-    envios: { title: "Envios Logísticos", path: "Extreme Wind / Logística & Frotas / Envios Logísticos" }
+    envios: { title: "Envios Logísticos", path: "Extreme Wind / Logística & Frotas / Envios Logísticos" },
+    reembolso: { title: "Reembolso", path: "Extreme Wind / Logística & Frotas / Reembolso" }
   };
 
   function showView(view){
@@ -272,6 +285,7 @@
     document.getElementById("view-frota").classList.toggle("active", view === "frota");
     document.getElementById("view-boletos").classList.toggle("active", view === "boletos");
     document.getElementById("view-envios").classList.toggle("active", view === "envios");
+    document.getElementById("view-reembolso").classList.toggle("active", view === "reembolso");
     document.getElementById("topTitle").textContent = TITLES[view].title;
     document.getElementById("topPath").textContent = TITLES[view].path;
   }

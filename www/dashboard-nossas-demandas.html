@@ -63,6 +63,7 @@
     <a href="dashboard-frota-manutencao.html" class="ew-nav-item">&#128663; Frota — Manutenção</a>
     <a href="dashboard-boletos.html" class="ew-nav-item">&#129534; Controle de Boletos</a>
     <a href="dashboard-envios-logisticos.html" class="ew-nav-item">&#128230; Envios Logísticos</a>
+    <a href="dashboard-reembolso.html" class="ew-nav-item">&#128176; Reembolso</a>
   </div>
 </div>
 <style>
@@ -95,15 +96,15 @@
       <div class="sub">Nossas Demandas — cópia consolidada de todos os itens em aberto/urgentes hoje</div>
     </div>
   </div>
-  <div class="badge-week" id="badgeData">Data: 26/07/2026</div>
+  <div class="badge-week" id="badgeData">Data: 27/07/2026</div>
 </header>
 
 <div class="kpis" id="kpisDemandas">
   <div class="kpi"><div class="label">Equipes</div><div class="n" id="cntEquipes">2</div></div>
-  <div class="kpi"><div class="label">Frota</div><div class="n" id="cntFrota">10</div></div>
-  <div class="kpi"><div class="label">Boletos</div><div class="n" id="cntBoletos">1</div></div>
-  <div class="kpi"><div class="label">Envios Logísticos</div><div class="n" id="cntEnvios">8</div></div>
-  <div class="kpi total"><div class="label">Total de demandas</div><div class="n" id="cntTotal">21</div></div>
+  <div class="kpi"><div class="label">Frota</div><div class="n" id="cntFrota">7</div></div>
+  <div class="kpi"><div class="label">Boletos</div><div class="n" id="cntBoletos">0</div></div>
+  <div class="kpi"><div class="label">Envios Logísticos</div><div class="n" id="cntEnvios">0</div></div>
+  <div class="kpi total"><div class="label">Total de demandas</div><div class="n" id="cntTotal">9</div></div>
 </div>
 
 <div class="panel">
@@ -126,17 +127,14 @@
 <div class="panel">
   <div class="panel-head">
     <h2>&#128663; Frota — Manutenção</h2>
-    <span class="count-pill" id="pillFrota">10</span>
+    <span class="count-pill" id="pillFrota">7</span>
   </div>
   <p class="panel-note">Ações com prazo em hoje (ou vencido) e ações marcadas como urgentes.</p>
   <div class="tablewrap">
   <table>
     <thead><tr><th>Ação</th><th>Tipo</th><th>Parque</th><th>Quem?</th><th>Status</th><th>Observação</th></tr></thead>
     <tbody id="bodyFrota">
-    <tr class="row-warn"><td>PNEUS Diants. ABAIXO DE 2,7mm</td><td>CORRETIVA</td><td>TRAIRI</td><td>JOÃO/WILLIAM DUARTE</td><td>22/07/2026</td><td>ALINHADO A TROCA COM LOCADORA</td></tr>
-    <tr class="row-warn"><td>REVISÃO*</td><td>PREVENTIVA</td><td>SÃO VITOR</td><td>JOÃO/MATEUS G.</td><td>24/07/2026</td><td>ALINHADO COM OFICINA</td></tr>
-    <tr class="row-warn"><td>REVISÃO</td><td>PREVENTIVA</td><td>DELTA 1</td><td>DE ASSIS</td><td>24/07/2026</td><td>AGENDADO P/ 24/07 na cidade</td></tr>
-    <tr class="row-warn"><td>S/Estepe Extra</td><td>CORRETIVA</td><td>BAIXA DO FEIJÃO</td><td>JOÃO/WILLIAMES DA HORA</td><td>23/07/2026</td><td>Alinhar c/ Motorista</td></tr>
+    <tr class="row-warn"><td>S/Estepe Extra</td><td>CORRETIVA</td><td>BAIXA DO FEIJÃO</td><td>JOÃO/WILLIAMES DA HORA</td><td>27/07/2026</td><td>Alinhar c/ Motorista</td></tr>
     <tr class="row-warn"><td>40K de KM RODADOS</td><td>ADMINISTRATIVA</td><td>SF1</td><td>JOÃO/</td><td>23/07/2026</td><td>ALINHADO C/ SUPERVISOR P/ TROCA 23/07</td></tr>
     <tr class="row-warn"><td>40K de KM RODADOS</td><td>ADMINISTRATIVA</td><td>COPEL</td><td>JOÃO/</td><td>Hoje</td><td></td></tr>
     <tr class="row-warn"><td>TESTE/INSTALAÇÃO RAPTOR</td><td>ADMINISTRATIVA</td><td>SÃO VITOR</td><td>JOÃO</td><td>21/07/2026</td><td></td></tr>
@@ -151,14 +149,14 @@
 <div class="panel">
   <div class="panel-head">
     <h2>&#129534; Controle de Boletos</h2>
-    <span class="count-pill" id="pillBoletos">1</span>
+    <span class="count-pill" id="pillBoletos">0</span>
   </div>
   <p class="panel-note">Multas, contestações e sinistros em aberto (Unidas e Localiza).</p>
   <div class="tablewrap">
   <table>
     <thead><tr><th>Tipo</th><th>Placa</th><th>Locadora</th><th>Parque</th><th>Vencimento</th><th>Motivo</th></tr></thead>
     <tbody id="bodyBoletos">
-    <tr class="row-warn"><td>Multa</td><td>TYA7G48</td><td>LOCALIZA</td><td>LDV INSP.INTERNA /PI</td><td>25/07/2026</td><td>-</td></tr>
+    <tr><td colspan="6" class="empty-note">Nenhuma demanda</td></tr>
     </tbody>
   </table>
   </div>
@@ -167,21 +165,14 @@
 <div class="panel">
   <div class="panel-head">
     <h2>&#128230; Envios Logísticos</h2>
-    <span class="count-pill" id="pillEnvios">8</span>
+    <span class="count-pill" id="pillEnvios">0</span>
   </div>
   <p class="panel-note">Divergências no Almoxarifado e requisições em trajeto/aguardando assinatura na Logística.</p>
   <div class="tablewrap">
   <table>
     <thead><tr><th>Setor</th><th>Projeto</th><th>Responsável</th><th>Prazo</th><th>Destinatário</th><th>Status</th></tr></thead>
     <tbody id="bodyEnvios">
-    <tr class="row-warn"><td>Logística</td><td>COPEL</td><td>EVAIR</td><td>22/07/2026</td><td>FELIPE SERPA</td><td>Em trajeto</td></tr>
-    <tr class="row-warn"><td>Logística</td><td>COPEL</td><td>THAYNÁ</td><td>22/07/2026</td><td>FELIPE SERPA</td><td>Em trajeto</td></tr>
-    <tr class="row-warn"><td>Logística</td><td>OITIS</td><td>POLLYANA</td><td>27/07/2026</td><td>JOHN LENNON</td><td>Em trajeto</td></tr>
-    <tr class="row-warn"><td>Logística</td><td>OITIS</td><td>POLLYANA</td><td>27/07/2026</td><td>SANDRELINO</td><td>Em trajeto</td></tr>
-    <tr class="row-warn"><td>Logística</td><td>OITIS</td><td>POLLYANA</td><td>27/07/2026</td><td>PEDRO LUCAS</td><td>Em trajeto</td></tr>
-    <tr class="row-warn"><td>Logística</td><td>ADM</td><td>POLLYANA</td><td>27/07/2026</td><td>MARIA DEUSARINA</td><td>Em trajeto</td></tr>
-    <tr class="row-warn"><td>Logística</td><td>SFN1</td><td>POLLYANA</td><td>24/07/2026</td><td>WEDDON</td><td>Aguardando assinatura</td></tr>
-    <tr class="row-warn"><td>Logística</td><td>SFN1</td><td>POLLYANA</td><td>27/07/2026</td><td>APARECIDO</td><td>Aguardando assinatura</td></tr>
+    <tr><td colspan="6" class="empty-note">Nenhuma demanda</td></tr>
     </tbody>
   </table>
   </div>
