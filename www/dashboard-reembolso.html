@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>Dashboard Reembolso - Extreme Wind</title>
+<link rel="icon" type="image/png" href="assets/icone-helice-color.png">
+<style>
+  :root{
+    --brand:#00679A; --brand-dark:#055384; --brand-deep:#021C2C;
+    --steel:#1C8CE8; --teal:#12BFA8;
+    --bg:#081C2C; --panel:#0F2A40; --panel2:#123350; --line:#1E4363;
+    --text:#EAF1F7; --muted:#8FA9C0;
+    --ok:#12A874; --nok:#E0483C; --warn:#D89A2B; --na:#5C7A93;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:Segoe UI,Arial,sans-serif; background:var(--bg); color:var(--text);
+    padding:24px; line-height:1.4; zoom:1.15;
+  }
+  @media (max-width:820px){
+    body{zoom:1; padding:14px;}
+    header{gap:10px;}
+  }
+  header{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:24px; border-bottom:1px solid var(--line); padding-bottom:18px;}
+  .brand{display:flex; align-items:center; gap:14px;}
+  .brand h1{font-size:19px; margin:0; letter-spacing:.02em;}
+  .brand .sub{color:var(--muted); font-size:12.5px; margin-top:2px;}
+  .badge-week{background:var(--brand); color:#fff; font-weight:600; padding:7px 16px; border-radius:6px; font-size:13px;}
+
+  .kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:16px; margin-bottom:28px;}
+  .kpi{background:var(--panel); border:1px solid var(--line); border-left:4px solid var(--brand); border-radius:10px; padding:20px;}
+  .kpi .label{color:var(--muted); font-size:12.5px; text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px;}
+  .kpi .value{font-size:26px; font-weight:700; margin-top:2px;}
+  .kpi .sub{font-size:12px; color:var(--muted); margin-top:6px;}
+
+  .panel{background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:18px; margin-bottom:20px;}
+  .panel h2{font-size:15px; margin:0 0 14px; color:var(--text);}
+
+  table{width:100%; border-collapse:collapse; font-size:12.5px;}
+  .tablewrap{overflow-x:auto;}
+  th{background:var(--panel2); text-align:left; padding:9px 12px; color:var(--muted); font-weight:600; white-space:nowrap;}
+  td{padding:9px 12px; border-bottom:1px solid var(--line); white-space:normal; word-break:break-word; vertical-align:top;}
+  td.num{text-align:right; white-space:nowrap; font-variant-numeric:tabular-nums;}
+  tr:hover td{background:#153A57;}
+
+  .barcell{position:relative;}
+  .bar{position:absolute; left:0; top:0; bottom:0; background:rgba(28,140,232,.18); z-index:0;}
+  .barcell span{position:relative; z-index:1;}
+
+  .note{font-size:12px; color:var(--muted); margin-top:8px; border-top:1px solid var(--line); padding-top:12px;}
+</style>
+</head>
+<body>
+<div id="ewNav" style="position:fixed; top:14px; right:14px; z-index:999; font-family:Segoe UI,Arial,sans-serif;">
+  <button id="ewNavBtn" aria-label="Menu de navegação" style="width:42px; height:42px; border-radius:8px; border:1px solid #1E4363; background:#123350; color:#EAF1F7; font-size:18px; cursor:pointer;">&#9776;</button>
+  <div id="ewNavPanel" style="display:none; position:absolute; top:48px; right:0; background:#0F2A40; border:1px solid #1E4363; border-radius:10px; padding:8px; min-width:210px; box-shadow:0 8px 24px rgba(0,0,0,.45);">
+    <a href="index.html" class="ew-nav-item">&#8962; Início</a>
+    <a href="dashboard-nossas-demandas.html" class="ew-nav-item">&#9888; Nossas Demandas</a>
+    <a href="dashboard-resumo-equipes.html" class="ew-nav-item">&#128101; Controle de Equipes</a>
+    <a href="dashboard-frota-manutencao.html" class="ew-nav-item">&#128663; Frota — Manutenção</a>
+    <a href="dashboard-boletos.html" class="ew-nav-item">&#129534; Controle de Boletos</a>
+    <a href="dashboard-envios-logisticos.html" class="ew-nav-item">&#128230; Envios Logísticos</a>
+    <a href="dashboard-reembolso.html" class="ew-nav-item">&#128176; Reembolso</a>
+  </div>
+</div>
+<style>
+  .ew-nav-item{display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:6px; color:#8FA9C0; text-decoration:none; font-size:13px; font-weight:600;}
+  .ew-nav-item:hover{background:rgba(255,255,255,.08); color:#EAF1F7;}
+  .ew-nav-item.current{background:#00679A; color:#fff;}
+</style>
+<script>
+  (function(){
+    if (window.self !== window.top) {
+      document.getElementById('ewNav').style.display = 'none';
+      return;
+    }
+    var btn=document.getElementById('ewNavBtn'), panel=document.getElementById('ewNavPanel');
+    btn.addEventListener('click', function(e){ e.stopPropagation(); panel.style.display = panel.style.display==='none'?'block':'none'; });
+    document.addEventListener('click', function(){ panel.style.display='none'; });
+    panel.addEventListener('click', function(e){ e.stopPropagation(); });
+    var here = (location.pathname.split('/').pop() || 'index.html');
+    Array.prototype.forEach.call(panel.querySelectorAll('a'), function(a){
+      if(a.getAttribute('href') === here) a.classList.add('current');
+    });
+  })();
+</script>
+
+<header>
+  <div class="brand">
+    <img src="assets/icone-helice-color.png" alt="" style="height:60px; width:auto; display:block;">
+    <div>
+      <img src="assets/logo-extreme-wind-white.png" alt="Extreme Wind" style="height:30px; width:auto; display:block; margin-bottom:6px;">
+      <div class="sub">Dashboard de Reembolso — Uso interno</div>
+    </div>
+  </div>
+  <div class="badge-week" id="badgeAtualizado">Atualizado 27/07/2026</div>
+</header>
+
+<div class="kpis" id="kpisReembolso">
+  <div class="kpi">
+    <div class="label" id="kpiMesAtualLabel">Total — Julho</div>
+    <div class="value" id="kpiMesAtualValue">R$ 9.322,09</div>
+    <div class="sub" id="kpiMesAtualSub">4 semanas · média R$ 2.330,52/semana</div>
+  </div>
+  <div class="kpi">
+    <div class="label" id="kpiSemanaAtualLabel">Semana Atual (parcial)</div>
+    <div class="value" id="kpiSemanaAtualValue">R$ 1.353,16</div>
+    <div class="sub">W30 · ainda em lançamento</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Total Acumulado 2026</div>
+    <div class="value" id="kpiTotalAnoValue">R$ 151.334,05</div>
+    <div class="sub" id="kpiTotalAnoSub">jan/26 a jul/26</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Lançamentos no Ano</div>
+    <div class="value" id="kpiLancamentosValue">2058</div>
+    <div class="sub" id="kpiLancamentosSub">5 responsáveis · 13 categorias</div>
+  </div>
+</div>
+
+<div class="panel">
+  <h2>Por Responsável (acumulado 2026)</h2>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Responsável</th><th style="text-align:right;">Total (R$)</th><th style="text-align:right;">Lançamentos</th><th style="text-align:right;">% do total</th></tr></thead>
+    <tbody id="rankRespRows">
+    <tr><td>ROBSON LINS</td><td class="num">R$ 97.805,91</td><td class="num">983</td><td class="num">64.6%</td></tr>
+    <tr><td>EVAIR SAMPAIO</td><td class="num">R$ 28.130,15</td><td class="num">538</td><td class="num">18.6%</td></tr>
+    <tr><td>TIBÉRIO RIBEIRO</td><td class="num">R$ 11.875,29</td><td class="num">273</td><td class="num">7.8%</td></tr>
+    <tr><td>HERLANDERSON MAGALHÃES</td><td class="num">R$ 11.611,56</td><td class="num">236</td><td class="num">7.7%</td></tr>
+    <tr><td>TARCÍSIO CRUZ</td><td class="num">R$ 1.911,14</td><td class="num">28</td><td class="num">1.3%</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="panel">
+  <h2>Por Categoria — Sub-atividade (top 10, acumulado 2026)</h2>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Sub-atividade</th><th style="text-align:right;">Total (R$)</th><th style="text-align:right;">Lançamentos</th></tr></thead>
+    <tbody id="rankSubRows">
+    <tr><td>01 - SERVIÇOS - MOB/DESMOB</td><td class="num">R$ 39.551,50</td><td class="num">365</td></tr>
+    <tr><td>02 - MATERIAL - DIVERSOS</td><td class="num">R$ 32.702,76</td><td class="num">634</td></tr>
+    <tr><td>01 - SERVIÇOS - LOGÍSTICA ENVIO/RETORNO MATÉRIA-PRIMA</td><td class="num">R$ 20.237,57</td><td class="num">182</td></tr>
+    <tr><td>01 - SERVIÇOS - BORRACHARIA DIVERSOS</td><td class="num">R$ 19.798,94</td><td class="num">263</td></tr>
+    <tr><td>01 - SERVIÇOS - MANUTENÇÃO</td><td class="num">R$ 12.267,53</td><td class="num">151</td></tr>
+    <tr><td>02 - MATERIAL - MAQUINÁRIO + ATIVO MOBILIZADO</td><td class="num">R$ 8.347,76</td><td class="num">83</td></tr>
+    <tr><td>02 - MATERIAL - EPI</td><td class="num">R$ 8.331,73</td><td class="num">171</td></tr>
+    <tr><td>01 - SERVIÇOS - TRANSPORTE</td><td class="num">R$ 4.351,85</td><td class="num">49</td></tr>
+    <tr><td>02 - MATERIAL - ESCRITÓRIO</td><td class="num">R$ 2.240,73</td><td class="num">55</td></tr>
+    <tr><td>01 - SERVIÇOS - DIVERSOS</td><td class="num">R$ 1.285,60</td><td class="num">91</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="panel">
+  <h2>Evolução Mensal 2026</h2>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Mês</th><th style="text-align:right;">Total (R$)</th><th style="text-align:right;">Semanas</th><th style="text-align:right;">Média Semanal (R$)</th></tr></thead>
+    <tbody id="monthlyRows">
+    <tr><td>Julho</td><td class="num">R$ 9.322,09</td><td class="num">4</td><td class="num">R$ 2.330,52</td></tr>
+    <tr><td>Junho</td><td class="num">R$ 17.185,08</td><td class="num">4</td><td class="num">R$ 4.296,27</td></tr>
+    <tr><td>Maio</td><td class="num">R$ 27.544,30</td><td class="num">5</td><td class="num">R$ 5.508,86</td></tr>
+    <tr><td>Abril</td><td class="num">R$ 27.473,38</td><td class="num">4</td><td class="num">R$ 6.868,34</td></tr>
+    <tr><td>Março</td><td class="num">R$ 28.506,69</td><td class="num">4</td><td class="num">R$ 7.126,67</td></tr>
+    <tr><td>Fevereiro</td><td class="num">R$ 26.156,59</td><td class="num">5</td><td class="num">R$ 5.231,32</td></tr>
+    <tr><td>Janeiro</td><td class="num">R$ 15.145,92</td><td class="num">4</td><td class="num">R$ 3.786,48</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="panel">
+  <h2>Últimos Lançamentos</h2>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Semana</th><th>Projeto</th><th>Responsável</th><th>Sub-atividade</th><th>Descrição</th><th style="text-align:right;">Valor (R$)</th></tr></thead>
+    <tbody id="ultimosRows">
+    <tr><td>S30</td><td>EXTREME</td><td>HERLANDERSON MAGALHÃES</td><td>01 - SERVIÇOS - DIVERSOS</td><td>Taxa Sólides</td><td class="num">R$ 5,90</td></tr>
+    <tr><td>S30</td><td>SÃO FERNANDO/RN</td><td>HERLANDERSON MAGALHÃES</td><td>02 - MATERIAL - ESCRITÓRIO</td><td>Papelaria</td><td class="num">R$ 18,00</td></tr>
+    <tr><td>S30</td><td>EXTREME</td><td>EVAIR SAMPAIO</td><td>01 - SERVIÇOS - DIVERSOS</td><td>Taxa Sólides</td><td class="num">R$ 5,90</td></tr>
+    <tr><td>S30</td><td>OITIS/PI</td><td>EVAIR SAMPAIO</td><td>02 - MATERIAL - MAQUINÁRIO + ATIVO MOBILIZADO</td><td>Trena de 30M</td><td class="num">R$ 103,00</td></tr>
+    <tr><td>S30</td><td>OITIS/PI</td><td>EVAIR SAMPAIO</td><td>02 - MATERIAL - DIVERSOS</td><td>Fita Crepe, Rolo de Pintura</td><td class="num">R$ 82,00</td></tr>
+    <tr><td>S30</td><td>OITIS/PI</td><td>EVAIR SAMPAIO</td><td>02 - MATERIAL - DIVERSOS</td><td>Fita Crepe</td><td class="num">R$ 42,00</td></tr>
+    <tr><td>S30</td><td>COPEL/RN</td><td>EVAIR SAMPAIO</td><td>01 - SERVIÇOS - BORRACHARIA DIVERSOS</td><td>Concerto do Pneu</td><td class="num">R$ 40,00</td></tr>
+    <tr><td>S30</td><td>TUCANO/BA</td><td>ROBSON LINS</td><td>01 - SERVIÇOS - LOGÍSTICA ENVIO/RETORNO MATÉRIA-PRIMA</td><td>Envio de Material</td><td class="num">R$ 80,00</td></tr>
+    <tr><td>S30</td><td>OITIS/PI</td><td>ROBSON LINS</td><td>01 - SERVIÇOS - LOGÍSTICA ENVIO/RETORNO MATÉRIA-PRIMA</td><td>Envio de Material [EPIs e Fardamentos]</td><td class="num">R$ 150,00</td></tr>
+    <tr><td>S30</td><td>COPEL/RN</td><td>ROBSON LINS</td><td>01 - SERVIÇOS - LOGÍSTICA ENVIO/RETORNO MATÉRIA-PRIMA</td><td>Envio de Material [Bag, Ferramentas e Balsas]</td><td class="num">R$ 200,00</td></tr>
+    <tr><td>S30</td><td>VENTOS DO PIAUÍ/PI</td><td>ROBSON LINS</td><td>01 - SERVIÇOS - MOB/DESMOB</td><td>Uber Escritório x Euro [Desmob VDP]</td><td class="num">R$ 34,97</td></tr>
+    <tr><td>S30</td><td>OITIS/PI</td><td>ROBSON LINS</td><td>01 - SERVIÇOS - LOGÍSTICA ENVIO/RETORNO MATÉRIA-PRIMA</td><td>Envio de Material [EPIs e Fardamentos]</td><td class="num">R$ 105,00</td></tr>
+    <tr><td>S30</td><td>SÃO VITOR/BA</td><td>ROBSON LINS</td><td>02 - MATERIAL - DIVERSOS</td><td>Compra de Tê</td><td class="num">R$ 10,00</td></tr>
+    <tr><td>S30</td><td>SÃO VITOR/BA</td><td>ROBSON LINS</td><td>01 - SERVIÇOS - MANUTENÇÃO</td><td>Conserto de 2 Lixadeiras</td><td class="num">R$ 10,00</td></tr>
+    <tr><td>S30</td><td>DELTA/PI</td><td>ROBSON LINS</td><td>02 - MATERIAL - DIVERSOS</td><td>Rolos de Espuma</td><td class="num">R$ 82,20</td></tr>
+    <tr><td>S30</td><td>DELTA/PI</td><td>ROBSON LINS</td><td>02 - MATERIAL - DIVERSOS</td><td>Potes de Químicos</td><td class="num">R$ 36,90</td></tr>
+    <tr><td>S30</td><td>EXTREME</td><td>ROBSON LINS</td><td>01 - SERVIÇOS - DIVERSOS</td><td>Taxa Sólides</td><td class="num">R$ 5,90</td></tr>
+    <tr><td>S30</td><td>SÃO VITOR/BA</td><td>ROBSON LINS</td><td>01 - SERVIÇOS - MANUTENÇÃO</td><td>Suporte de Disco Rígido e Porca [Lixadeira]</td><td class="num">R$ 58,00</td></tr>
+    <tr><td>S30</td><td>TRAIRI/CE</td><td>ROBSON LINS</td><td>01 - SERVIÇOS - BORRACHARIA DIVERSOS</td><td>Alinhamento, Balanceamento e Troca de Pneu</td><td class="num">R$ 220,00</td></tr>
+    <tr><td>S30</td><td>VENTOS DO PIAUÍ/PI</td><td>ROBSON LINS</td><td>02 - MATERIAL - DIVERSOS</td><td>Rolo de Laminação</td><td class="num">R$ 34,58</td></tr>
+    <tr><td>S30</td><td>VENTOS DO PIAUÍ/PI</td><td>ROBSON LINS</td><td>02 - MATERIAL - DIVERSOS</td><td>Disco de Lixa</td><td class="num">R$ 28,81</td></tr>
+    <tr><td>S29</td><td>EXTREME</td><td>HERLANDERSON MAGALHÃES</td><td>01 - SERVIÇOS - DIVERSOS</td><td>Taxa Sólides</td><td class="num">R$ 5,90</td></tr>
+    <tr><td>S29</td><td>SÃO FERNANDO/RN</td><td>HERLANDERSON MAGALHÃES</td><td>01 - SERVIÇOS - BORRACHARIA DIVERSOS</td><td>Filtro de Ar-Condicionado</td><td class="num">R$ 48,60</td></tr>
+    <tr><td>S29</td><td>SÃO FERNANDO/RN</td><td>HERLANDERSON MAGALHÃES</td><td>01 - SERVIÇOS - MANUTENÇÃO</td><td>Lavagem Veícular</td><td class="num">R$ 60,00</td></tr>
+    <tr><td>S29</td><td>EXTREME</td><td>EVAIR SAMPAIO</td><td>01 - SERVIÇOS - DIVERSOS</td><td>Taxa Sólides</td><td class="num">R$ 5,90</td></tr>
+    <tr><td>S29</td><td>TRAIRI/CE</td><td>EVAIR SAMPAIO</td><td>02 - MATERIAL - DIVERSOS</td><td>Potes para Químicos, Sacos de Lixo</td><td class="num">R$ 73,00</td></tr>
+    <tr><td>S29</td><td>COPEL/RN</td><td>EVAIR SAMPAIO</td><td>02 - MATERIAL - EPI</td><td>Luvas Nitrílicas</td><td class="num">R$ 40,00</td></tr>
+    <tr><td>S29</td><td>COPEL/RN</td><td>EVAIR SAMPAIO</td><td>02 - MATERIAL - ESCRITÓRIO</td><td>Impressão de Documentos</td><td class="num">R$ 30,00</td></tr>
+    <tr><td>S29</td><td>COPEL/RN</td><td>EVAIR SAMPAIO</td><td>02 - MATERIAL - DIVERSOS</td><td>Álcool Gel</td><td class="num">R$ 36,98</td></tr>
+    <tr><td>S29</td><td>OITIS/PI</td><td>ROBSON LINS</td><td>01 - SERVIÇOS - LOGÍSTICA ENVIO/RETORNO MATÉRIA-PRIMA</td><td>Envio de Material [Balsas Oitis] - Petrolina x Recife</td><td class="num">R$ 300,00</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="note">Mostrando os últimos lançamentos da planilha (ordem de digitação, não necessariamente ordem cronológica dentro da mesma semana).</div>
+</div>
+
+<div class="note" id="fonteNote">Fonte: planilha "Formulário de Reembolso Master (2026)", aba REEMBOLSO. Totais mensais e semanais lidos diretamente da tabela "CONTROLE MENSAL" já calculada na planilha; ranking por responsável/categoria calculado a partir dos lançamentos brutos. A planilha não tem uma coluna de status (pendente x já reembolsado) — este dashboard mostra histórico consolidado, não uma fila de pendências. Dados extraídos automaticamente; confira os valores na fonte antes de compartilhar. Uso interno do setor — não repasse fora da equipe sem necessidade.</div>
+
+</body>
+</html>
