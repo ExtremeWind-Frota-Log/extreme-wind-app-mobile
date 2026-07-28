@@ -104,7 +104,6 @@
   <div style="position:relative; height:300px;">
     <canvas id="chartReembolsoEvolucao"></canvas>
   </div>
-  <div class="note" id="evolucaoNote" style="margin-top:10px;"></div>
 </div>
 
 <div class="panel">
@@ -112,7 +111,6 @@
   <div style="position:relative; height:320px;">
     <canvas id="chartReembolsoCliente"></canvas>
   </div>
-  <div class="note">Cliente identificado a partir do campo "Projeto" (nome do parque), cruzado com o histórico de mobilização/desmobilização do Diário de Bordo. Lançamentos do projeto "EXTREME" (interno, não é parque de cliente) entram na conta da GE. "Não identificado" são projetos sem cliente reconhecido no histórico — confira na fonte se valer a pena. Parques que já tiveram mais de um cliente ao longo do tempo (ex: TRAIRI/CE) usam o cliente mais frequente no histórico, não uma separação exata por lançamento. A quantidade entre parênteses na legenda é o número de projetos distintos daquele cliente.</div>
 </div>
 
 <div class="panel">
@@ -120,7 +118,6 @@
   <div class="pareto-wrap" style="position:relative;">
     <canvas id="chartReembolsoParetoSub"></canvas>
   </div>
-  <div class="note">Barras: valor total por sub-atividade (maior para o menor); em vermelho suave, as que atingem 80% do valor da maior categoria. Linha: % acumulado do total geral de todas as categorias — a linha tracejada vermelha marca os 80%.</div>
 </div>
 
 <div class="panel">
@@ -140,8 +137,6 @@
   </table>
   </div>
 </div>
-
-<div class="note" id="fonteNote">Fonte: planilha "Formulário de Reembolso Master (2026)", aba REEMBOLSO. O gráfico de evolução, os totais mensais e o ranking por responsável/categoria são recalculados a partir dos lançamentos brutos (coluna Semana + Valor) — não das fórmulas prontas da planilha, que ficam com cache zerado sempre que outra automação resalva o arquivo via openpyxl. A planilha não tem uma coluna de status (pendente x já reembolsado) — este dashboard mostra histórico consolidado, não uma fila de pendências. Dados extraídos automaticamente; confira os valores na fonte antes de compartilhar. Uso interno do setor — não repasse fora da equipe sem necessidade.</div>
 
 <script>
   var reembolsoEvoLabels = ["Média 2025","1º Tri 2026","2º Tri 2026","W27","W28","W29","W30"];
