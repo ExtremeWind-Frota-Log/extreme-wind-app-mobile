@@ -110,11 +110,11 @@
 
 <div class="panel active" id="panel-ativos">
 <div class="kpis">
-  <div class="kpi"><div class="label">Tecnicos ativos</div><div class="value">41</div><div class="sub">5 em desmobilizacao ate 28/07/2026, 30/07/2026</div></div>
+  <div class="kpi"><div class="label">Tecnicos ativos</div><div class="value">38</div><div class="sub">2 em desmobilizacao ate 30/07/2026</div></div>
   <div class="kpi"><div class="label">Planejado (headcount)</div><div class="value">36</div><div class="sub">meta de equipes</div></div>
   <div class="kpi"><div class="label">Deficit total</div><div class="value red">0</div><div class="sub">abaixo do plano</div></div>
   <div class="kpi"><div class="label">Parques ativos</div><div class="value">10<span class="sub" style="font-size:16px;"> / 10</span></div><div class="sub">0 parques vazios</div></div>
-  <div class="kpi"><div class="label">Em desmobilizacao</div><div class="value amber">5</div><div class="sub">saida ja decidida, viagem ate 28/07/2026, 30/07/2026</div></div>
+  <div class="kpi"><div class="label">Em desmobilizacao</div><div class="value amber">2</div><div class="sub">saida ja decidida, viagem ate 30/07/2026</div></div>
 </div>
 <div class="grid2">
   <div class="card"><h2>Por cliente <span>tecnicos ativos</span></h2><canvas id="chartCliente"></canvas></div>
@@ -142,10 +142,10 @@
 
 <div class="panel" id="panel-historico">
 <div class="kpis">
-  <div class="kpi"><div class="label">Mobilizacoes</div><div class="value">703</div><div class="sub">51.4% dos eventos</div></div>
-  <div class="kpi"><div class="label">Desmobilizacoes</div><div class="value">660</div><div class="sub">48.2% dos eventos</div></div>
+  <div class="kpi"><div class="label">Mobilizacoes</div><div class="value">703</div><div class="sub">51.2% dos eventos</div></div>
+  <div class="kpi"><div class="label">Desmobilizacoes</div><div class="value">663</div><div class="sub">48.3% dos eventos</div></div>
   <div class="kpi"><div class="label">Cancelamentos</div><div class="value amber">6</div><div class="sub">0.4% dos eventos</div></div>
-  <div class="kpi"><div class="label">Total de eventos</div><div class="value">1369</div><div class="sub">jan/24 a jul/26</div></div>
+  <div class="kpi"><div class="label">Total de eventos</div><div class="value">1372</div><div class="sub">jan/24 a jul/26</div></div>
 </div>
 <div class="grid2">
   <div class="card"><h2>Ranking por parque <span>top 10</span></h2><div style="height:360px;"><canvas id="chartRankingParque" style="max-height:360px;"></canvas></div></div>
@@ -283,7 +283,7 @@ var parques = [
   {nome:"TRAIRI/CE", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
   {nome:"INTERMARÍTIMA/BA", cliente:"SIEMENS", suop:"WILDNER", real:2, plano:2}
 ];
-var emDesmobQtd = 5;
+var emDesmobQtd = 2;
 function badgeClass(c){ return {GE:'ge',NORDEX:'nordex',SIEMENS:'siemens'}[c] || 'ge'; }
 var tbody = document.getElementById('tbodyParques');
 parques.forEach(function(p){
@@ -370,7 +370,7 @@ function initHistoricoCharts(){
 var rankingParque = [
   ["LDV3/PI",83,83,1],
   ["OITIS/PI",82,79,0],
-  ["TRAIRI/CE",38,32,0],
+  ["TRAIRI/CE",38,33,0],
   ["COPEL/RN",35,32,1],
   ["UMBURANAS/BA",31,31,0],
   ["CAMPO LARGO/BA",25,25,0],
@@ -403,8 +403,8 @@ var chartRankingParque = new Chart(document.getElementById('chartRankingParque')
 });
 
 var rankingCliente = [
-  ["GE",392,381,4],
-  ["SIEMENS",206,180,1],
+  ["GE",392,382,4],
+  ["SIEMENS",206,182,1],
   ["NORDEX / LWS",62,56,0],
   ["SINOMA BLADES",21,21,1],
   ["LM",11,11,0],
@@ -427,7 +427,7 @@ var chartRankingCliente = new Chart(document.getElementById('chartRankingCliente
 });
 
 var mesesTodos = ["Jan/24","Fev/24","Mar/24","Abr/24","Mai/24","Jun/24","Jul/24","Ago/24","Set/24","Out/24","Nov/24","Dez/24","Jan/25","Fev/25","Mar/25","Abr/25","Mai/25","Jun/25","Jul/25","Ago/25","Set/25","Out/25","Nov/25","Dez/25","Jan/26","Fev/26","Mar/26","Abr/26","Mai/26","Jun/26","Jul/26"];
-var motivoClienteTodos = [16,3,16,26,15,24,10,21,21,6,25,10,38,15,20,29,43,28,30,34,33,25,50,59,71,34,42,41,44,25,25];
+var motivoClienteTodos = [16,3,16,26,15,24,10,21,21,6,25,10,38,15,20,29,43,28,30,34,33,25,50,59,71,34,42,41,44,25,28];
 var motivoExtremeTodos = [11,5,5,7,14,22,17,14,11,17,16,8,7,7,15,11,21,19,10,12,7,9,9,18,19,19,28,56,34,22,20];
 
 // Mes atual + ultimos 12 meses (13 barras no total)
