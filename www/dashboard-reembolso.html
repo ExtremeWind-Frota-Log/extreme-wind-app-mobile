@@ -98,27 +98,11 @@
 
 <div class="panel">
   <h2>Evolução do Reembolso</h2>
-  <div class="sub" id="evolucaoResumo" style="margin-bottom:14px;">Total acumulado 2026: R$ 151.658,05 · Semana atual (W30, parcial): R$ 1.677,16 · 2062 lançamentos · 5 responsáveis · 13 categorias</div>
+  <div class="sub" id="evolucaoResumo" style="margin-bottom:14px;">Total acumulado 2026: R$ 151.353,05 · Semana atual (W30, parcial): R$ 1.677,16 · 2061 lançamentos · 5 responsáveis · 13 categorias</div>
   <div style="position:relative; height:300px;">
     <canvas id="chartReembolsoEvolucao"></canvas>
   </div>
   <div class="note" id="evolucaoNote" style="margin-top:10px;"></div>
-</div>
-
-<div class="panel">
-  <h2>Por Responsável (acumulado 2026)</h2>
-  <div class="tablewrap">
-  <table>
-    <thead><tr><th>Responsável</th><th style="text-align:right;">Total (R$)</th><th style="text-align:right;">Lançamentos</th><th style="text-align:right;">% do total</th></tr></thead>
-    <tbody id="rankRespRows">
-    <tr><td>ROBSON LINS</td><td class="num">R$ 98.075,91</td><td class="num">986</td><td class="num">64.7%</td></tr>
-    <tr><td>EVAIR SAMPAIO</td><td class="num">R$ 28.184,15</td><td class="num">539</td><td class="num">18.6%</td></tr>
-    <tr><td>TIBÉRIO RIBEIRO</td><td class="num">R$ 11.875,29</td><td class="num">273</td><td class="num">7.8%</td></tr>
-    <tr><td>HERLANDERSON MAGALHÃES</td><td class="num">R$ 11.611,56</td><td class="num">236</td><td class="num">7.7%</td></tr>
-    <tr><td>TARCÍSIO CRUZ</td><td class="num">R$ 1.911,14</td><td class="num">28</td><td class="num">1.3%</td></tr>
-    </tbody>
-  </table>
-  </div>
 </div>
 
 <div class="panel">
@@ -139,7 +123,7 @@
     <tr><td>Junho</td><td class="num">R$ 17.185,08</td><td class="num">4</td><td class="num">R$ 4.296,27</td></tr>
     <tr><td>Maio</td><td class="num">R$ 27.544,30</td><td class="num">5</td><td class="num">R$ 5.508,86</td></tr>
     <tr><td>Abril</td><td class="num">R$ 27.473,38</td><td class="num">4</td><td class="num">R$ 6.868,34</td></tr>
-    <tr><td>Março</td><td class="num">R$ 28.506,69</td><td class="num">4</td><td class="num">R$ 7.126,67</td></tr>
+    <tr><td>Março</td><td class="num">R$ 28.201,69</td><td class="num">4</td><td class="num">R$ 7.050,42</td></tr>
     <tr><td>Fevereiro</td><td class="num">R$ 26.156,59</td><td class="num">5</td><td class="num">R$ 5.231,32</td></tr>
     <tr><td>Janeiro</td><td class="num">R$ 15.145,92</td><td class="num">4</td><td class="num">R$ 3.786,48</td></tr>
     </tbody>
@@ -193,7 +177,7 @@
 
 <script>
   var reembolsoEvoLabels = ["Média 2025","1º Tri 2026","2º Tri 2026","W27","W28","W29","W30"];
-  var reembolsoEvoValores = [2865.45,5369.94,5554.06,4258.95,1878.37,1831.61,1677.16];
+  var reembolsoEvoValores = [2865.45,5346.48,5554.06,4258.95,1878.37,1831.61,1677.16];
   var reembolsoEvoTecnicos = [43,75,65,46,46,45,42];
   var reembolsoEvoTipos = ["ano","trimestre","trimestre","semana","semana","semana","semana"];
 
@@ -214,7 +198,8 @@
           label: 'Valor (R$)',
           data: reembolsoEvoValores,
           backgroundColor: barColors,
-          yAxisID: 'y'
+          yAxisID: 'y',
+          order: 2
         },
         {
           type: 'line',
@@ -224,10 +209,32 @@
           backgroundColor: '#D89A2B',
           pointRadius: 4,
           tension: 0.25,
-          yAxisID: 'y1'
+          yAxisID: 'y1',
+          order: 1
         }
       ]
     },
+    plugins: [{
+      id: 'tecnicosValueLabels',
+      afterDatasetsDraw: function(chart){
+        var dsIndex = chart.data.datasets.findIndex(function(d){ return d.label === 'Técnicos ativos (média)'; });
+        if (dsIndex === -1) return;
+        var meta = chart.getDatasetMeta(dsIndex);
+        if (!meta || meta.hidden) return;
+        var ctx = chart.ctx;
+        ctx.save();
+        ctx.font = 'bold 11px Segoe UI, Arial, sans-serif';
+        ctx.fillStyle = '#D89A2B';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        meta.data.forEach(function(point, i){
+          var v = reembolsoEvoTecnicos[i];
+          if (v === null || v === undefined) return;
+          ctx.fillText(Math.round(v), point.x, point.y - 8);
+        });
+        ctx.restore();
+      }
+    }],
     options: {
       responsive: true,
       maintainAspectRatio: false,
@@ -256,9 +263,13 @@
 
 <script>
   var reembolsoSubLabels = ["01 - SERVIÇOS - MOB/DESMOB","02 - MATERIAL - DIVERSOS","01 - SERVIÇOS - LOGÍSTICA ENVIO/RETORNO MATÉRIA-PRIMA","01 - SERVIÇOS - BORRACHARIA DIVERSOS","01 - SERVIÇOS - MANUTENÇÃO","02 - MATERIAL - MAQUINÁRIO + ATIVO MOBILIZADO","02 - MATERIAL - EPI","01 - SERVIÇOS - TRANSPORTE","02 - MATERIAL - ESCRITÓRIO","01 - SERVIÇOS - DIVERSOS"];
-  var reembolsoSubValores = [39581.5,32836.76,20237.57,19798.94,12427.53,8347.76,8331.73,4351.85,2240.73,1285.6];
-  var reembolsoSubQtd = [366,636,182,263,152,83,171,49,55,91];
-  var reembolsoSubCumPct = [26.1,47.8,61.1,74.2,82.3,87.8,93.3,96.2,97.7,98.5];
+  var reembolsoSubValores = [39581.5,32836.76,19932.57,19798.94,12427.53,8347.76,8331.73,4351.85,2240.73,1285.6];
+  var reembolsoSubQtd = [366,636,181,263,152,83,171,49,55,91];
+  var reembolsoSubCumPct = [26.2,47.8,61.0,74.1,82.3,87.8,93.3,96.2,97.7,98.5];
+  // Barras cujo % acumulado ate ali entra nos 80% (a "regra dos poucos vitais"
+  // do 80/20) ficam em vermelho suave, pra destacar visualmente onde esta a
+  // prioridade; o resto fica na cor padrao.
+  var reembolsoSubBarColors = reembolsoSubCumPct.map(function(c){ return c <= 80 ? '#D9736B' : '#1C8CE8'; });
 
   new Chart(document.getElementById('chartReembolsoParetoSub'), {
     data: {
@@ -268,7 +279,7 @@
           type: 'bar',
           label: 'Valor (R$)',
           data: reembolsoSubValores,
-          backgroundColor: '#1C8CE8',
+          backgroundColor: reembolsoSubBarColors,
           xAxisID: 'xValor',
           yAxisID: 'y',
           order: 2
