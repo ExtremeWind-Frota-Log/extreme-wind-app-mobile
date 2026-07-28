@@ -108,6 +108,14 @@
 </div>
 
 <div class="panel">
+  <h2>Reembolso por Cliente (2026)</h2>
+  <div style="position:relative; height:320px; max-width:420px; margin:0 auto;">
+    <canvas id="chartReembolsoCliente"></canvas>
+  </div>
+  <div class="note">Cliente identificado a partir do campo "Projeto" (nome do parque), cruzado com o histórico de mobilização/desmobilização do Diário de Bordo. "Interno (Extreme)" são lançamentos do projeto "EXTREME" (não é parque de cliente). "Não identificado" são projetos sem cliente reconhecido no histórico — confira na fonte se valer a pena. Parques que já tiveram mais de um cliente ao longo do tempo (ex: TRAIRI/CE) usam o cliente mais frequente no histórico, não uma separação exata por lançamento.</div>
+</div>
+
+<div class="panel">
   <h2>Pareto — Sub-atividade (top 10, acumulado 2026)</h2>
   <div class="pareto-wrap" style="position:relative;">
     <canvas id="chartReembolsoParetoSub"></canvas>
@@ -315,6 +323,45 @@
                   ticks: { callback: function(v){ return 'R$ ' + v.toLocaleString('pt-BR'); } } },
         xPct: { axis: 'x', position: 'top', beginAtZero:true, max: 100, grid: { display:false },
                 ticks: { color:'#D89A2B', callback: function(v){ return v + '%'; } } }
+      }
+    }
+  });
+</script>
+
+<script>
+  var reembolsoCliLabels = ["GE","SIEMENS","NORDEX / LWS","Interno (Extreme)","Não identificado"];
+  var reembolsoCliValores = [86134.91,24759.69,22157.34,9591.18,8709.93];
+  var reembolsoCliPct = [56.9,16.4,14.6,6.3,5.8];
+
+  var coresPorCliente = {
+    'GE': '#1C8CE8',
+    'SIEMENS': '#12BFA8',
+    'NORDEX / LWS': '#D89A2B',
+    'Interno (Extreme)': '#5C7A93',
+    'Não identificado': '#3A4A5A'
+  };
+  var reembolsoCliCores = reembolsoCliLabels.map(function(l){ return coresPorCliente[l] || '#1C8CE8'; });
+
+  new Chart(document.getElementById('chartReembolsoCliente'), {
+    type: 'pie',
+    data: {
+      labels: reembolsoCliLabels,
+      datasets: [{
+        data: reembolsoCliValores,
+        backgroundColor: reembolsoCliCores,
+        borderColor: '#0F2A40',
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true, position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+        tooltip: { callbacks: { label: function(ctx){
+          var pct = reembolsoCliPct[ctx.dataIndex];
+          return ctx.label + ': ' + fmtBRL(ctx.parsed) + ' (' + pct + '%)';
+        } } }
       }
     }
   });
