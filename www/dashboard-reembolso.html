@@ -383,7 +383,22 @@
         borderWidth: 2
       }]
     },
-    plugins: [reembolsoCliPieLabels],
+    plugins: [reembolsoCliPieLabels, {
+      // No mobile, empurra a legenda mais pra esquerda (mais distancia da
+      // pizza) alargando artificialmente a caixa da legenda calculada pelo
+      // Chart.js -- unica forma de controlar esse espacamento sem plugin
+      // externo.
+      id: 'reembolsoCliLegendGap',
+      beforeInit: function(chart){
+        var legend = chart.legend;
+        if (!legend) return;
+        var origFit = legend.fit;
+        legend.fit = function(){
+          origFit.bind(legend)();
+          if (window.innerWidth <= 820) legend.width += 34;
+        };
+      }
+    }],
     options: {
       responsive: true,
       maintainAspectRatio: false,
@@ -393,6 +408,7 @@
           position: 'left',
           labels: {
             boxWidth: 12,
+            color: '#FFFFFF',
             font: { size: 11 },
             generateLabels: function(chart){
               var data = chart.data;
