@@ -109,10 +109,10 @@
 
 <div class="panel">
   <h2>Reembolso por Cliente (2026)</h2>
-  <div style="position:relative; height:320px; max-width:420px; margin:0 auto;">
+  <div style="position:relative; height:320px;">
     <canvas id="chartReembolsoCliente"></canvas>
   </div>
-  <div class="note">Cliente identificado a partir do campo "Projeto" (nome do parque), cruzado com o histórico de mobilização/desmobilização do Diário de Bordo. "Interno (Extreme)" são lançamentos do projeto "EXTREME" (não é parque de cliente). "Não identificado" são projetos sem cliente reconhecido no histórico — confira na fonte se valer a pena. Parques que já tiveram mais de um cliente ao longo do tempo (ex: TRAIRI/CE) usam o cliente mais frequente no histórico, não uma separação exata por lançamento.</div>
+  <div class="note">Cliente identificado a partir do campo "Projeto" (nome do parque), cruzado com o histórico de mobilização/desmobilização do Diário de Bordo. Lançamentos do projeto "EXTREME" (interno, não é parque de cliente) entram na conta da GE. "Não identificado" são projetos sem cliente reconhecido no histórico — confira na fonte se valer a pena. Parques que já tiveram mais de um cliente ao longo do tempo (ex: TRAIRI/CE) usam o cliente mais frequente no histórico, não uma separação exata por lançamento. A quantidade entre parênteses na legenda é o número de projetos distintos daquele cliente.</div>
 </div>
 
 <div class="panel">
@@ -329,21 +329,21 @@
 </script>
 
 <script>
-  var reembolsoCliLabels = ["GE","NORDEX / LWS","SIEMENS","Interno (Extreme)","Não identificado"];
-  var reembolsoCliValores = [86134.91,29840.45,25744.51,9591.18,42.0];
-  var reembolsoCliPct = [56.9,19.7,17.0,6.3,0.0];
-  var reembolsoCliNProjetos = [11,6,14,1,2];
+  var reembolsoCliLabels = ["GE","NORDEX / LWS","SIEMENS","Não identificado"];
+  var reembolsoCliValores = [95726.09,29840.45,25744.51,42.0];
+  var reembolsoCliPct = [63.2,19.7,17.0,0.0];
+  var reembolsoCliNProjetos = [12,6,14,2];
 
   var coresPorCliente = {
     'GE': '#1C8CE8',
     'SIEMENS': '#12BFA8',
     'NORDEX / LWS': '#D89A2B',
-    'Interno (Extreme)': '#5C7A93',
     'Não identificado': '#3A4A5A'
   };
   var reembolsoCliCores = reembolsoCliLabels.map(function(l){ return coresPorCliente[l] || '#1C8CE8'; });
 
-  // Desenha "PCT% (N projetos)" direto em cima de cada fatia da pizza.
+  // Desenha so o percentual direto em cima de cada fatia da pizza (a
+  // quantidade de projetos fica na legenda, do lado do nome do cliente).
   var reembolsoCliPieLabels = {
     id: 'reembolsoCliPieLabels',
     afterDatasetsDraw: function(chart){
@@ -355,13 +355,12 @@
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.lineWidth = 3;
-      ctx.strokeStyle = 'rgba(8,20,32,0.85)';
-      ctx.fillStyle = '#FFFFFF';
+      ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+      ctx.fillStyle = '#000000';
       meta.data.forEach(function(arc, i){
         var pct = reembolsoCliPct[i];
         if (pct === null || pct === undefined || pct < 2) return; // fatia pequena demais pro texto caber
-        var n = reembolsoCliNProjetos[i];
-        var label = pct + '% (' + n + (n === 1 ? ' projeto' : ' projetos') + ')';
+        var label = pct + '%';
         var angle = (arc.startAngle + arc.endAngle) / 2;
         var radius = ((arc.innerRadius || 0) + arc.outerRadius) / 2 * 0.98;
         var x = arc.x + Math.cos(angle) * radius;
@@ -389,7 +388,30 @@
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: { display: true, position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+        legend: {
+          display: true,
+          position: 'left',
+          labels: {
+            boxWidth: 12,
+            font: { size: 11 },
+            generateLabels: function(chart){
+              var data = chart.data;
+              var meta = chart.getDatasetMeta(0);
+              return data.labels.map(function(label, i){
+                var style = meta.controller.getStyle(i);
+                var n = reembolsoCliNProjetos[i];
+                return {
+                  text: label + ' (' + n + (n === 1 ? ' projeto' : ' projetos') + ')',
+                  fillStyle: style.backgroundColor,
+                  strokeStyle: style.borderColor,
+                  lineWidth: style.borderWidth,
+                  hidden: false,
+                  index: i
+                };
+              });
+            }
+          }
+        },
         tooltip: { callbacks: { label: function(ctx){
           var pct = reembolsoCliPct[ctx.dataIndex];
           var n = reembolsoCliNProjetos[ctx.dataIndex];
