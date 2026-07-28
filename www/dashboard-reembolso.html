@@ -3,6 +3,7 @@
 
 <title>Dashboard Reembolso - Extreme Wind</title>
 <link rel="icon" type="image/png" href="assets/icone-helice-color.png">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
   :root{
     --brand:#00679A; --brand-dark:#055384; --brand-deep:#021C2C;
@@ -95,27 +96,13 @@
   <div class="badge-week" id="badgeAtualizado">Atualizado 27/07/2026</div>
 </header>
 
-<div class="kpis" id="kpisReembolso">
-  <div class="kpi">
-    <div class="label" id="kpiMesAtualLabel">Total — Julho</div>
-    <div class="value" id="kpiMesAtualValue">R$ 9.646,09</div>
-    <div class="sub" id="kpiMesAtualSub">4 semanas · média R$ 2.411,52/semana</div>
+<div class="panel">
+  <h2>Evolução do Reembolso</h2>
+  <div class="sub" id="evolucaoResumo" style="margin-bottom:14px;">Total acumulado 2026: R$ 151.353,05 · Semana atual (W30, parcial): R$ 1.677,16 · 2061 lançamentos · 5 responsáveis · 13 categorias</div>
+  <div style="position:relative; height:300px;">
+    <canvas id="chartReembolsoEvolucao"></canvas>
   </div>
-  <div class="kpi">
-    <div class="label" id="kpiSemanaAtualLabel">Semana Atual (parcial)</div>
-    <div class="value" id="kpiSemanaAtualValue">R$ 1.677,16</div>
-    <div class="sub">W30 · ainda em lançamento</div>
-  </div>
-  <div class="kpi">
-    <div class="label">Total Acumulado 2026</div>
-    <div class="value" id="kpiTotalAnoValue">R$ 151.353,05</div>
-    <div class="sub" id="kpiTotalAnoSub">jan/26 a jul/26</div>
-  </div>
-  <div class="kpi">
-    <div class="label">Lançamentos no Ano</div>
-    <div class="value" id="kpiLancamentosValue">2061</div>
-    <div class="sub" id="kpiLancamentosSub">5 responsáveis · 13 categorias</div>
-  </div>
+  <div class="note" id="evolucaoNote" style="margin-top:10px;">Média 2024 sem dado disponível (nenhum arquivo de Master de reembolso encontrado para 2024, ou a referência já vinha quebrada na planilha de origem). </div>
 </div>
 
 <div class="panel">
@@ -215,7 +202,51 @@
   <div class="note">Mostrando os últimos lançamentos da planilha (ordem de digitação, não necessariamente ordem cronológica dentro da mesma semana).</div>
 </div>
 
-<div class="note" id="fonteNote">Fonte: planilha "Formulário de Reembolso Master (2026)", aba REEMBOLSO. Totais mensais e semanais lidos diretamente da tabela "CONTROLE MENSAL" já calculada na planilha; ranking por responsável/categoria calculado a partir dos lançamentos brutos. A planilha não tem uma coluna de status (pendente x já reembolsado) — este dashboard mostra histórico consolidado, não uma fila de pendências. Dados extraídos automaticamente; confira os valores na fonte antes de compartilhar. Uso interno do setor — não repasse fora da equipe sem necessidade.</div>
+<div class="note" id="fonteNote">Fonte: planilha "Formulário de Reembolso Master (2026)", aba REEMBOLSO. O gráfico de evolução, os totais mensais e o ranking por responsável/categoria são recalculados a partir dos lançamentos brutos (coluna Semana + Valor) — não das fórmulas prontas da planilha, que ficam com cache zerado sempre que outra automação resalva o arquivo via openpyxl. A planilha não tem uma coluna de status (pendente x já reembolsado) — este dashboard mostra histórico consolidado, não uma fila de pendências. Dados extraídos automaticamente; confira os valores na fonte antes de compartilhar. Uso interno do setor — não repasse fora da equipe sem necessidade.</div>
+
+<script>
+  var reembolsoEvoLabels = ["Média 2024","Média 2025","1º Tri 2026","2º Tri 2026","W27","W28","W29","W30"];
+  var reembolsoEvoValores = [null,2865.45,5346.48,5554.06,4258.95,1878.37,1831.61,1677.16];
+  var reembolsoEvoTipos = ["ano","ano","trimestre","trimestre","semana","semana","semana","semana"];
+
+  var coresPorTipo = { ano: '#5C7A93', trimestre: '#1C8CE8', semana: '#12BFA8' };
+  var barColors = reembolsoEvoTipos.map(function(t){ return coresPorTipo[t] || '#1C8CE8'; });
+
+  function fmtBRL(v){
+    if (v === null || v === undefined) return '-';
+    return 'R$ ' + v.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+  }
+
+  new Chart(document.getElementById('chartReembolsoEvolucao'), {
+    type: 'bar',
+    data: {
+      labels: reembolsoEvoLabels,
+      datasets: [{
+        label: 'Valor (R$) — média semanal em barras de ano/trimestre, total na semana',
+        data: reembolsoEvoValores,
+        backgroundColor: barColors
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: function(ctx){
+          var v = ctx.parsed.y;
+          if (v === null || v === undefined) return 'Sem dado disponível';
+          var tipo = reembolsoEvoTipos[ctx.dataIndex];
+          var sufixo = tipo === 'semana' ? ' (total da semana)' : ' (média semanal do período)';
+          return fmtBRL(v) + sufixo;
+        }}}
+      },
+      scales: {
+        x: { grid: { display:false }, ticks: { font: { size: 11 } } },
+        y: { beginAtZero:true, grid: { color:'#1E4363' }, ticks: { callback: function(v){ return 'R$ ' + v.toLocaleString('pt-BR'); } } }
+      }
+    }
+  });
+</script>
 
 </body>
 </html>
