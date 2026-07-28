@@ -422,7 +422,13 @@
                   strokeStyle: style.borderColor,
                   lineWidth: style.borderWidth,
                   hidden: false,
-                  index: i
+                  index: i,
+                  // Chart.js so aplica "labels.color" quando usa o generateLabels
+                  // padrao -- com generateLabels customizado (nosso caso, pra
+                  // incluir a qtd de projetos), cada item precisa declarar a
+                  // propria cor, senao cai pra preto por padrao. Confirmado
+                  // testando ao vivo no navegador antes de publicar.
+                  fontColor: '#FFFFFF'
                 };
               });
             }
