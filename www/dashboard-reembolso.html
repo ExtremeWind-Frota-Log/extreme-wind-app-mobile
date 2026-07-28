@@ -98,11 +98,11 @@
 
 <div class="panel">
   <h2>Evolução do Reembolso</h2>
-  <div class="sub" id="evolucaoResumo" style="margin-bottom:14px;">Total acumulado 2026: R$ 151.353,05 · Semana atual (W30, parcial): R$ 1.677,16 · 2061 lançamentos · 5 responsáveis · 13 categorias</div>
+  <div class="sub" id="evolucaoResumo" style="margin-bottom:14px;">Total acumulado 2026: R$ 151.658,05 · Semana atual (W30, parcial): R$ 1.677,16 · 2062 lançamentos · 5 responsáveis · 13 categorias</div>
   <div style="position:relative; height:300px;">
     <canvas id="chartReembolsoEvolucao"></canvas>
   </div>
-  <div class="note" id="evolucaoNote" style="margin-top:10px;">Média 2024 sem dado disponível (nenhum arquivo de Master de reembolso encontrado para 2024, ou a referência já vinha quebrada na planilha de origem). </div>
+  <div class="note" id="evolucaoNote" style="margin-top:10px;"></div>
 </div>
 
 <div class="panel">
@@ -111,7 +111,7 @@
   <table>
     <thead><tr><th>Responsável</th><th style="text-align:right;">Total (R$)</th><th style="text-align:right;">Lançamentos</th><th style="text-align:right;">% do total</th></tr></thead>
     <tbody id="rankRespRows">
-    <tr><td>ROBSON LINS</td><td class="num">R$ 97.770,91</td><td class="num">985</td><td class="num">64.6%</td></tr>
+    <tr><td>ROBSON LINS</td><td class="num">R$ 98.075,91</td><td class="num">986</td><td class="num">64.7%</td></tr>
     <tr><td>EVAIR SAMPAIO</td><td class="num">R$ 28.184,15</td><td class="num">539</td><td class="num">18.6%</td></tr>
     <tr><td>TIBÉRIO RIBEIRO</td><td class="num">R$ 11.875,29</td><td class="num">273</td><td class="num">7.8%</td></tr>
     <tr><td>HERLANDERSON MAGALHÃES</td><td class="num">R$ 11.611,56</td><td class="num">236</td><td class="num">7.7%</td></tr>
@@ -129,7 +129,7 @@
     <tbody id="rankSubRows">
     <tr><td>01 - SERVIÇOS - MOB/DESMOB</td><td class="num">R$ 39.581,50</td><td class="num">366</td></tr>
     <tr><td>02 - MATERIAL - DIVERSOS</td><td class="num">R$ 32.836,76</td><td class="num">636</td></tr>
-    <tr><td>01 - SERVIÇOS - LOGÍSTICA ENVIO/RETORNO MATÉRIA-PRIMA</td><td class="num">R$ 19.932,57</td><td class="num">181</td></tr>
+    <tr><td>01 - SERVIÇOS - LOGÍSTICA ENVIO/RETORNO MATÉRIA-PRIMA</td><td class="num">R$ 20.237,57</td><td class="num">182</td></tr>
     <tr><td>01 - SERVIÇOS - BORRACHARIA DIVERSOS</td><td class="num">R$ 19.798,94</td><td class="num">263</td></tr>
     <tr><td>01 - SERVIÇOS - MANUTENÇÃO</td><td class="num">R$ 12.427,53</td><td class="num">152</td></tr>
     <tr><td>02 - MATERIAL - MAQUINÁRIO + ATIVO MOBILIZADO</td><td class="num">R$ 8.347,76</td><td class="num">83</td></tr>
@@ -152,7 +152,7 @@
     <tr><td>Junho</td><td class="num">R$ 17.185,08</td><td class="num">4</td><td class="num">R$ 4.296,27</td></tr>
     <tr><td>Maio</td><td class="num">R$ 27.544,30</td><td class="num">5</td><td class="num">R$ 5.508,86</td></tr>
     <tr><td>Abril</td><td class="num">R$ 27.473,38</td><td class="num">4</td><td class="num">R$ 6.868,34</td></tr>
-    <tr><td>Março</td><td class="num">R$ 28.201,69</td><td class="num">4</td><td class="num">R$ 7.050,42</td></tr>
+    <tr><td>Março</td><td class="num">R$ 28.506,69</td><td class="num">4</td><td class="num">R$ 7.126,67</td></tr>
     <tr><td>Fevereiro</td><td class="num">R$ 26.156,59</td><td class="num">5</td><td class="num">R$ 5.231,32</td></tr>
     <tr><td>Janeiro</td><td class="num">R$ 15.145,92</td><td class="num">4</td><td class="num">R$ 3.786,48</td></tr>
     </tbody>
@@ -205,9 +205,10 @@
 <div class="note" id="fonteNote">Fonte: planilha "Formulário de Reembolso Master (2026)", aba REEMBOLSO. O gráfico de evolução, os totais mensais e o ranking por responsável/categoria são recalculados a partir dos lançamentos brutos (coluna Semana + Valor) — não das fórmulas prontas da planilha, que ficam com cache zerado sempre que outra automação resalva o arquivo via openpyxl. A planilha não tem uma coluna de status (pendente x já reembolsado) — este dashboard mostra histórico consolidado, não uma fila de pendências. Dados extraídos automaticamente; confira os valores na fonte antes de compartilhar. Uso interno do setor — não repasse fora da equipe sem necessidade.</div>
 
 <script>
-  var reembolsoEvoLabels = ["Média 2024","Média 2025","1º Tri 2026","2º Tri 2026","W27","W28","W29","W30"];
-  var reembolsoEvoValores = [null,2865.45,5346.48,5554.06,4258.95,1878.37,1831.61,1677.16];
-  var reembolsoEvoTipos = ["ano","ano","trimestre","trimestre","semana","semana","semana","semana"];
+  var reembolsoEvoLabels = ["Média 2025","1º Tri 2026","2º Tri 2026","W27","W28","W29","W30"];
+  var reembolsoEvoValores = [2865.45,5369.94,5554.06,4258.95,1878.37,1831.61,1677.16];
+  var reembolsoEvoTecnicos = [42.5,75.5,65.1,46.0,46.0,45.0,42.0];
+  var reembolsoEvoTipos = ["ano","trimestre","trimestre","semana","semana","semana","semana"];
 
   var coresPorTipo = { ano: '#5C7A93', trimestre: '#1C8CE8', semana: '#12BFA8' };
   var barColors = reembolsoEvoTipos.map(function(t){ return coresPorTipo[t] || '#1C8CE8'; });
@@ -218,31 +219,49 @@
   }
 
   new Chart(document.getElementById('chartReembolsoEvolucao'), {
-    type: 'bar',
     data: {
       labels: reembolsoEvoLabels,
-      datasets: [{
-        label: 'Valor (R$) — média semanal em barras de ano/trimestre, total na semana',
-        data: reembolsoEvoValores,
-        backgroundColor: barColors
-      }]
+      datasets: [
+        {
+          type: 'bar',
+          label: 'Valor (R$)',
+          data: reembolsoEvoValores,
+          backgroundColor: barColors,
+          yAxisID: 'y'
+        },
+        {
+          type: 'line',
+          label: 'Técnicos ativos (média)',
+          data: reembolsoEvoTecnicos,
+          borderColor: '#D89A2B',
+          backgroundColor: '#D89A2B',
+          pointRadius: 4,
+          tension: 0.25,
+          yAxisID: 'y1'
+        }
+      ]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: { display: false },
+        legend: { display: true, position: 'top', labels: { boxWidth: 12, font: { size: 11 } } },
         tooltip: { callbacks: { label: function(ctx){
           var v = ctx.parsed.y;
-          if (v === null || v === undefined) return 'Sem dado disponível';
+          if (v === null || v === undefined) return ctx.dataset.label + ': sem dado disponível';
+          if (ctx.dataset.type === 'line') return 'Técnicos ativos (média): ' + v;
           var tipo = reembolsoEvoTipos[ctx.dataIndex];
           var sufixo = tipo === 'semana' ? ' (total da semana)' : ' (média semanal do período)';
-          return fmtBRL(v) + sufixo;
+          return 'Valor: ' + fmtBRL(v) + sufixo;
         }}}
       },
       scales: {
         x: { grid: { display:false }, ticks: { font: { size: 11 } } },
-        y: { beginAtZero:true, grid: { color:'#1E4363' }, ticks: { callback: function(v){ return 'R$ ' + v.toLocaleString('pt-BR'); } } }
+        y: { beginAtZero:true, position: 'left', grid: { color:'#1E4363' },
+             ticks: { callback: function(v){ return 'R$ ' + v.toLocaleString('pt-BR'); } } },
+        y1: { beginAtZero:true, position: 'right', grid: { display:false },
+              title: { display:true, text:'Técnicos ativos', color:'#D89A2B', font:{size:11} },
+              ticks: { color:'#D89A2B' } }
       }
     }
   });
