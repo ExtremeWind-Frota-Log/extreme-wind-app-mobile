@@ -207,7 +207,7 @@
 <script>
   var reembolsoEvoLabels = ["Média 2025","1º Tri 2026","2º Tri 2026","W27","W28","W29","W30"];
   var reembolsoEvoValores = [2865.45,5369.94,5554.06,4258.95,1878.37,1831.61,1677.16];
-  var reembolsoEvoTecnicos = [42.5,75.5,65.1,46.0,46.0,45.0,42.0];
+  var reembolsoEvoTecnicos = [43,75,65,46,46,45,42];
   var reembolsoEvoTipos = ["ano","trimestre","trimestre","semana","semana","semana","semana"];
 
   var coresPorTipo = { ano: '#5C7A93', trimestre: '#1C8CE8', semana: '#12BFA8' };
@@ -249,7 +249,7 @@
         tooltip: { callbacks: { label: function(ctx){
           var v = ctx.parsed.y;
           if (v === null || v === undefined) return ctx.dataset.label + ': sem dado disponível';
-          if (ctx.dataset.type === 'line') return 'Técnicos ativos (média): ' + v;
+          if (ctx.dataset.type === 'line') return 'Técnicos ativos (média): ' + Math.round(v);
           var tipo = reembolsoEvoTipos[ctx.dataIndex];
           var sufixo = tipo === 'semana' ? ' (total da semana)' : ' (média semanal do período)';
           return 'Valor: ' + fmtBRL(v) + sufixo;
@@ -261,7 +261,7 @@
              ticks: { callback: function(v){ return 'R$ ' + v.toLocaleString('pt-BR'); } } },
         y1: { beginAtZero:true, position: 'right', grid: { display:false },
               title: { display:true, text:'Técnicos ativos', color:'#D89A2B', font:{size:11} },
-              ticks: { color:'#D89A2B' } }
+              ticks: { color:'#D89A2B', precision: 0, callback: function(v){ return Math.round(v); } } }
       }
     }
   });
