@@ -96,7 +96,7 @@
       <div class="sub">Dashboard de Reembolso — Uso interno</div>
     </div>
   </div>
-  <div class="badge-week" id="badgeAtualizado">Atualizado 27/07/2026</div>
+  <div class="badge-week" id="badgeAtualizado">Atualizado 28/07/2026</div>
 </header>
 
 <div class="panel">
@@ -332,6 +332,7 @@
   var reembolsoCliLabels = ["GE","NORDEX / LWS","SIEMENS","Interno (Extreme)","Não identificado"];
   var reembolsoCliValores = [86134.91,29840.45,25744.51,9591.18,42.0];
   var reembolsoCliPct = [56.9,19.7,17.0,6.3,0.0];
+  var reembolsoCliNProjetos = [11,6,14,1,2];
 
   var coresPorCliente = {
     'GE': '#1C8CE8',
@@ -341,6 +342,36 @@
     'Não identificado': '#3A4A5A'
   };
   var reembolsoCliCores = reembolsoCliLabels.map(function(l){ return coresPorCliente[l] || '#1C8CE8'; });
+
+  // Desenha "PCT% (N projetos)" direto em cima de cada fatia da pizza.
+  var reembolsoCliPieLabels = {
+    id: 'reembolsoCliPieLabels',
+    afterDatasetsDraw: function(chart){
+      var meta = chart.getDatasetMeta(0);
+      if (!meta || !meta.data) return;
+      var ctx = chart.ctx;
+      ctx.save();
+      ctx.font = 'bold 12px Segoe UI, Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = 'rgba(8,20,32,0.85)';
+      ctx.fillStyle = '#FFFFFF';
+      meta.data.forEach(function(arc, i){
+        var pct = reembolsoCliPct[i];
+        if (pct === null || pct === undefined || pct < 2) return; // fatia pequena demais pro texto caber
+        var n = reembolsoCliNProjetos[i];
+        var label = pct + '% (' + n + (n === 1 ? ' projeto' : ' projetos') + ')';
+        var angle = (arc.startAngle + arc.endAngle) / 2;
+        var radius = ((arc.innerRadius || 0) + arc.outerRadius) / 2 * 0.98;
+        var x = arc.x + Math.cos(angle) * radius;
+        var y = arc.y + Math.sin(angle) * radius;
+        ctx.strokeText(label, x, y);
+        ctx.fillText(label, x, y);
+      });
+      ctx.restore();
+    }
+  };
 
   new Chart(document.getElementById('chartReembolsoCliente'), {
     type: 'pie',
@@ -353,6 +384,7 @@
         borderWidth: 2
       }]
     },
+    plugins: [reembolsoCliPieLabels],
     options: {
       responsive: true,
       maintainAspectRatio: false,
@@ -360,7 +392,8 @@
         legend: { display: true, position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
         tooltip: { callbacks: { label: function(ctx){
           var pct = reembolsoCliPct[ctx.dataIndex];
-          return ctx.label + ': ' + fmtBRL(ctx.parsed) + ' (' + pct + '%)';
+          var n = reembolsoCliNProjetos[ctx.dataIndex];
+          return ctx.label + ': ' + fmtBRL(ctx.parsed) + ' (' + pct + '%, ' + n + (n === 1 ? ' projeto' : ' projetos') + ')';
         } } }
       }
     }
