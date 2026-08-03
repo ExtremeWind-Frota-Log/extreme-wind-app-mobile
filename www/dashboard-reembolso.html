@@ -243,26 +243,56 @@
     return (v / reembolsoSubAxisMax) >= 0.8 ? '#D9736B' : '#1C8CE8';
   });
 
-  // Em telas estreitas (celular na vertical), quebra o nome da sub-atividade
-  // em varias linhas pra caber no eixo Y sem estourar a largura da tela.
-  function wrapLabelPareto(label, maxLen){
-    if (!label || label.length <= maxLen) return label;
-    var words = label.split(' '), lines = [], cur = '';
+  // Nome da sub-atividade e desenhado DENTRO de cada barra (nao mais no eixo
+  // Y, que fica oculto) -- plugin customizado abaixo. Quebra em varias linhas
+  // quando o texto nao cabe na largura da barra.
+  function wrapLabelToWidth(ctx, text, maxWidth){
+    var words = text.split(' '), lines = [], cur = '';
     words.forEach(function(w){
       var test = cur ? cur + ' ' + w : w;
-      if (test.length > maxLen && cur) { lines.push(cur); cur = w; }
+      if (ctx.measureText(test).width > maxWidth && cur) { lines.push(cur); cur = w; }
       else { cur = test; }
     });
     if (cur) lines.push(cur);
     return lines;
   }
-  var reembolsoSubLabelsChart = (window.innerWidth <= 820)
-    ? reembolsoSubLabels.map(function(l){ return wrapLabelPareto(l, 18); })
-    : reembolsoSubLabels;
+
+  var paretoBarLabelsPlugin = {
+    id: 'paretoBarLabels',
+    afterDatasetsDraw: function(chart){
+      var barDataset = chart.data.datasets.findIndex(function(d){ return d.type === 'bar'; });
+      var meta = chart.getDatasetMeta(barDataset);
+      var ctx = chart.ctx;
+      ctx.save();
+      ctx.font = '11px Segoe UI, Arial, sans-serif';
+      ctx.fillStyle = '#EAF1F7';
+      ctx.textBaseline = 'middle';
+      meta.data.forEach(function(bar, i){
+        var label = reembolsoSubLabels[i];
+        if (!label) return;
+        var barLeft = bar.base;   // borda esquerda da barra (base = 0 no eixo x)
+        var barRight = bar.x;     // ponta direita da barra
+        var barWidth = barRight - barLeft;
+        var padding = 8;
+        var maxTextWidth = barWidth - padding * 2;
+        if (maxTextWidth < 30) return; // barra curta demais, nao escreve (evita texto vazando)
+        var lines = wrapLabelToWidth(ctx, label, maxTextWidth);
+        var lineHeight = 13;
+        var totalHeight = lines.length * lineHeight;
+        var startY = bar.y - totalHeight / 2 + lineHeight / 2;
+        ctx.textAlign = 'left';
+        lines.forEach(function(line, li){
+          ctx.fillText(line, barLeft + padding, startY + li * lineHeight);
+        });
+      });
+      ctx.restore();
+    }
+  };
 
   new Chart(document.getElementById('chartReembolsoParetoSub'), {
+    plugins: [paretoBarLabelsPlugin],
     data: {
-      labels: reembolsoSubLabelsChart,
+      labels: reembolsoSubLabels,
       datasets: [
         {
           type: 'bar',
@@ -313,7 +343,7 @@
         } } }
       },
       scales: {
-        y: { axis: 'y', grid: { display:false }, ticks: { font: { size: 10 } } },
+        y: { axis: 'y', grid: { display:false }, ticks: { display:false } },
         xValor: { axis: 'x', position: 'bottom', beginAtZero:true, max: reembolsoSubAxisMax, grid: { color:'#1E4363' },
                   ticks: { callback: function(v){ return 'R$ ' + v.toLocaleString('pt-BR'); } } },
         xPct: { axis: 'x', position: 'top', beginAtZero:true, max: 100, grid: { display:false },
