@@ -96,7 +96,7 @@
       <div class="sub">Dashboard de Reembolso — Uso interno</div>
     </div>
   </div>
-  <div class="badge-week" id="badgeAtualizado">Atualizado 02/08/2026</div>
+  <div class="badge-week" id="badgeAtualizado">Atualizado 03/08/2026</div>
 </header>
 
 <div class="panel">
@@ -117,6 +117,14 @@
   <h2>Pareto — Sub-atividade (top 10, acumulado 2026)</h2>
   <div class="pareto-wrap" style="position:relative;">
     <canvas id="chartReembolsoParetoSub"></canvas>
+  </div>
+</div>
+
+<div class="panel">
+  <h2>Pareto — Categorias de Lançamento (top 10 dentro das 2 maiores sub-atividades)</h2>
+  <p class="panel-note" id="paretoDescTop2Note">Top 10 categorias de lançamento (descrições agrupadas) dentro das 2 sub-atividades de maior valor (01 - SERVIÇOS - MOB/DESMOB + 02 - MATERIAL - DIVERSOS), acumulado 2026.</p>
+  <div class="pareto-wrap" style="position:relative;">
+    <canvas id="chartReembolsoParetoDescTop2"></canvas>
   </div>
 </div>
 
@@ -347,6 +355,106 @@
         xValor: { axis: 'x', position: 'bottom', beginAtZero:true, max: reembolsoSubAxisMax, grid: { color:'#1E4363' },
                   ticks: { callback: function(v){ return 'R$ ' + v.toLocaleString('pt-BR'); } } },
         xPct: { axis: 'x', position: 'top', beginAtZero:true, max: 100, grid: { display:false },
+                ticks: { color:'#D89A2B', callback: function(v){ return v + '%'; } } }
+      }
+    }
+  });
+</script>
+
+<script>
+  // Pareto estratificado: top 10 descricoes de lancamento, so dentro das 2
+  // sub-atividades de maior valor (mesma logica de labels-dentro-da-barra do
+  // Pareto acima, reaproveitando wrapLabelToWidth ja definido no script
+  // anterior). Aqui a cauda de descricoes e longa (centenas de itens
+  // distintos), entao o top 10 normalmente NAO chega perto de 80% do total
+  // -- por isso este grafico nao tem linha de referencia de 80%, so a curva
+  // de % acumulado.
+  var reembolsoDescTop2Labels = ["Translados Mobs ou Desmobs","Fita Crepe","Abastecimento de Combustível","Potes de Químicos","Material de Limpeza","Rolos de Laminação","Impressões de Documentações EHS","Pilotos","Disco Lixa","Rolos de Espuma"];
+  var reembolsoDescTop2Valores = [32176.35,6067.6,3799.52,3588.2,2232.44,1854.65,1408.45,1235.5,1144.18,929.94];
+  var reembolsoDescTop2Qtd = [309,99,21,76,30,29,53,41,20,18];
+  var reembolsoDescTop2CumPct = [44.0,52.4,57.6,62.5,65.5,68.1,70.0,71.7,73.2,74.5];
+
+  var reembolsoDescTop2ValorMax = Math.max.apply(null, reembolsoDescTop2Valores);
+  var reembolsoDescTop2AxisMax = Math.ceil(reembolsoDescTop2ValorMax / 500) * 500;
+  var reembolsoDescTop2BarColors = reembolsoDescTop2Labels.map(function(){ return '#1C8CE8'; });
+
+  var paretoDescTop2LabelsPlugin = {
+    id: 'paretoDescTop2Labels',
+    afterDatasetsDraw: function(chart){
+      var barDataset = chart.data.datasets.findIndex(function(d){ return d.type === 'bar'; });
+      var meta = chart.getDatasetMeta(barDataset);
+      var ctx = chart.ctx;
+      ctx.save();
+      ctx.font = '11px Segoe UI, Arial, sans-serif';
+      ctx.fillStyle = '#EAF1F7';
+      ctx.textBaseline = 'middle';
+      meta.data.forEach(function(bar, i){
+        var label = reembolsoDescTop2Labels[i];
+        if (!label) return;
+        var barLeft = bar.base;
+        var barRight = bar.x;
+        var barWidth = barRight - barLeft;
+        var padding = 8;
+        var maxTextWidth = barWidth - padding * 2;
+        if (maxTextWidth < 30) return;
+        var lines = wrapLabelToWidth(ctx, label, maxTextWidth);
+        var lineHeight = 13;
+        var totalHeight = lines.length * lineHeight;
+        var startY = bar.y - totalHeight / 2 + lineHeight / 2;
+        ctx.textAlign = 'left';
+        lines.forEach(function(line, li){
+          ctx.fillText(line, barLeft + padding, startY + li * lineHeight);
+        });
+      });
+      ctx.restore();
+    }
+  };
+
+  new Chart(document.getElementById('chartReembolsoParetoDescTop2'), {
+    plugins: [paretoDescTop2LabelsPlugin],
+    data: {
+      labels: reembolsoDescTop2Labels,
+      datasets: [
+        {
+          type: 'bar',
+          label: 'Valor (R$)',
+          data: reembolsoDescTop2Valores,
+          backgroundColor: reembolsoDescTop2BarColors,
+          xAxisID: 'xValor2',
+          yAxisID: 'y',
+          order: 2
+        },
+        {
+          type: 'line',
+          label: '% acumulado',
+          data: reembolsoDescTop2CumPct,
+          borderColor: '#D89A2B',
+          backgroundColor: '#D89A2B',
+          pointRadius: 3,
+          borderWidth: 2,
+          xAxisID: 'xPct2',
+          yAxisID: 'y',
+          order: 0
+        }
+      ]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true, position: 'top', labels: { boxWidth: 12, font: { size: 11 } } },
+        tooltip: { callbacks: { label: function(ctx){
+          if (ctx.dataset.label === '% acumulado') return '% acumulado: ' + ctx.parsed.x + '%';
+          var qtd = reembolsoDescTop2Qtd[ctx.dataIndex];
+          return 'Valor: ' + fmtBRL(ctx.parsed.x) + ' (' + qtd + ' lançamentos)';
+        } } }
+      },
+      scales: {
+        y: { axis: 'y', grid: { display:false }, ticks: { display:false } },
+        xValor2: { axis: 'x', position: 'bottom', beginAtZero:true, max: reembolsoDescTop2AxisMax, grid: { color:'#1E4363' },
+                  ticks: { callback: function(v){ return 'R$ ' + v.toLocaleString('pt-BR'); } } },
+        xPct2: { axis: 'x', position: 'top', beginAtZero:true, max: 100, grid: { display:false },
                 ticks: { color:'#D89A2B', callback: function(v){ return v + '%'; } } }
       }
     }
