@@ -163,11 +163,11 @@
 <div class="kpis" id="kpisEnvios">
   <div class="kpi">
     <div class="label">Total 2026</div>
-    <div class="n" id="kpiTotal">546</div>
+    <div class="n" id="kpiTotal">544</div>
   </div>
   <div class="kpi kpi-fill-blue">
     <div class="label">Requisições Almoxarifado 2026</div>
-    <div class="n" id="kpiAlmox">546</div>
+    <div class="n" id="kpiAlmox">544</div>
   </div>
   <div class="kpi kpi-fill-green">
     <div class="label">Entregues 2026 (Log.)</div>
@@ -183,10 +183,10 @@
   <h2>Resumo — Requisições em Aberto 2026</h2>
   <p class="panel-note">Situações que ainda aguardam ação (Almoxarifado ou Logística)</p>
   <div class="aberto" id="abertoBadges">
-    <div class="aberto-badge"><div class="n" id="abEmSeparacao">3</div><div class="l">Em separação</div></div>
-    <div class="aberto-badge"><div class="n" id="abAguardandoColeta">4</div><div class="l">Aguardando coleta</div></div>
-    <div class="aberto-badge warn"><div class="n" id="abEmTrajeto">2</div><div class="l">Em trajeto</div></div>
-    <div class="aberto-badge total"><div class="n" id="abTotal">9</div><div class="l">Total em aberto</div></div>
+    <div class="aberto-badge"><div class="n" id="abEmSeparacao">1</div><div class="l">Em separação</div></div>
+    <div class="aberto-badge"><div class="n" id="abAguardandoColeta">3</div><div class="l">Aguardando coleta</div></div>
+    <div class="aberto-badge warn"><div class="n" id="abEmTrajeto">3</div><div class="l">Em trajeto</div></div>
+    <div class="aberto-badge total"><div class="n" id="abTotal">7</div><div class="l">Total em aberto</div></div>
   </div>
 </div>
 
@@ -242,9 +242,9 @@
 <div class="note" id="fonteNote">Fonte: planilha "Controle_Logistico_Requisicoes.xlsx", aba DASHBOARD (ROBSON). Dados extraídos automaticamente; confira os valores na fonte antes de compartilhar. Uso interno do setor — link privado, não indexado publicamente; não repasse fora da equipe sem necessidade.</div>
 
 <script>
-  var evolucaoMeses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago"];
-  var evolucaoReq = [100, 83, 106, 76, 58, 83, 38, 2];
-  var evolucaoEnt = [96, 76, 103, 72, 58, 73, 28, 0];
+  var evolucaoMeses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul"];
+  var evolucaoReq = [100, 83, 106, 76, 58, 83, 38];
+  var evolucaoEnt = [96, 76, 103, 72, 58, 73, 28];
   new Chart(document.getElementById("chartEvolucao"), {
     type:"line",
     data:{ labels: evolucaoMeses,
