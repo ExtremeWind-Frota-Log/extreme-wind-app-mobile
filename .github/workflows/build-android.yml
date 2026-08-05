@@ -37,13 +37,25 @@ jobs:
           else
             npx cap sync android
           fi
-
       - name: Gerar icone e splash screen a partir de resources/
         run: npx @capacitor/assets generate --android
 
+      - name: Habilitar third-party cookies no WebView (necessario pro embed do Google Maps)
+        id: cookie_patch
+        continue-on-error: true
+        run: |
+          MAIN_ACTIVITY=$(find android/app/src/main/java -name MainActivity.java)
+          echo "MainActivity encontrado em: $MAIN_ACTIVITY"
+          python3 patches/apply_webview_cookie_patch.py "$MAIN_ACTIVITY"
+
+      - name: Avisar se o patch de cookies falhou
+        if: steps.cookie_patch.outcome == 'failure'
+        run: |
+          echo "::warning::Patch de third-party cookies (embed do Google Maps) falhou -- ver step anterior. O apk sera gerado normalmente, mas o Mapa de Clientes no dashboard de Equipes pode nao carregar dentro do app."
+
       - name: Dar permissao de execucao ao gradlew
         run: chmod +x android/gradlew
-
+      
       - name: Compilar APK de debug
         working-directory: android
         run: ./gradlew assembleDebug --no-daemon
