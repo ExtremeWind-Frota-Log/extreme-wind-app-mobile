@@ -212,9 +212,10 @@
   <p class="panel-note">Itens em aberto hoje, um por linha. Divergências entre Almoxarifado e Logística entram aqui como atividade de quem precisa corrigir.</p>
 
   <div class="collapsible" id="acaoBody">
-  <div class="aberto" style="max-width:420px; margin:6px 0 16px">
+  <div class="aberto" style="max-width:620px; margin:6px 0 16px">
     <div class="aberto-badge"><div class="n" id="acaoCountAlmox">9</div><div class="l">Ações Almoxarifado</div></div>
     <div class="aberto-badge"><div class="n" id="acaoCountLog">0</div><div class="l">Ações Logística</div></div>
+    <div class="aberto-badge warn"><div class="n" id="acaoCountAssinatura">3</div><div class="l">Aguardando Assinatura</div></div>
   </div>
 
   <h3 style="font-size:12.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:0 0 8px;">Ações Almoxarifado</h3>
@@ -236,11 +237,24 @@
   </div>
 
   <h3 style="font-size:12.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:0 0 8px;">Ações Logística</h3>
-  <div class="tablewrap">
+  <div class="tablewrap" style="margin-bottom:20px">
   <table>
     <thead><tr><th>Projeto</th><th>Responsável</th><th>Prazo para Entrega</th><th>Destinatário</th><th>Data de Entrega</th><th>Status</th></tr></thead>
     <tbody id="acoesLog">
     <tr><td colspan="6" style="color:var(--muted); text-align:center;">Nenhuma ação pendente</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3 style="font-size:12.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:0 0 8px;">Aguardando Assinatura</h3>
+  <p class="panel-note">Entregas já realizadas cujo comprovante de recebimento assinado ainda não retornou — identificadas pelo preenchimento amarelo, sem data, na coluna "Data do Recebimento Assinado" da Sheet1.</p>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Projeto</th><th>Responsável</th><th>Prazo para Entrega</th><th>Destinatário</th><th>Data de Entrega</th></tr></thead>
+    <tbody id="acoesAssinatura">
+    <tr class="row-warn"><td>OITIS MCU</td><td>EVAIR</td><td>29/07/2026</td><td>John Lenon</td><td>30/07/2026</td></tr>
+    <tr class="row-warn"><td>OITIS MCU</td><td>EVAIR</td><td>29/07/2026</td><td>John Lenon</td><td>30/07/2026</td></tr>
+    <tr class="row-warn"><td>COPEL</td><td>JAMILE</td><td>03/08/2026</td><td>JONATO DIAS FEITOSA</td><td>05/08/2026</td></tr>
     </tbody>
   </table>
   </div>
