@@ -163,15 +163,15 @@
 <div class="kpis" id="kpisEnvios">
   <div class="kpi">
     <div class="label">Total 2026</div>
-    <div class="n" id="kpiTotal">544</div>
+    <div class="n" id="kpiTotal">549</div>
   </div>
   <div class="kpi kpi-fill-blue">
     <div class="label">Requisições Almoxarifado 2026</div>
-    <div class="n" id="kpiAlmox">544</div>
+    <div class="n" id="kpiAlmox">549</div>
   </div>
   <div class="kpi kpi-fill-green">
     <div class="label">Entregues 2026 (Log.)</div>
-    <div class="n" id="kpiEntregues">506</div>
+    <div class="n" id="kpiEntregues">509</div>
   </div>
   <div class="kpi kpi-fill-red">
     <div class="label">Canceladas 2026 (Almox.)</div>
@@ -183,10 +183,10 @@
   <h2>Resumo — Requisições em Aberto 2026</h2>
   <p class="panel-note">Situações que ainda aguardam ação (Almoxarifado ou Logística)</p>
   <div class="aberto" id="abertoBadges">
-    <div class="aberto-badge"><div class="n" id="abEmSeparacao">1</div><div class="l">Em separação</div></div>
-    <div class="aberto-badge"><div class="n" id="abAguardandoColeta">3</div><div class="l">Aguardando coleta</div></div>
-    <div class="aberto-badge warn"><div class="n" id="abEmTrajeto">3</div><div class="l">Em trajeto</div></div>
-    <div class="aberto-badge total"><div class="n" id="abTotal">7</div><div class="l">Total em aberto</div></div>
+    <div class="aberto-badge"><div class="n" id="abEmSeparacao">4</div><div class="l">Em separação</div></div>
+    <div class="aberto-badge"><div class="n" id="abAguardandoColeta">5</div><div class="l">Aguardando coleta</div></div>
+    <div class="aberto-badge warn"><div class="n" id="abEmTrajeto">0</div><div class="l">Em trajeto</div></div>
+    <div class="aberto-badge total"><div class="n" id="abTotal">9</div><div class="l">Total em aberto</div></div>
   </div>
 </div>
 
@@ -213,8 +213,8 @@
 
   <div class="collapsible" id="acaoBody">
   <div class="aberto" style="max-width:420px; margin:6px 0 16px">
-    <div class="aberto-badge"><div class="n" id="acaoCountAlmox">4</div><div class="l">Ações Almoxarifado</div></div>
-    <div class="aberto-badge"><div class="n" id="acaoCountLog">3</div><div class="l">Ações Logística</div></div>
+    <div class="aberto-badge"><div class="n" id="acaoCountAlmox">9</div><div class="l">Ações Almoxarifado</div></div>
+    <div class="aberto-badge"><div class="n" id="acaoCountLog">0</div><div class="l">Ações Logística</div></div>
   </div>
 
   <h3 style="font-size:12.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:0 0 8px;">Ações Almoxarifado</h3>
@@ -226,6 +226,11 @@
     <tr><td>SANTO AGOSTINHO</td><td>JAMILE</td><td>03/08/2026</td><td></td><td>AGUARDANDO COLETA</td></tr>
     <tr><td>SANTO AGOSTINHO</td><td>JAMILE</td><td>03/08/2026</td><td></td><td>AGUARDANDO COLETA</td></tr>
     <tr><td>SÃO VITOR</td><td>JAMILE</td><td>03/08/2026</td><td></td><td>AGUARDANDO COLETA</td></tr>
+    <tr><td>OITIS</td><td>EVAIR</td><td>sem previsão</td><td></td><td>AGUARDANDO COLETA</td></tr>
+    <tr><td>OITIS</td><td>EVAIR</td><td>sem previsão</td><td></td><td>AGUARDANDO COLETA</td></tr>
+    <tr><td>COPEL</td><td>EVAIR</td><td>sem previsão</td><td></td><td>A SEPARAR</td></tr>
+    <tr><td>COPEL</td><td>EVAIR</td><td>sem previsão</td><td></td><td>A SEPARAR</td></tr>
+    <tr><td>BAIXA DO FEIJÃO</td><td>POLLYANA</td><td>10/08/2026</td><td></td><td>A SEPARAR</td></tr>
     </tbody>
   </table>
   </div>
@@ -235,9 +240,7 @@
   <table>
     <thead><tr><th>Projeto</th><th>Responsável</th><th>Prazo para Entrega</th><th>Destinatário</th><th>Data de Entrega</th><th>Status</th></tr></thead>
     <tbody id="acoesLog">
-    <tr class="row-warn"><td>OITIS MCU</td><td>EVAIR</td><td>29/07/2026</td><td>John Lenon</td><td>30/07/2026</td><td>EM TRAJETO</td></tr>
-    <tr class="row-warn"><td>OITIS MCU</td><td>EVAIR</td><td>29/07/2026</td><td>John Lenon</td><td>30/07/2026</td><td>EM TRAJETO</td></tr>
-    <tr class="row-warn"><td>COPEL</td><td>JAMILE</td><td>03/08/2026</td><td></td><td></td><td>EM TRAJETO</td></tr>
+    <tr><td colspan="6" style="color:var(--muted); text-align:center;">Nenhuma ação pendente</td></tr>
     </tbody>
   </table>
   </div>
@@ -247,9 +250,9 @@
 <div class="note" id="fonteNote">Fonte: planilha "Controle_Logistico_Requisicoes.xlsx", aba Sheet1 (dados brutos, calculado diretamente a cada execução). Dados extraídos automaticamente; confira os valores na fonte antes de compartilhar. Uso interno do setor — link privado, não indexado publicamente; não repasse fora da equipe sem necessidade.</div>
 
 <script>
-  var evolucaoMeses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul"];
-  var evolucaoReq = [100, 83, 106, 76, 58, 83, 38];
-  var evolucaoEnt = [96, 76, 103, 72, 58, 73, 28];
+  var evolucaoMeses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago"];
+  var evolucaoReq = [100, 83, 106, 76, 58, 83, 38, 5];
+  var evolucaoEnt = [96, 76, 103, 72, 58, 73, 31, 0];
   new Chart(document.getElementById("chartEvolucao"), {
     type:"line",
     data:{ labels: evolucaoMeses,
