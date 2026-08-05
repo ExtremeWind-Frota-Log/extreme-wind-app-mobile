@@ -4,6 +4,16 @@
   "webDir": "www",
   "server": {
     "url": "https://extremewind-frota-log.github.io/extreme-wind-app-mobile/",
-    "cleartext": false
+    "cleartext": false,
+    "allowNavigation": [
+      "*.google.com",
+      "*.googleapis.com",
+      "*.gstatic.com",
+      "*.ggpht.com"
+    ]
+  },
+  "android": {
+    "webContentsDebuggingEnabled": true,
+    "allowMixedContent": true
   }
 }
