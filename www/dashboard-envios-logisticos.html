@@ -163,11 +163,11 @@
 <div class="kpis" id="kpisEnvios">
   <div class="kpi">
     <div class="label">Total 2026</div>
-    <div class="n" id="kpiTotal">549</div>
+    <div class="n" id="kpiTotal">550</div>
   </div>
   <div class="kpi kpi-fill-blue">
     <div class="label">Requisições Almoxarifado 2026</div>
-    <div class="n" id="kpiAlmox">549</div>
+    <div class="n" id="kpiAlmox">550</div>
   </div>
   <div class="kpi kpi-fill-green">
     <div class="label">Entregues 2026 (Log.)</div>
@@ -183,10 +183,10 @@
   <h2>Resumo — Requisições em Aberto 2026</h2>
   <p class="panel-note">Situações que ainda aguardam ação (Almoxarifado ou Logística)</p>
   <div class="aberto" id="abertoBadges">
-    <div class="aberto-badge"><div class="n" id="abEmSeparacao">4</div><div class="l">Em separação</div></div>
+    <div class="aberto-badge"><div class="n" id="abEmSeparacao">5</div><div class="l">Em separação</div></div>
     <div class="aberto-badge"><div class="n" id="abAguardandoColeta">5</div><div class="l">Aguardando coleta</div></div>
     <div class="aberto-badge warn"><div class="n" id="abEmTrajeto">0</div><div class="l">Em trajeto</div></div>
-    <div class="aberto-badge total"><div class="n" id="abTotal">9</div><div class="l">Total em aberto</div></div>
+    <div class="aberto-badge total"><div class="n" id="abTotal">10</div><div class="l">Total em aberto</div></div>
   </div>
 </div>
 
@@ -213,7 +213,7 @@
 
   <div class="collapsible" id="acaoBody">
   <div class="aberto" style="max-width:620px; margin:6px 0 16px">
-    <div class="aberto-badge"><div class="n" id="acaoCountAlmox">9</div><div class="l">Ações Almoxarifado</div></div>
+    <div class="aberto-badge"><div class="n" id="acaoCountAlmox">10</div><div class="l">Ações Almoxarifado</div></div>
     <div class="aberto-badge"><div class="n" id="acaoCountLog">0</div><div class="l">Ações Logística</div></div>
     <div class="aberto-badge warn"><div class="n" id="acaoCountAssinatura">3</div><div class="l">Aguardando Assinatura</div></div>
   </div>
@@ -232,6 +232,7 @@
     <tr><td>COPEL</td><td>EVAIR</td><td>sem previsão</td><td></td><td>A SEPARAR</td></tr>
     <tr><td>COPEL</td><td>EVAIR</td><td>sem previsão</td><td></td><td>A SEPARAR</td></tr>
     <tr><td>BAIXA DO FEIJÃO</td><td>POLLYANA</td><td>10/08/2026</td><td></td><td>A SEPARAR</td></tr>
+    <tr><td>SÃO FERNANDO</td><td>JAMILE</td><td>10/08/2026</td><td></td><td>A SEPARAR</td></tr>
     </tbody>
   </table>
   </div>
@@ -265,7 +266,7 @@
 
 <script>
   var evolucaoMeses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago"];
-  var evolucaoReq = [100, 83, 106, 76, 58, 83, 38, 5];
+  var evolucaoReq = [100, 83, 106, 76, 58, 83, 38, 6];
   var evolucaoEnt = [96, 76, 103, 72, 58, 73, 31, 0];
   new Chart(document.getElementById("chartEvolucao"), {
     type:"line",
