@@ -96,29 +96,32 @@
       <div class="sub">Nossas Demandas — cópia consolidada de todos os itens em aberto/urgentes hoje</div>
     </div>
   </div>
-  <div class="badge-week" id="badgeData">Data: 05/08/2026</div>
+  <div class="badge-week" id="badgeData">Data: 06/08/2026</div>
 </header>
 
 <div class="kpis" id="kpisDemandas">
-  <div class="kpi"><div class="label">Equipes</div><div class="n" id="cntEquipes">2</div></div>
-  <div class="kpi"><div class="label">Frota</div><div class="n" id="cntFrota">0</div></div>
+  <div class="kpi"><div class="label">Equipes</div><div class="n" id="cntEquipes">5</div></div>
+  <div class="kpi"><div class="label">Frota</div><div class="n" id="cntFrota">1</div></div>
   <div class="kpi"><div class="label">Boletos</div><div class="n" id="cntBoletos">0</div></div>
-  <div class="kpi"><div class="label">Envios Logísticos</div><div class="n" id="cntEnvios">0</div></div>
-  <div class="kpi total"><div class="label">Total de demandas</div><div class="n" id="cntTotal">2</div></div>
+  <div class="kpi"><div class="label">Envios Logísticos</div><div class="n" id="cntEnvios">3</div></div>
+  <div class="kpi total"><div class="label">Total de demandas</div><div class="n" id="cntTotal">9</div></div>
 </div>
 
 <div class="panel">
   <div class="panel-head">
     <h2>&#128101; Controle de Equipes - Desmobilizações</h2>
-    <span class="count-pill" id="pillEquipes">2</span>
+    <span class="count-pill" id="pillEquipes">5</span>
   </div>
   <p class="panel-note">Desmobilizações já decididas, com saída prevista até hoje.</p>
   <div class="tablewrap">
   <table>
     <thead><tr><th>Mat</th><th>Técnico</th><th>Parque</th><th>Cliente</th><th>Finalização prevista</th></tr></thead>
     <tbody id="bodyEquipes">
-    <tr class="row-warn"><td>329</td><td>MARCOS JOSE MUNIZ</td><td>DELTA/PI</td><td>SIEMENS</td><td>06/08/2026</td></tr>
     <tr class="row-warn"><td>239</td><td>JOAO PAULO SILVA SANTOS</td><td>DELTA/PI</td><td>SIEMENS</td><td>07/08/2026</td></tr>
+    <tr class="row-warn"><td>307</td><td>MARCOS ROBERTO RODRIGUES SARAIVA</td><td>DELTA/PI</td><td>SIEMENS</td><td>07/08/2026</td></tr>
+    <tr class="row-warn"><td>379</td><td>WADSON MARCELO PINTO LINDOSO</td><td>DELTA/PI</td><td>SIEMENS</td><td>08/08/2026</td></tr>
+    <tr class="row-warn"><td>381</td><td>RODRIGO BUENO DE CAMARGO</td><td>DELTA/PI</td><td>SIEMENS</td><td>11/08/2026</td></tr>
+    <tr class="row-warn"><td>375</td><td>WAGNER DOS SANTOS SILVA</td><td>DELTA/PI</td><td>SIEMENS</td><td>11/08/2026</td></tr>
     </tbody>
   </table>
   </div>
@@ -127,14 +130,14 @@
 <div class="panel">
   <div class="panel-head">
     <h2>&#128663; Frota — Manutenção</h2>
-    <span class="count-pill" id="pillFrota">0</span>
+    <span class="count-pill" id="pillFrota">1</span>
   </div>
   <p class="panel-note">Ações com prazo em hoje (ou vencido) e ações marcadas como urgentes.</p>
   <div class="tablewrap">
   <table>
     <thead><tr><th>Ação</th><th>Tipo</th><th>Parque</th><th>Quem?</th><th>Status</th><th>Observação</th></tr></thead>
     <tbody id="bodyFrota">
-    <tr><td colspan="6" class="empty-note">Nenhuma demanda</td></tr>
+    <tr class="row-warn"><td>REVISÃO</td><td>PREVENTIVA</td><td>DELTA 3</td><td>JOÃO/RODRIGO</td><td>06/08/2026</td><td>STANDBY</td></tr>
     </tbody>
   </table>
   </div>
@@ -159,14 +162,16 @@
 <div class="panel">
   <div class="panel-head">
     <h2>&#128230; Envios Logísticos</h2>
-    <span class="count-pill" id="pillEnvios">0</span>
+    <span class="count-pill" id="pillEnvios">3</span>
   </div>
   <p class="panel-note">Divergências no Almoxarifado e requisições em trajeto/aguardando assinatura na Logística.</p>
   <div class="tablewrap">
   <table>
     <thead><tr><th>Setor</th><th>Projeto</th><th>Responsável</th><th>Prazo</th><th>Destinatário</th><th>Status</th></tr></thead>
     <tbody id="bodyEnvios">
-    <tr><td colspan="6" class="empty-note">Nenhuma demanda</td></tr>
+    <tr class="row-warn"><td>Logística</td><td>OITIS MCU</td><td>EVAIR</td><td>29/07/2026</td><td>John Lenon</td><td>Aguardando assinatura</td></tr>
+    <tr class="row-warn"><td>Logística</td><td>OITIS MCU</td><td>EVAIR</td><td>29/07/2026</td><td>John Lenon</td><td>Aguardando assinatura</td></tr>
+    <tr class="row-warn"><td>Logística</td><td>COPEL</td><td>JAMILE</td><td>03/08/2026</td><td>JONATO DIAS FEITOSA</td><td>Aguardando assinatura</td></tr>
     </tbody>
   </table>
   </div>
