@@ -30,6 +30,28 @@ jobs:
       - name: Instalar dependencias
         run: npm install
 
+      - name: Gerar screenshot atualizado do Mapa de Clientes (Google My Maps)
+        # O embed <iframe> do My Maps funciona no navegador normal, mas o
+        # Google recusa servir o iframe dentro do WebView do app Android
+        # (net::ERR_BLOCKED_BY_RESPONSE) -- ja tentamos cookies de terceiros e
+        # um User-Agent de Chrome comum, nenhum dos dois resolveu esse
+        # bloqueio. A solucao estavel: capturar o mapa como imagem usando um
+        # Chrome headless de verdade aqui no CI, a cada build, e exibir essa
+        # imagem no app em vez do iframe ao vivo. continue-on-error porque se
+        # isso falhar (ex: mudanca no Google Maps, rede instavel), o build do
+        # apk nao deve travar -- o index.html mantem a imagem anterior/
+        # placeholder nesse caso.
+        id: map_screenshot
+        continue-on-error: true
+        run: |
+          npm install puppeteer --no-save
+          node patches/gerar_screenshot_mapa.js
+
+      - name: Avisar se o screenshot do mapa falhou
+        if: steps.map_screenshot.outcome == 'failure'
+        run: |
+          echo "::warning::Geracao do screenshot do Mapa de Clientes falhou -- ver step anterior. O apk sera gerado normalmente, mas a imagem do mapa em www/assets/mapa-clientes.png pode estar desatualizada ou ausente."
+
       - name: Criar o projeto Android (se ainda nao existir)
         run: |
           if [ ! -d "android" ]; then
@@ -40,22 +62,9 @@ jobs:
       - name: Gerar icone e splash screen a partir de resources/
         run: npx @capacitor/assets generate --android
 
-      - name: Habilitar third-party cookies no WebView (necessario pro embed do Google Maps)
-        id: cookie_patch
-        continue-on-error: true
-        run: |
-          MAIN_ACTIVITY=$(find android/app/src/main/java -name MainActivity.java)
-          echo "MainActivity encontrado em: $MAIN_ACTIVITY"
-          python3 patches/apply_webview_cookie_patch.py "$MAIN_ACTIVITY"
-
-      - name: Avisar se o patch de cookies falhou
-        if: steps.cookie_patch.outcome == 'failure'
-        run: |
-          echo "::warning::Patch de third-party cookies (embed do Google Maps) falhou -- ver step anterior. O apk sera gerado normalmente, mas o Mapa de Clientes no dashboard de Equipes pode nao carregar dentro do app."
-
       - name: Dar permissao de execucao ao gradlew
         run: chmod +x android/gradlew
-      
+
       - name: Compilar APK de debug
         working-directory: android
         run: ./gradlew assembleDebug --no-daemon

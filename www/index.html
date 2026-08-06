@@ -195,21 +195,27 @@
         </div>
 
         <div class="note-box" style="position:relative; padding:0; overflow:hidden; margin-bottom:28px; height:340px; isolation:isolate;">
-          <div style="position:absolute; top:0; left:0; right:0; padding:16px 20px 4px; font-weight:700; color:var(--text); font-size:14.5px; z-index:2; pointer-events:none;">
+          <div style="position:absolute; top:0; left:0; right:0; padding:16px 20px 4px; font-weight:700; color:var(--text); font-size:14.5px; z-index:2; pointer-events:none; background:linear-gradient(180deg, rgba(15,42,64,.85), rgba(15,42,64,0));">
             &#128506; Mapa de Clientes <span style="font-weight:400; color:var(--muted); font-size:12px;">projetos ativos por localização</span>
           </div>
-          <iframe src="https://www.google.com/maps/d/u/0/embed?mid=10Tb-6WWrSx-gk6TIM6r05paJrYBBXcg&ehbc=2E312F"
-            style="position:absolute; inset:0; width:100%; height:100%; border:0; display:block;" loading="lazy"
-            title="Mapa de clientes ativos Extreme Wind"></iframe>
-
-          <div class="card" data-view="equipes" style="position:absolute; top:14px; right:14px; z-index:3; width:230px; padding:14px 16px; margin:0;">
-            <div class="card-title" style="font-size:13px; margin-bottom:6px;">&#128101; Controle de Equipes</div>
-            <div class="kpirow" style="gap:10px 14px;">
-              <div><div class="n" style="font-size:19px;">31</div><div class="l">Ativos hoje</div></div>
-              <div><div class="n" style="color:var(--warn); font-size:19px;">5</div><div class="l">Em Desmob.</div></div>
-              <div><div class="n" style="font-size:19px;">10/10</div><div class="l">Parques</div></div>
+          <a href="https://www.google.com/maps/d/u/0/viewer?mid=10Tb-6WWrSx-gk6TIM6r05paJrYBBXcg" target="_blank" rel="noopener"
+            style="position:absolute; inset:0; display:block;" title="Abrir mapa interativo no navegador">
+            <img src="assets/mapa-clientes.png" alt="Mapa de clientes ativos Extreme Wind"
+              style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; border:0; display:block; background:#0f1720;"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div style="display:none; position:absolute; inset:0; align-items:center; justify-content:center; color:var(--muted); font-size:12.5px; text-align:center; padding:20px;">
+              Mapa indisponível no momento.<br>Toque para abrir no navegador.
             </div>
-            <div class="go" style="margin-top:8px; font-size:11px;">Ver equipes ativas →</div>
+          </a>
+
+          <div class="card" data-view="equipes" style="position:absolute; top:7px; right:7px; z-index:3; width:115px; padding:7px 8px; margin:0;">
+            <div class="card-title" style="font-size:9px; margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">&#128101; Equipes</div>
+            <div class="kpirow" style="gap:4px 6px;">
+              <div><div class="n" style="font-size:12px;">31</div><div class="l" style="font-size:7px;">Ativos</div></div>
+              <div><div class="n" style="color:var(--warn); font-size:12px;">5</div><div class="l" style="font-size:7px;">Desmob.</div></div>
+              <div><div class="n" style="font-size:12px;">10/10</div><div class="l" style="font-size:7px;">Parques</div></div>
+            </div>
+            <div class="go" style="margin-top:4px; font-size:7px;">Ver mais →</div>
           </div>
         </div>
 
@@ -391,4 +397,3 @@
 </script>
 </body>
 </html>
-<!-- redeploy 2026-08-06T13:25:28Z -->
