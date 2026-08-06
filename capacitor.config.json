@@ -3,7 +3,6 @@
   "appName": "Extreme Wind",
   "webDir": "www",
   "server": {
-    "url": "https://extremewind-frota-log.github.io/extreme-wind-app-mobile/",
     "cleartext": false,
     "allowNavigation": [
       "*.google.com",
