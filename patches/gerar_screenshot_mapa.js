@@ -73,20 +73,61 @@ async function main() {
     const page = await browser.newPage();
     await page.setViewport(VIEWPORT);
 
+    // Diagnostico extra: loga erros de console/pagina e falhas de request
+    // (ex: bloqueio por CORS, CSP, ou recusa do Google -- o mesmo tipo de
+    // problema que afeta o WebView do Android pode, em tese, tambem afetar
+    // um Chrome headless "de servidor" se o Google decidir bloquear por
+    // outro sinal, como IP de datacenter/user-agent headless).
+    page.on("console", (msg) => {
+      const tipo = msg.type();
+      if (tipo === "error" || tipo === "warning") {
+        console.log(`    [console.${tipo}] ${msg.text().slice(0, 300)}`);
+      }
+    });
+    page.on("requestfailed", (req) => {
+      console.log(`    [request-falhou] ${req.resourceType()} ${req.url().slice(0, 150)} -- ${req.failure()?.errorText}`);
+    });
+    page.on("pageerror", (err) => {
+      console.log(`    [pageerror] ${String(err).slice(0, 300)}`);
+    });
+
     // Conta requisicoes de rede de tiles de imagem do Google Maps que
     // respondem com sucesso (status 200-299). Isso e uma evidencia direta de
     // que o mapa esta buscando/recebendo os tiles visuais, independente de
     // qual elemento de DOM o Google usa para renderiza-los.
+    //
+    // Diagnostico (build #167): o filtro anterior (khms / maps.gstatic.com /
+    // vt) deu 0 em 3 tentativas seguidas, mesmo com uma captura de 19497
+    // bytes (mais que o placeholder de 11014). Em vez de adivinhar outro
+    // hostname, agora logamos TODA resposta de imagem/rede relevante (sem
+    // filtro de host) para ver exatamente o que o embed carrega, e usamos um
+    // filtro bem mais amplo (qualquer resposta de imagem de dominio google)
+    // como evidencia de tile.
     let tilesCarregados = 0;
+    const urlsVistas = new Set();
     page.on("response", (response) => {
       try {
         const url = response.url();
-        const isTileHost =
-          url.includes("khms") || // ex: khms0.googleapis.com, khms1.google.com (tiles de satelite/mapa)
-          url.includes("maps.gstatic.com") ||
-          (url.includes("google.com/vt") || url.includes("/vt/"));
-        if (isTileHost && response.ok()) {
+        const req = response.request();
+        const tipo = req.resourceType();
+        const isGoogleImg =
+          tipo === "image" &&
+          /google|gstatic|ggpht|googleusercontent/i.test(url);
+        if (isGoogleImg && response.ok()) {
           tilesCarregados++;
+        }
+        // Log de diagnostico: registra dominios distintos vistos (nao a URL
+        // inteira, pra nao poluir o log com querystrings gigantes), so a
+        // primeira vez que cada host aparece.
+        try {
+          const host = new URL(url).host;
+          const chave = `${tipo}:${host}`;
+          if (!urlsVistas.has(chave)) {
+            urlsVistas.add(chave);
+            console.log(`    [rede] tipo=${tipo} host=${host} status=${response.status()}`);
+          }
+        } catch (e) {
+          // URL invalida, ignora o log de diagnostico.
         }
       } catch (e) {
         // Ignora erros de leitura de resposta (conexao fechada etc).
@@ -132,6 +173,25 @@ async function main() {
         }
       } catch (e) {
         console.log("Aviso: nao foi possivel tentar fechar banner do My Maps (nao critico).", e.message);
+      }
+
+      // Diagnostico extra: titulo da pagina, texto visivel (pode conter uma
+      // mensagem de erro do Google, como "nao e possivel carregar" etc), e
+      // contagem de elementos <img>/<canvas> no DOM (independente de rede).
+      try {
+        const diag = await page.evaluate(() => ({
+          titulo: document.title,
+          textoInicial: (document.body.innerText || "").slice(0, 200).replace(/\s+/g, " "),
+          numImgs: document.querySelectorAll("img").length,
+          numCanvas: document.querySelectorAll("canvas").length,
+          numIframes: document.querySelectorAll("iframe").length,
+        }));
+        console.log(
+          `    [diag-dom] titulo="${diag.titulo}" imgs=${diag.numImgs} canvas=${diag.numCanvas} ` +
+          `iframes=${diag.numIframes} texto="${diag.textoInicial}"`
+        );
+      } catch (e) {
+        console.log("    [diag-dom] falhou ao ler DOM:", e.message);
       }
 
       const valido = await screenshotParecevalido(page, TMP_PATH, tilesCarregados);
