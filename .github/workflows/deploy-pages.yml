@@ -17,9 +17,16 @@ permissions:
   pages: write
   id-token: write
 
+
+# cancel-in-progress: false (nao cancela um deploy em andamento quando um
+# push novo chega) -- descobrimos que "true" cancelava deploys no meio da
+# publicacao, deixando o ambiente "github-pages" preso num estado de
+# deployment_queued que fazia o PROXIMO deploy esperar/travar por ~10
+# minutos antes de falhar por timeout. Com cancel-in-progress: false, os
+# deploys ficam na fila e rodam um de cada vez em vez de se cancelarem.
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -29,6 +36,29 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Gerar screenshot atualizado do Mapa de Clientes (Google My Maps)
+        # Sem este passo, o site publicado sempre mostrava o placeholder
+        # estatico de www/assets/mapa-clientes.png (o Build Android APK
+        # gera a imagem de forma efemera, so dentro do APK -- nunca chegava
+        # ao site). continue-on-error para o deploy do site nao travar se o
+        # Google Maps estiver instavel; nesse caso o site mantem a ultima
+        # imagem publicada.
+        id: map_screenshot
+        continue-on-error: true
+        run: |
+          npm install puppeteer --no-save
+          node patches/gerar_screenshot_mapa.js
+
+      - name: Avisar se o screenshot do mapa falhou
+        if: steps.map_screenshot.outcome == 'failure'
+        run: |
+          echo "::warning::Geracao do screenshot do Mapa de Clientes falhou no deploy do site -- ver step anterior."
 
       - name: Upload artefato do site (pasta www)
         uses: actions/upload-pages-artifact@v3
