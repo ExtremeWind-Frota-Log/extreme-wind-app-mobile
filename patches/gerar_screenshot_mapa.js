@@ -35,23 +35,26 @@ const VIEWPORT = { width: 1280, height: 720 };
 // primeira vez (o My Maps as vezes fica preso carregando o fundo cinza).
 const MAX_TENTATIVAS = 3;
 
+// Numero minimo de requisicoes de imagem de tile (gstatic/maps) que precisam
+// ter respondido com sucesso antes de considerarmos o mapa "carregado". Um
+// mapa vazio/cinza nao dispara essas requisicoes; um mapa real dispara
+// dezenas delas conforme os tiles do viewport chegam.
+const MIN_TILES_CARREGADOS = 15;
+
 // Verifica se a pagina parece ter renderizado algo visual (nao e so o fundo
-// cinza padrao do My Maps enquanto os tiles nao carregam). Em vez de tentar
-// adivinhar a estrutura interna do DOM do Google Maps (que usa <img>, <canvas>
-// ou <div> com background-image dependendo da versao/tecnologia de tile, e
-// pode mudar sem aviso), analisa a VARIEDADE DE COR da propria screenshot:
-// uma pagina de verdade com tiles de mapa + marcadores coloridos tem muito
-// mais variedade de cor que uma tela cinza/vazia solida.
-async function screenshotParecevalido(page, caminhoTemp) {
+// cinza padrao do My Maps enquanto os tiles nao carregam). Combina duas
+// evidencias: (1) contagem de requisicoes de rede de tiles de imagem que
+// completaram com sucesso (evidencia direta de que o Maps buscou o
+// conteudo), e (2) tamanho do PNG resultante como reforço (tiles reais
+// aumentam bastante o tamanho do arquivo comparado a uma tela solida).
+async function screenshotParecevalido(page, caminhoTemp, tilesCarregados) {
   await page.screenshot({ path: caminhoTemp, type: "png" });
   const stats = fs.statSync(caminhoTemp);
-
-  // Uma screenshot PNG de uma tela quase solida comprime muito bem (poucos
-  // bytes); uma com tiles/marcadores reais tem muito mais detalhe e portanto
-  // um arquivo bem maior. Esse limiar e uma heuristica, calibrada bem acima
-  // do tamanho tipico de uma tela vazia (~11KB observado nos testes).
-  console.log(`  (verificacao: screenshot temporaria tem ${stats.size} bytes)`);
-  return stats.size > 20000;
+  console.log(
+    `  (verificacao: ${tilesCarregados} tiles carregados via rede, ` +
+    `screenshot temporaria tem ${stats.size} bytes)`
+  );
+  return tilesCarregados >= MIN_TILES_CARREGADOS && stats.size > 15000;
 }
 
 async function main() {
@@ -70,9 +73,37 @@ async function main() {
     const page = await browser.newPage();
     await page.setViewport(VIEWPORT);
 
+    // Conta requisicoes de rede de tiles de imagem do Google Maps que
+    // respondem com sucesso (status 200-299). Isso e uma evidencia direta de
+    // que o mapa esta buscando/recebendo os tiles visuais, independente de
+    // qual elemento de DOM o Google usa para renderiza-los.
+    let tilesCarregados = 0;
+    page.on("response", (response) => {
+      try {
+        const url = response.url();
+        const isTileHost =
+          url.includes("khms") || // ex: khms0.googleapis.com, khms1.google.com (tiles de satelite/mapa)
+          url.includes("maps.gstatic.com") ||
+          (url.includes("google.com/vt") || url.includes("/vt/"));
+        if (isTileHost && response.ok()) {
+          tilesCarregados++;
+        }
+      } catch (e) {
+        // Ignora erros de leitura de resposta (conexao fechada etc).
+      }
+    });
+
     let sucesso = false;
+    // Guarda a melhor tentativa (maior numero de tiles carregados) mesmo se
+    // nenhuma bater o limiar ideal -- assim, se o limiar estiver calibrado
+    // errado, ainda usamos a captura mais completa em vez de descartar tudo
+    // e ficar preso no placeholder para sempre.
+    let melhorTiles = -1;
+    let melhorBytes = 0;
+    const MELHOR_TMP_PATH = OUTPUT_PATH + ".melhor.tmp";
 
     for (let tentativa = 1; tentativa <= MAX_TENTATIVAS && !sucesso; tentativa++) {
+      tilesCarregados = 0;
       console.log(`Tentativa ${tentativa}/${MAX_TENTATIVAS}: abrindo ${MAP_EMBED_URL} ...`);
       await page.goto(MAP_EMBED_URL, { waitUntil: "networkidle2", timeout: 60000 });
 
@@ -103,25 +134,56 @@ async function main() {
         console.log("Aviso: nao foi possivel tentar fechar banner do My Maps (nao critico).", e.message);
       }
 
-      const valido = await screenshotParecevalido(page, TMP_PATH);
+      const valido = await screenshotParecevalido(page, TMP_PATH, tilesCarregados);
+      const stats = fs.statSync(TMP_PATH);
+
+      if (tilesCarregados > melhorTiles) {
+        melhorTiles = tilesCarregados;
+        melhorBytes = stats.size;
+        fs.copyFileSync(TMP_PATH, MELHOR_TMP_PATH);
+      }
+
       if (valido) {
         sucesso = true;
-        console.log("Screenshot com variedade de cor suficiente, aceitando.");
+        console.log("Screenshot com tiles suficientes carregados, aceitando.");
       } else {
         console.log(
-          `[aviso] Screenshot da tentativa ${tentativa} parece vazia/solida -- ` +
+          `[aviso] Screenshot da tentativa ${tentativa} parece incompleta -- ` +
           "o mapa pode nao ter renderizado visualmente ainda."
         );
       }
     }
 
     if (!sucesso) {
+      // Piso minimo de seguranca: exige que a melhor tentativa seja
+      // claramente maior que o placeholder conhecido (~11KB), mesmo sem
+      // bater o limiar ideal de tiles -- evita publicar algo pior que o que
+      // ja existe, mas tambem evita ficar travado no placeholder para
+      // sempre se o limiar ideal estiver calibrado alto demais.
+      if (melhorTiles > 0 && melhorBytes > 13000 && fs.existsSync(MELHOR_TMP_PATH)) {
+        console.log(
+          `[aviso] Nenhuma tentativa bateu o limiar ideal (${MIN_TILES_CARREGADOS} tiles), ` +
+          `mas a melhor tentativa teve ${melhorTiles} tiles / ${melhorBytes} bytes -- usando-a ` +
+          "como melhor esforco, em vez de manter o placeholder."
+        );
+        fs.copyFileSync(MELHOR_TMP_PATH, OUTPUT_PATH);
+        fs.unlinkSync(MELHOR_TMP_PATH);
+        console.log(`Screenshot do mapa (melhor esforco) salvo em: ${OUTPUT_PATH}`);
+        return;
+      }
+      if (fs.existsSync(MELHOR_TMP_PATH)) {
+        fs.unlinkSync(MELHOR_TMP_PATH);
+      }
       throw new Error(
-        "Apos " + MAX_TENTATIVAS + " tentativas, a screenshot continua parecendo " +
-        "vazia (pouca variedade de cor). Abortando sem sobrescrever a imagem anterior."
+        `Apos ${MAX_TENTATIVAS} tentativas, a melhor captura teve apenas ${melhorTiles} ` +
+        `tiles / ${melhorBytes} bytes -- proximo demais do placeholder vazio. ` +
+        "Abortando sem sobrescrever a imagem anterior."
       );
     }
 
+    if (fs.existsSync(MELHOR_TMP_PATH)) {
+      fs.unlinkSync(MELHOR_TMP_PATH);
+    }
     fs.renameSync(TMP_PATH, OUTPUT_PATH);
     console.log(`Screenshot do mapa salvo em: ${OUTPUT_PATH}`);
   } finally {
