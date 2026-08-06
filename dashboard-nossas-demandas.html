@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>Nossas Demandas</title>
+<link rel="icon" type="image/png" href="assets/icone-helice-color.png">
+<style>
+  :root{
+    --brand:#00679A; --brand-dark:#055384; --brand-deep:#021C2C;
+    --steel:#1C8CE8; --teal:#12BFA8;
+    --bg:#081C2C; --panel:#0F2A40; --panel2:#123350; --line:#1E4363;
+    --text:#EAF1F7; --muted:#8FA9C0;
+    --ok:#12A874; --nok:#E0483C; --warn:#D89A2B; --na:#5C7A93;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:Segoe UI,Arial,sans-serif; background:var(--bg); color:var(--text);
+    padding:24px; line-height:1.4; zoom:1.15;
+  }
+  @media (max-width:820px){
+    body{zoom:1; padding:14px;}
+    header{gap:10px;}
+  }
+  header{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:24px; border-bottom:1px solid var(--line); padding-bottom:18px;}
+  .brand{display:flex; align-items:center; gap:14px;}
+  .brand h1{font-size:19px; margin:0; letter-spacing:.02em;}
+  .brand .sub{color:var(--muted); font-size:12.5px; margin-top:2px;}
+  .badge-week{background:var(--warn); color:#1a1200; font-weight:700; padding:7px 16px; border-radius:6px; font-size:13px;}
+
+  .kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:16px; margin-bottom:24px;}
+  .kpi{background:rgba(216,154,43,.20); border:1px solid var(--line); border-left:4px solid var(--warn); border-radius:10px; padding:18px 20px;}
+  .kpi .label{color:var(--warn); font-size:12px; text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px;}
+  .kpi .n{font-size:28px; font-weight:700; color:var(--warn);}
+  .kpi.total{background:var(--warn); border-left-color:var(--warn);}
+  .kpi.total .label, .kpi.total .n{color:#1a1200;}
+
+  .panel{background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:18px; margin-bottom:20px;}
+  .panel-head{display:flex; align-items:center; gap:10px; margin-bottom:4px; flex-wrap:wrap;}
+  .panel-head h2{font-size:15px; margin:0; color:var(--text);}
+  .panel-head .count-pill{
+    font-family:inherit; font-size:12px; font-weight:700; padding:3px 11px; border-radius:20px;
+    background:rgba(216,154,43,.24); color:var(--warn);
+  }
+  .panel-note{font-size:11.5px; color:var(--muted); margin:2px 0 14px;}
+
+  table{width:100%; border-collapse:collapse; font-size:12.5px;}
+  .tablewrap{overflow-x:auto;}
+  th{background:var(--panel2); text-align:left; padding:9px 12px; color:var(--muted); font-weight:600; white-space:nowrap;}
+  td{padding:9px 12px; border-bottom:1px solid var(--line); white-space:normal; word-break:break-word; vertical-align:top;}
+  tr.row-warn td{background:rgba(216,154,43,.20);}
+  tr.row-warn:hover td{background:rgba(216,154,43,.32);}
+  .empty-note{color:var(--muted); text-align:center; padding:16px; font-size:13px;}
+
+  .note{font-size:12px; color:var(--muted); margin-top:18px; border-top:1px solid var(--line); padding-top:12px;}
+</style>
+</head>
+<body>
+<div id="ewNav" style="position:fixed; top:14px; right:14px; z-index:999; font-family:Segoe UI,Arial,sans-serif;">
+  <button id="ewNavBtn" aria-label="Menu de navegação" style="width:42px; height:42px; border-radius:8px; border:1px solid #1E4363; background:#123350; color:#EAF1F7; font-size:18px; cursor:pointer;">&#9776;</button>
+  <div id="ewNavPanel" style="display:none; position:absolute; top:48px; right:0; background:#0F2A40; border:1px solid #1E4363; border-radius:10px; padding:8px; min-width:210px; box-shadow:0 8px 24px rgba(0,0,0,.45);">
+    <a href="index.html" class="ew-nav-item">&#8962; Início</a>
+    <a href="dashboard-nossas-demandas.html" class="ew-nav-item">&#9888; Nossas Demandas</a>
+    <a href="dashboard-resumo-equipes.html" class="ew-nav-item">&#128101; Controle de Equipes</a>
+    <a href="dashboard-frota-manutencao.html" class="ew-nav-item">&#128663; Frota — Manutenção</a>
+    <a href="dashboard-boletos.html" class="ew-nav-item">&#129534; Controle de Boletos</a>
+    <a href="dashboard-envios-logisticos.html" class="ew-nav-item">&#128230; Envios Logísticos</a>
+    <a href="dashboard-reembolso.html" class="ew-nav-item">&#128176; Reembolso</a>
+  </div>
+</div>
+<style>
+  .ew-nav-item{display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:6px; color:#8FA9C0; text-decoration:none; font-size:13px; font-weight:600;}
+  .ew-nav-item:hover{background:rgba(255,255,255,.08); color:#EAF1F7;}
+  .ew-nav-item.current{background:#00679A; color:#fff;}
+</style>
+<script>
+  (function(){
+    if (window.self !== window.top) {
+      document.getElementById('ewNav').style.display = 'none';
+      return;
+    }
+    var btn=document.getElementById('ewNavBtn'), panel=document.getElementById('ewNavPanel');
+    btn.addEventListener('click', function(e){ e.stopPropagation(); panel.style.display = panel.style.display==='none'?'block':'none'; });
+    document.addEventListener('click', function(){ panel.style.display='none'; });
+    panel.addEventListener('click', function(e){ e.stopPropagation(); });
+    var here = (location.pathname.split('/').pop() || 'index.html');
+    Array.prototype.forEach.call(panel.querySelectorAll('a'), function(a){
+      if(a.getAttribute('href') === here) a.classList.add('current');
+    });
+  })();
+</script>
+
+<header>
+  <div class="brand">
+    <img src="assets/icone-helice-color.png" alt="" style="height:60px; width:auto; display:block;">
+    <div>
+      <img src="assets/logo-extreme-wind-white.png" alt="Extreme Wind" style="height:30px; width:auto; display:block; margin-bottom:6px;">
+      <div class="sub">Nossas Demandas — cópia consolidada de todos os itens em aberto/urgentes hoje</div>
+    </div>
+  </div>
+  <div class="badge-week" id="badgeData">Data: 06/08/2026</div>
+</header>
+
+<div class="kpis" id="kpisDemandas">
+  <div class="kpi"><div class="label">Equipes</div><div class="n" id="cntEquipes">5</div></div>
+  <div class="kpi"><div class="label">Frota</div><div class="n" id="cntFrota">1</div></div>
+  <div class="kpi"><div class="label">Boletos</div><div class="n" id="cntBoletos">0</div></div>
+  <div class="kpi"><div class="label">Envios Logísticos</div><div class="n" id="cntEnvios">0</div></div>
+  <div class="kpi total"><div class="label">Total de demandas</div><div class="n" id="cntTotal">6</div></div>
+</div>
+
+<div class="panel">
+  <div class="panel-head">
+    <h2>&#128101; Controle de Equipes - Desmobilizações</h2>
+    <span class="count-pill" id="pillEquipes">5</span>
+  </div>
+  <p class="panel-note">Desmobilizações já decididas, com saída prevista até hoje.</p>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Mat</th><th>Técnico</th><th>Parque</th><th>Cliente</th><th>Finalização prevista</th></tr></thead>
+    <tbody id="bodyEquipes">
+    <tr class="row-warn"><td>239</td><td>JOAO PAULO SILVA SANTOS</td><td>DELTA/PI</td><td>SIEMENS</td><td>07/08/2026</td></tr>
+    <tr class="row-warn"><td>307</td><td>MARCOS ROBERTO RODRIGUES SARAIVA</td><td>DELTA/PI</td><td>SIEMENS</td><td>07/08/2026</td></tr>
+    <tr class="row-warn"><td>379</td><td>WADSON MARCELO PINTO LINDOSO</td><td>DELTA/PI</td><td>SIEMENS</td><td>08/08/2026</td></tr>
+    <tr class="row-warn"><td>381</td><td>RODRIGO BUENO DE CAMARGO</td><td>DELTA/PI</td><td>SIEMENS</td><td>11/08/2026</td></tr>
+    <tr class="row-warn"><td>375</td><td>WAGNER DOS SANTOS SILVA</td><td>DELTA/PI</td><td>SIEMENS</td><td>11/08/2026</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-head">
+    <h2>&#128663; Frota — Manutenção</h2>
+    <span class="count-pill" id="pillFrota">1</span>
+  </div>
+  <p class="panel-note">Ações com prazo em hoje (ou vencido) e ações marcadas como urgentes.</p>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Ação</th><th>Tipo</th><th>Parque</th><th>Quem?</th><th>Status</th><th>Observação</th></tr></thead>
+    <tbody id="bodyFrota">
+    <tr class="row-warn"><td>REVISÃO</td><td>PREVENTIVA</td><td>DELTA 3</td><td>JOÃO/RODRIGO</td><td>06/08/2026</td><td>STANDBY</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-head">
+    <h2>&#129534; Controle de Boletos</h2>
+    <span class="count-pill" id="pillBoletos">0</span>
+  </div>
+  <p class="panel-note">Multas, contestações e sinistros em aberto (Unidas e Localiza).</p>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Tipo</th><th>Placa</th><th>Locadora</th><th>Parque</th><th>Vencimento</th><th>Motivo</th></tr></thead>
+    <tbody id="bodyBoletos">
+    <tr><td colspan="6" class="empty-note">Nenhuma demanda</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-head">
+    <h2>&#128230; Envios Logísticos</h2>
+    <span class="count-pill" id="pillEnvios">0</span>
+  </div>
+  <p class="panel-note">Divergências no Almoxarifado e requisições em trajeto/aguardando assinatura na Logística.</p>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Setor</th><th>Projeto</th><th>Responsável</th><th>Prazo</th><th>Destinatário</th><th>Status</th></tr></thead>
+    <tbody id="bodyEnvios">
+    <tr><td colspan="6" class="empty-note">Nenhuma demanda</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="note" id="fonteNote">Cópia consolidada gerada a partir dos dashboards de Equipes, Frota, Boletos e Envios Logísticos. Os dashboards originais permanecem inalterados — esta página só reúne, num único lugar, os itens já marcados como pendentes/urgentes em cada um deles. Dados extraídos automaticamente; confira na fonte antes de compartilhar. Uso interno do setor.</div>
+
+</body>
+</html>

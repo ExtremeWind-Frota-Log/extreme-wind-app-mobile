@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>Dashboard Boletos - Locadoras</title>
+<link rel="icon" type="image/png" href="assets/icone-helice-color.png">
+<style>
+  :root{
+    /* Paleta fria, sólida — baseada no azul da logo Extreme Wind (hélice/marca) */
+    --brand:#00679A;      /* azul-marinho da helice/marca, conferido na logo oficial */
+    --brand-dark:#055384; /* azul mais profundo, para chrome/header */
+    --brand-deep:#021C2C; /* quase-preto azulado, fundo da página */
+    --steel:#1C8CE8;      /* azul vívido, acentos secundários */
+    --teal:#12BFA8;       /* verde-azulado vívido, terceiro acento */
+
+    --bg:#081C2C; --panel:#0F2A40; --panel2:#123350; --line:#1E4363;
+    --text:#EAF1F7; --muted:#8FA9C0;
+
+    --ok:#12A874; --nok:#E0483C; --warn:#D89A2B; --na:#5C7A93;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:Segoe UI,Arial,sans-serif; background:var(--bg); color:var(--text);
+    padding:24px; line-height:1.4; zoom:1.15;
+  }
+  @media (max-width:820px){
+    body{zoom:1; padding:14px;}
+    header{gap:10px;}
+  }
+  header{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:24px; border-bottom:1px solid var(--line); padding-bottom:18px;}
+  .brand{display:flex; align-items:center; gap:14px;}
+  .brand svg{display:block;}
+  .brand h1{font-size:19px; margin:0; letter-spacing:.02em;}
+  .brand .sub{color:var(--muted); font-size:12.5px; margin-top:2px;}
+  .badge-week{background:var(--brand); color:#fff; font-weight:600; padding:7px 16px; border-radius:6px; font-size:13px;}
+
+  .kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:16px; margin-bottom:28px;}
+  .kpi{background:var(--panel); border:1px solid var(--line); border-left:4px solid var(--brand); border-radius:10px; padding:20px;}
+  .kpi-warn{background:rgba(216,154,43,.34); border-left:4px solid var(--warn);}
+  .kpi .label{color:var(--muted); font-size:12.5px; text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px;}
+  .kpi .foot{font-size:12px; color:var(--muted); margin-top:10px;}
+
+  .locadoras{display:flex; gap:8px; margin-top:10px;}
+  .loc-badge{flex:1; display:flex; flex-direction:column; align-items:center; border-radius:6px; padding:10px 6px;}
+  .loc-badge .n{font-size:20px; font-weight:700;}
+  .loc-badge .l{font-size:11px; text-transform:uppercase; letter-spacing:.04em; opacity:.85; margin-top:2px;}
+
+  .locadoras-sm{display:flex; gap:6px; margin-top:8px;}
+  .loc-badge-sm{flex:1; display:flex; flex-direction:column; align-items:center; border-radius:5px; padding:4px 6px;}
+  .loc-badge-sm .n{font-size:12.5px; font-weight:700;}
+  .loc-badge-sm .l{font-size:8.5px; text-transform:uppercase; letter-spacing:.03em; opacity:.85; margin-top:1px;}
+  .loc-localiza{background:rgba(18,191,168,.20); color:var(--teal);}
+  .loc-unidas{background:rgba(28,140,232,.20); color:var(--steel);}
+
+  .panel{background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:18px;}
+  .panel h2{font-size:15px; margin:0 0 14px; color:var(--text);}
+
+  table{width:100%; border-collapse:collapse; font-size:12.5px;}
+  .tablewrap{overflow-x:auto;}
+  th{background:var(--panel2); text-align:left; padding:9px 12px; color:var(--muted); font-weight:600; white-space:nowrap;}
+  td{padding:9px 12px; border-bottom:1px solid var(--line); white-space:normal; word-break:break-word; vertical-align:top;}
+  tr:hover td{background:#153A57;}
+  tr.row-warn td{background:rgba(216,154,43,.34);}
+  tr.row-warn:hover td{background:rgba(216,154,43,.46);}
+  .tag{display:inline-block; padding:2px 9px; border-radius:20px; font-size:11px; font-weight:700; white-space:nowrap;}
+  .tag-ok{background:rgba(18,168,116,.18); color:var(--ok);}
+  .tag-warn{background:rgba(216,154,43,.18); color:var(--warn);}
+
+  .note{font-size:12px; color:var(--muted); margin-top:18px; border-top:1px solid var(--line); padding-top:12px;}
+</style>
+</head>
+<body>
+<div id="ewNav" style="position:fixed; top:14px; right:14px; z-index:999; font-family:Segoe UI,Arial,sans-serif;">
+  <button id="ewNavBtn" aria-label="Menu de navegação" style="width:42px; height:42px; border-radius:8px; border:1px solid #1E4363; background:#123350; color:#EAF1F7; font-size:18px; cursor:pointer;">&#9776;</button>
+  <div id="ewNavPanel" style="display:none; position:absolute; top:48px; right:0; background:#0F2A40; border:1px solid #1E4363; border-radius:10px; padding:8px; min-width:210px; box-shadow:0 8px 24px rgba(0,0,0,.45);">
+    <a href="index.html" class="ew-nav-item">&#8962; Início</a>
+    <a href="dashboard-nossas-demandas.html" class="ew-nav-item">&#9888; Nossas Demandas</a>
+    <a href="dashboard-resumo-equipes.html" class="ew-nav-item">&#128101; Controle de Equipes</a>
+    <a href="dashboard-frota-manutencao.html" class="ew-nav-item">&#128663; Frota — Manutenção</a>
+    <a href="dashboard-boletos.html" class="ew-nav-item">&#129534; Controle de Boletos</a>
+    <a href="dashboard-envios-logisticos.html" class="ew-nav-item">&#128230; Envios Logísticos</a>
+    <a href="dashboard-reembolso.html" class="ew-nav-item">&#128176; Reembolso</a>
+  </div>
+</div>
+<style>
+  .ew-nav-item{display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:6px; color:#8FA9C0; text-decoration:none; font-size:13px; font-weight:600;}
+  .ew-nav-item:hover{background:rgba(255,255,255,.08); color:#EAF1F7;}
+  .ew-nav-item.current{background:#00679A; color:#fff;}
+</style>
+<script>
+  (function(){
+    // Dentro do app (index.html carrega cada dashboard num iframe) ja existe
+    // o menu lateral proprio -- escondemos este pra nao duplicar.
+    if (window.self !== window.top) {
+      document.getElementById('ewNav').style.display = 'none';
+      return;
+    }
+    var btn=document.getElementById('ewNavBtn'), panel=document.getElementById('ewNavPanel');
+    btn.addEventListener('click', function(e){ e.stopPropagation(); panel.style.display = panel.style.display==='none'?'block':'none'; });
+    document.addEventListener('click', function(){ panel.style.display='none'; });
+    panel.addEventListener('click', function(e){ e.stopPropagation(); });
+    var here = (location.pathname.split('/').pop() || 'index.html');
+    Array.prototype.forEach.call(panel.querySelectorAll('a'), function(a){
+      if(a.getAttribute('href') === here) a.classList.add('current');
+    });
+  })();
+</script>
+
+<header>
+  <div class="brand">
+    <img src="assets/icone-helice-color.png" alt="" style="height:60px; width:auto; display:block;">
+    <div>
+      <img src="assets/logo-extreme-wind-white.png" alt="Extreme Wind" style="height:30px; width:auto; display:block; margin-bottom:6px;">
+      <div class="sub">Dashboard de Boletos — Uso interno</div>
+      <div class="sub" style="margin-top:4px;">Data do último boleto atualizado</div>
+      <div class="locadoras-sm" id="ultimoBoletoSub" style="max-width:220px;">
+        <div class="loc-badge-sm loc-unidas"><span class="n">31/08/2026</span><span class="l">Unidas</span></div>
+        <div class="loc-badge-sm loc-localiza"><span class="n">19/08/2026</span><span class="l">Localiza</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="badge-week" id="badgeAtualizado">Atualizado 06/08/2026</div>
+</header>
+
+<div class="kpis" id="kpisBoletos">
+  <div class="kpi">
+    <div class="label">Contestação</div>
+    <div class="locadoras">
+      <div class="loc-badge loc-unidas"><span class="n">3</span><span class="l">Unidas</span></div>
+      <div class="loc-badge loc-localiza"><span class="n">1</span><span class="l">Localiza</span></div>
+    </div>
+  </div>
+  <div class="kpi">
+    <div class="label">Boletos à Vencer</div>
+    <div class="locadoras">
+      <div class="loc-badge loc-unidas"><span class="n">5</span><span class="l">Unidas</span></div>
+      <div class="loc-badge loc-localiza"><span class="n">0</span><span class="l">Localiza</span></div>
+    </div>
+    <div class="locadoras-sm" id="proximoSub">
+      <div class="loc-badge-sm loc-unidas"><span class="n">06/08/2026</span><span class="l">Próx. Unidas</span></div>
+      <div class="loc-badge-sm loc-localiza"><span class="n">06/08/2026</span><span class="l">Próx. Localiza</span></div>
+    </div>
+  </div>
+  <div class="kpi kpi-warn">
+    <div class="label">Multas em Aberto</div>
+    <div class="locadoras">
+      <div class="loc-badge loc-unidas"><span class="n">0</span><span class="l">Unidas</span></div>
+      <div class="loc-badge loc-localiza"><span class="n">0</span><span class="l">Localiza</span></div>
+    </div>
+  </div>
+  <div class="kpi kpi-warn">
+    <div class="label">Boletos/Multas pendentes Download</div>
+    <div class="locadoras">
+      <div class="loc-badge loc-unidas"><span class="n">0</span><span class="l">Unidas</span></div>
+      <div class="loc-badge loc-localiza"><span class="n">0</span><span class="l">Localiza</span></div>
+    </div>
+  </div>
+  <div class="kpi kpi-warn">
+    <div class="label">Contestar</div>
+    <div class="locadoras">
+      <div class="loc-badge loc-unidas"><span class="n">0</span><span class="l">Unidas</span></div>
+      <div class="loc-badge loc-localiza"><span class="n">0</span><span class="l">Localiza</span></div>
+    </div>
+  </div>
+  <div class="kpi kpi-warn">
+    <div class="label">Sinistros em Aberto</div>
+    <div class="locadoras">
+      <div class="loc-badge loc-unidas"><span class="n">0</span><span class="l">Unidas</span></div>
+      <div class="loc-badge loc-localiza"><span class="n">0</span><span class="l">Localiza</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="panel">
+  <h2 style="margin-bottom:16px">Pendências em Aberto — Detalhe</h2>
+
+  <h3 style="font-size:12.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:0 0 8px;">Multas em Aberto</h3>
+  <div class="tablewrap" style="margin-bottom:20px">
+  <table>
+    <thead><tr><th>Placa</th><th>Locadora</th><th>Parque</th><th>Vencimento</th><th>Motivo</th><th>Motivo Cobrança Extra</th></tr></thead>
+    <tbody id="detMultas">
+    <tr><td colspan="6" style="color:var(--muted); text-align:center;">Nenhuma pendência registrada</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3 style="font-size:12.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:0 0 8px;">Contestar</h3>
+  <div class="tablewrap" style="margin-bottom:20px">
+  <table>
+    <thead><tr><th>Placa</th><th>Locadora</th><th>Parque</th><th>Vencimento</th><th>Motivo</th><th>Motivo Cobrança Extra</th></tr></thead>
+    <tbody id="detContestar">
+    <tr><td colspan="6" style="color:var(--muted); text-align:center;">Nenhuma pendência registrada</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3 style="font-size:12.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:0 0 8px;">Sinistros em Aberto</h3>
+  <div class="tablewrap" style="margin-bottom:20px">
+  <table>
+    <thead><tr><th>Placa</th><th>Locadora</th><th>Parque</th><th>Vencimento</th><th>Motivo</th><th>Motivo Cobrança Extra</th></tr></thead>
+    <tbody id="detSinistros">
+    <tr><td colspan="6" style="color:var(--muted); text-align:center;">Nenhuma pendência registrada</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3 style="font-size:12.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:0 0 8px;">Atualizações Semanais</h3>
+  <div class="tablewrap">
+  <table>
+    <thead>
+      <tr><th>Semana</th><th>Data</th><th>Locadora</th><th>Status</th><th>Obs. / boletos pendentes de download manual</th></tr>
+    </thead>
+    <tbody id="logRows">
+    <tr><td colspan="5" style="color:var(--muted); text-align:center;">Nenhuma pendência registrada</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3 style="font-size:12.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:20px 0 8px;">Contestação — Detalhe (Unidas e Localiza)</h3>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Placa</th><th>Locadora</th><th>Parque</th><th>Vencimento</th><th>Motivo</th><th>Motivo Cobrança Extra</th></tr></thead>
+    <tbody id="detContestacao">
+    <tr class="row-warn"><td>TXC6E59</td><td>LOCALIZA</td><td>VENTOS DO PIAUÍ/PI</td><td>31/07/2026</td><td>-</td><td>SINISTRO - EM CONTESTAÇÃO</td></tr>
+    <tr class="row-warn"><td>TDX6D11</td><td>UNIDAS</td><td>CAMPO LARGO/BA</td><td>25/07/2026</td><td>-</td><td>SINISTRO - EM CONTESTAÇÃO</td></tr>
+    <tr class="row-warn"><td>TET3C50</td><td>UNIDAS</td><td>SÃO FERNANDO 1/RN</td><td>20/08/2026</td><td>-</td><td>SINISTRO</td></tr>
+    <tr class="row-warn"><td>SEM PLACA</td><td>UNIDAS</td><td>???</td><td>12/07/2026</td><td>-</td><td>SINISTRO - EM CONTESTAÇÃO (CASO ANTIGO, GANHO)</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="note" id="fonteNote">Fonte: planilha "01. CONTROLE DE CONTAS A PAGAR UNIDAS", aba DASHBOARD ATUALIZAÇÃO. "Boletos/Multas pendentes Download" é atualizado manualmente na rotina semanal (não é fórmula automática). Dados extraídos automaticamente; confira os valores na fonte antes de compartilhar. Uso interno do setor — link privado, não indexado publicamente; não repasse fora da equipe sem necessidade.</div>
+
+</body>
+</html>

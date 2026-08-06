@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard - Extreme Wind</title>
+<link rel="icon" type="image/png" href="assets/icone-helice-color.png">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root{
+    /* Paleta unificada com o restante do site — azul-marinho da logo Extreme Wind */
+    --bg:#081C2C; --card:#0F2A40; --line:#1E4363;
+    --text:#EAF1F7; --muted:#8FA9C0; --accent:#1C8CE8; --green:#12A874;
+    --red:#E0483C; --amber:#D89A2B; --purple:#9b59b6;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; font-family:'Segoe UI',Arial,sans-serif; background:var(--bg); color:var(--text); padding:28px 32px 60px; zoom:1.15;}
+  @media (max-width:820px){
+    body{zoom:1; padding:16px 14px 40px;}
+    h1{font-size:19px;}
+    .tabs{flex-wrap:wrap; gap:6px;}
+    .tab{flex:1 1 calc(50% - 6px); padding:9px 6px; font-size:11.5px; text-align:center; white-space:normal; line-height:1.25;}
+  }
+  h1{font-size:22px; margin:0 0 2px;}
+  .subtitle{color:var(--muted); font-size:13px; margin-bottom:10px;}
+  .tabs{display:flex; gap:8px; margin:18px 0 26px; border-bottom:1px solid var(--line);}
+  .tab{padding:10px 18px; font-size:13px; font-weight:600; color:var(--muted); cursor:pointer; border-bottom:2px solid transparent; white-space:normal; word-break:break-word;}
+  .tab.active{color:var(--accent); border-bottom:2px solid var(--accent);}
+  .panel{display:none;}
+  .panel.active{display:block;}
+  .kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; margin-bottom:24px;}
+  .kpi{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px 18px;}
+  .kpi .label{font-size:12px; color:var(--muted); text-transform:uppercase;}
+  .kpi .value{font-size:28px; font-weight:700; margin-top:6px;}
+  .kpi .sub{font-size:12px; color:var(--muted); margin-top:4px;}
+  .value.red{color:var(--red);} .value.amber{color:var(--amber);}
+  .grid{display:grid; grid-template-columns:2fr 1fr 1fr; gap:16px; margin-bottom:20px;}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px;}
+  @media(max-width:900px){ .grid,.grid2{grid-template-columns:1fr;} }
+  .card{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:18px;}
+  .card h2{font-size:14px; margin:0 0 12px; font-weight:600;}
+  .card h2 span{color:var(--muted); font-weight:400; font-size:12px;}
+  table{width:100%; border-collapse:collapse; font-size:13px;}
+  th,td{text-align:left; padding:8px 10px; border-bottom:1px solid var(--line);}
+  th{color:var(--muted); font-weight:600; font-size:11px; text-transform:uppercase;}
+  tr.deficit td{background:rgba(224,72,60,.08);}
+  tr.deficit td:nth-child(4){color:var(--red); font-weight:700;}
+  td.num{text-align:right;}
+  .badge{display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:600;}
+  .badge.ge{background:rgba(28,140,232,.18); color:var(--accent);}
+  .badge.nordex{background:rgba(155,89,182,.2); color:#c68ce0;}
+  .badge.siemens{background:rgba(18,168,116,.18); color:var(--green);}
+  .alerts{margin-top:6px;}
+  .alert{padding:10px 12px; border-radius:8px; margin-bottom:8px; font-size:13px;}
+  .alert.crit{background:rgba(224,72,60,.1); border:1px solid rgba(224,72,60,.35);}
+  .alert.warn{background:rgba(216,154,43,.1); border:1px solid rgba(216,154,43,.35);}
+  .alert.info{background:rgba(28,140,232,.1); border:1px solid rgba(28,140,232,.35);}
+  .section-title{font-size:16px; margin:32px 0 12px; padding-top:10px; border-top:1px solid var(--line);}
+  .improve li{margin-bottom:10px; font-size:13.5px; line-height:1.5;}
+  .improve b{color:var(--accent);}
+  .footer{color:var(--muted); font-size:11px; margin-top:30px;}
+  canvas{max-height:280px;}
+  .scrollx{overflow-x:auto;}
+</style>
+</head>
+<body>
+<div id="ewNav" style="position:fixed; top:14px; right:14px; z-index:999; font-family:Segoe UI,Arial,sans-serif;">
+  <button id="ewNavBtn" aria-label="Menu de navegação" style="width:42px; height:42px; border-radius:8px; border:1px solid #1E4363; background:#123350; color:#EAF1F7; font-size:18px; cursor:pointer;">&#9776;</button>
+  <div id="ewNavPanel" style="display:none; position:absolute; top:48px; right:0; background:#0F2A40; border:1px solid #1E4363; border-radius:10px; padding:8px; min-width:210px; box-shadow:0 8px 24px rgba(0,0,0,.45);">
+    <a href="index.html" class="ew-nav-item">&#8962; Início</a>
+    <a href="dashboard-nossas-demandas.html" class="ew-nav-item">&#9888; Nossas Demandas</a>
+    <a href="dashboard-resumo-equipes.html" class="ew-nav-item">&#128101; Controle de Equipes</a>
+    <a href="dashboard-frota-manutencao.html" class="ew-nav-item">&#128663; Frota — Manutenção</a>
+    <a href="dashboard-boletos.html" class="ew-nav-item">&#129534; Controle de Boletos</a>
+    <a href="dashboard-envios-logisticos.html" class="ew-nav-item">&#128230; Envios Logísticos</a>
+    <a href="dashboard-reembolso.html" class="ew-nav-item">&#128176; Reembolso</a>
+  </div>
+</div>
+<style>
+  .ew-nav-item{display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:6px; color:#8FA9C0; text-decoration:none; font-size:13px; font-weight:600;}
+  .ew-nav-item:hover{background:rgba(255,255,255,.08); color:#EAF1F7;}
+  .ew-nav-item.current{background:#00679A; color:#fff;}
+</style>
+<script>
+  (function(){
+    // Dentro do app (index.html carrega cada dashboard num iframe) ja existe
+    // o menu lateral proprio -- escondemos este pra nao duplicar.
+    if (window.self !== window.top) {
+      document.getElementById('ewNav').style.display = 'none';
+      return;
+    }
+    var btn=document.getElementById('ewNavBtn'), panel=document.getElementById('ewNavPanel');
+    btn.addEventListener('click', function(e){ e.stopPropagation(); panel.style.display = panel.style.display==='none'?'block':'none'; });
+    document.addEventListener('click', function(){ panel.style.display='none'; });
+    panel.addEventListener('click', function(e){ e.stopPropagation(); });
+    var here = (location.pathname.split('/').pop() || 'index.html');
+    Array.prototype.forEach.call(panel.querySelectorAll('a'), function(a){
+      if(a.getAttribute('href') === here) a.classList.add('current');
+    });
+  })();
+</script>
+<img src="assets/logo-extreme-wind-white.png" alt="Extreme Wind" style="height:38px; width:auto; display:block; margin-bottom:14px;">
+<h1>Dashboard - Extreme Wind</h1>
+<div class="subtitle">Diario de Bordo - dados consolidados em 06/08/2026</div>
+<div class="tabs">
+  <div class="tab active" data-tab="ativos">Equipes ativas (hoje)</div>
+  <div class="tab" data-tab="historico">Histórico mob/desmob</div>
+  <div class="tab" data-tab="busca">Busca Técnicos</div>
+  <div class="tab" data-tab="rankings">Ranking (Atuação)</div>
+</div>
+
+<div class="panel active" id="panel-ativos">
+<div class="kpis">
+  <div class="kpi"><div class="label">Tecnicos ativos</div><div class="value">36</div><div class="sub">5 em desmobilizacao ate 07/08/2026, 08/08/2026, 11/08/2026</div></div>
+  <div class="kpi"><div class="label">Planejado (headcount)</div><div class="value">31</div><div class="sub">meta de equipes</div></div>
+  <div class="kpi"><div class="label">Deficit total</div><div class="value red">0</div><div class="sub">abaixo do plano</div></div>
+  <div class="kpi"><div class="label">Parques ativos</div><div class="value">10<span class="sub" style="font-size:16px;"> / 10</span></div><div class="sub">0 parques vazios</div></div>
+  <div class="kpi"><div class="label">Em desmobilizacao</div><div class="value amber">5</div><div class="sub">saida ja decidida, viagem ate 07/08/2026, 08/08/2026, 11/08/2026</div></div>
+</div>
+<div class="grid2">
+  <div class="card"><h2>Por cliente <span>tecnicos ativos</span></h2><canvas id="chartCliente"></canvas></div>
+  <div class="card"><h2>Por supervisor (SUOP) <span>tecnicos ativos</span></h2><canvas id="chartSuop"></canvas></div>
+</div>
+<div class="card">
+  <h2>Detalhe por parque</h2>
+  <div class="scrollx">
+  <table>
+    <thead><tr><th>Parque</th><th>Cliente</th><th>Supervisor</th><th class="num">Real</th><th class="num">Plano</th><th class="num">Diferenca</th></tr></thead>
+    <tbody id="tbodyParques"></tbody>
+  </table>
+  </div>
+</div>
+<div class="section-title">Técnicos Mobilizados <span style="font-weight:400;font-size:12px;color:#93a3b8;">(acima de 90 dias, maior → menor)</span></div>
+<div class="card">
+  <div class="scrollx">
+  <table>
+    <thead><tr><th>Mat</th><th>Técnico</th><th class="num">Tempo Mobilizado</th><th>Projeto</th><th>Supervisor</th></tr></thead>
+    <tbody id="tbodyTecnicos"></tbody>
+  </table>
+  </div>
+</div>
+</div>
+
+<div class="panel" id="panel-historico">
+<div class="kpis">
+  <div class="kpi"><div class="label">Mobilizacoes</div><div class="value">704</div><div class="sub">51.2% dos eventos</div></div>
+  <div class="kpi"><div class="label">Desmobilizacoes</div><div class="value">665</div><div class="sub">48.4% dos eventos</div></div>
+  <div class="kpi"><div class="label">Cancelamentos</div><div class="value amber">6</div><div class="sub">0.4% dos eventos</div></div>
+  <div class="kpi"><div class="label">Total de eventos</div><div class="value">1375</div><div class="sub">jan/24 a ago/26</div></div>
+</div>
+<div class="grid2">
+  <div class="card"><h2>Ranking por parque <span>top 10</span></h2><div style="height:360px;"><canvas id="chartRankingParque" style="max-height:360px;"></canvas></div></div>
+  <div class="card"><h2>Ranking por cliente <span>total historico</span></h2><div style="height:300px;"><canvas id="chartRankingCliente" style="max-height:300px;"></canvas></div></div>
+</div>
+<div class="card">
+  <h2>Solicitacoes por motivo (mensal) <span>Cliente x Extreme - percentual do mes em cada barra</span></h2>
+  <div id="motivoResumo" style="margin:-4px 0 10px; color:#93a3b8; font-size:12px;"></div>
+  <div style="height:300px;"><canvas id="chartMotivo" style="max-height:300px;"></canvas></div>
+</div>
+</div>
+
+<div class="panel" id="panel-busca">
+<div class="card">
+  <h2>Buscar Técnico <span>por nome (parcial) ou matrícula (número exato)</span></h2>
+  <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+    <input id="buscaTecInput" type="text" placeholder="Digite o nome ou a matrícula..." autocomplete="off"
+      style="flex:1; min-width:220px; background:#0B2338; border:1px solid var(--line); border-radius:8px; color:var(--text); padding:10px 12px; font-size:14px;">
+  </div>
+  <div id="buscaTecSugestoes" style="margin-top:8px; display:none;"></div>
+</div>
+<div id="buscaTecResultado" style="margin-top:20px; display:none;">
+  <div class="card">
+    <h2 id="buscaTecNome">-</h2>
+    <div id="buscaTecSemDados" style="display:none; color:var(--muted); font-size:13px;">Nenhum periodo mobilizado encontrado para este tecnico.</div>
+    <div class="section-title" style="margin-top:6px;">Tempo mobilizado por ano</div>
+    <div class="scrollx">
+    <table>
+      <thead><tr><th>Ano</th><th class="num">Dias mobilizado</th></tr></thead>
+      <tbody id="tbodyTecAno"></tbody>
+    </table>
+    </div>
+    <div id="tecPizzasAno" style="display:flex; flex-wrap:wrap; gap:16px; margin-top:16px;"></div>
+    <div class="section-title">Tempo mobilizado por ano e por cliente</div>
+    <div class="scrollx">
+    <table>
+      <thead><tr id="theadTecAnoCliente"><th>Ano</th></tr></thead>
+      <tbody id="tbodyTecAnoCliente"></tbody>
+    </table>
+    </div>
+    <div id="tecPizzaClienteBox" style="margin-top:16px; display:none;">
+      <div style="background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px; max-width:320px;">
+        <div style="font-size:12px; color:var(--muted); text-transform:uppercase; margin-bottom:6px;">% de atendimento por cliente</div>
+        <canvas id="chartTecCliente" width="280" height="280"></canvas>
+      </div>
+    </div>
+    <div class="section-title">Observações negativas (histórico)</div>
+    <div id="buscaTecSemNegativos" style="display:none; color:var(--muted); font-size:13px; margin-bottom:8px;">Nenhuma observação negativa registrada.</div>
+    <div class="scrollx">
+    <table>
+      <thead><tr><th>Data</th><th>Parque</th><th>Motivo / Observação</th></tr></thead>
+      <tbody id="tbodyTecNegativos"></tbody>
+    </table>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="panel" id="panel-rankings">
+<div class="card">
+  <h2>Ranking — Top 20 técnicos N1/N2 <span>mais dias mobilizados (carreira)</span></h2>
+  <div class="scrollx">
+  <table>
+    <thead><tr><th>Pos.</th><th>Técnico</th><th>IRATA</th><th class="num">Dias mobilizado</th></tr></thead>
+    <tbody id="tbodyRankTop20"></tbody>
+  </table>
+  </div>
+</div>
+<div class="card" style="margin-top:20px;">
+  <h2>Ranking — Top 5 técnicos N3 <span>mais dias mobilizados (carreira)</span></h2>
+  <div class="scrollx">
+  <table>
+    <thead><tr><th>Pos.</th><th>Técnico</th><th>IRATA</th><th class="num">Dias mobilizado</th></tr></thead>
+    <tbody id="tbodyRankTop5"></tbody>
+  </table>
+  </div>
+</div>
+<div class="footer" style="margin-top:14px;">Inclui dias em ciclos ja encerrados + dias corridos desde a mobilizacao atual, para quem ainda esta em campo. Tecnicos sem classificacao N1/N2/N3 registrada nao entram no ranking.</div>
+</div>
+
+<div class="footer">Painel 1: CONTROLE DE EQUIPES. Painel 2: DADOS/RESUMOS (aba DASHBOARD original). 06/08/2026.</div>
+
+<script>
+var historicoInited = false;
+document.querySelectorAll('.tab').forEach(function(t){
+  t.addEventListener('click', function(){
+    document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active');});
+    document.querySelectorAll('.panel').forEach(function(x){x.classList.remove('active');});
+    t.classList.add('active');
+    document.getElementById('panel-'+t.dataset.tab).classList.add('active');
+    // Os graficos do painel Historico so sao criados na 1a vez que a aba fica visivel.
+    // Criar Chart.js num canvas ainda com display:none da 0x0px e o grafico nunca
+    // aparece depois (falha mais visivel no app mobile/webview do que no desktop).
+    if (t.dataset.tab === 'historico' && !historicoInited) {
+      historicoInited = true;
+      initHistoricoCharts();
+    }
+  });
+});
+// Acesso direto pela aba "Buscar Tecnico" do menu Visao (index.html abre este
+// arquivo num iframe, controlando via hash na URL: "#busca" so abre a aba,
+// "#busca=NOME" abre a aba ja com a busca desse nome executada -- o campo de
+// busca do proprio menu lateral do index.html usa isso pra buscar direto dali,
+// sem precisar digitar de novo aqui dentro). Reage tanto ao carregar a pagina
+// quanto a mudancas de hash depois (o index.html troca so o hash do iframe,
+// sem recarregar, quando o usuario faz uma nova busca no menu).
+function processarHashBuscaTec(){
+  var h = location.hash;
+  if (h.indexOf('#busca') !== 0) return;
+  var tabBusca = document.querySelector('.tab[data-tab="busca"]');
+  if (tabBusca && !tabBusca.classList.contains('active')) tabBusca.click();
+  var eqIdx = h.indexOf('=');
+  var termo = eqIdx !== -1 ? decodeURIComponent(h.slice(eqIdx + 1)) : '';
+  if (termo && window.abrirBuscaTecnico) {
+    window.abrirBuscaTecnico(termo);
+  } else {
+    var inputBusca = document.getElementById('buscaTecInput');
+    if (inputBusca) { setTimeout(function(){ inputBusca.focus(); }, 50); }
+  }
+}
+processarHashBuscaTec();
+window.addEventListener('hashchange', processarHashBuscaTec);
+Chart.defaults.color = '#93a3b8';
+Chart.defaults.font.family = "'Segoe UI',Arial,sans-serif";
+
+var parques = [
+  {nome:"COPEL/RN", cliente:"GE", suop:"EVAIR", real:4, plano:4},
+  {nome:"OITIS/PI", cliente:"GE", suop:"EVAIR", real:3, plano:3},
+  {nome:"SÃO FERNANDO/RN", cliente:"NORDEX", suop:"MAGALHÃES", real:6, plano:6},
+  {nome:"SÃO VITOR/BA", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
+  {nome:"BAIXA DO FEIJÃO/RN", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
+  {nome:"SANTO AGOSTINHO/RN", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
+  {nome:"TUCANO/BA", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
+  {nome:"DELTA/PI", cliente:"SIEMENS", suop:"WILDNER", real:1, plano:1},
+  {nome:"TRAIRI/CE", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
+  {nome:"INTERMARÍTIMA/BA", cliente:"SIEMENS", suop:"WILDNER", real:2, plano:2}
+];
+var emDesmobQtd = 5;
+function badgeClass(c){ return {GE:'ge',NORDEX:'nordex',SIEMENS:'siemens'}[c] || 'ge'; }
+var tbody = document.getElementById('tbodyParques');
+parques.forEach(function(p){
+  var diff = p.real - p.plano;
+  var tr = document.createElement('tr');
+  if(diff<0) tr.className='deficit';
+  tr.innerHTML = '<td>'+p.nome+'</td><td><span class="badge '+badgeClass(p.cliente)+'">'+p.cliente+'</span></td><td>'+p.suop+'</td><td class="num">'+p.real+'</td><td class="num">'+p.plano+'</td><td class="num">'+(diff>0?'+':'')+diff+'</td>';
+  tbody.appendChild(tr);
+});
+var totReal = parques.reduce(function(s,p){return s+p.real;},0);
+var totPlano = parques.reduce(function(s,p){return s+p.plano;},0);
+if (emDesmobQtd > 0) {
+  var trDesmob = document.createElement('tr');
+  trDesmob.style.color = '#f0ad4e';
+  trDesmob.innerHTML = '<td>EM DESMOBILIZAÇÃO</td><td></td><td>Responsável: Robson Lins</td><td class="num">'+emDesmobQtd+'</td><td class="num">-</td><td class="num">-</td>';
+  tbody.appendChild(trDesmob);
+}
+var trTot = document.createElement('tr');
+trTot.style.fontWeight='700'; trTot.style.borderTop='2px solid #2a3746';
+trTot.innerHTML = '<td>Total Geral</td><td></td><td></td><td class="num">'+totReal+'</td><td class="num">'+totPlano+'</td><td class="num">'+(totReal-totPlano)+'</td>';
+tbody.appendChild(trTot);
+
+var tecnicosAtivos = [
+  {mat:"292", nome:"FRANCISCO ELINALDO SILVA QUINTO", acumulado:251, parque:"COPEL/RN", suop:"EVAIR"},
+  {mat:"30", nome:"FELIPE DE LIMA SERPA", acumulado:221, parque:"COPEL/RN", suop:"EVAIR"},
+  {mat:"899", nome:"PEDRO LUCAS DA CRUZ DA SILVA", acumulado:212, parque:"OITIS/PI", suop:"EVAIR"},
+  {mat:"958", nome:"MAURICIO CESAR DE ANDRADE DE MOURA", acumulado:211, parque:"SÃO FERNANDO/RN", suop:"MAGALHÃES"},
+  {mat:"295", nome:"SANDRELINO MACIEL DE FREITAS", acumulado:209, parque:"OITIS/PI", suop:"EVAIR"},
+  {mat:"304", nome:"SERGIO MATEUS DA SILVA MARTINS", acumulado:171, parque:"COPEL/RN", suop:"EVAIR"},
+  {mat:"221", nome:"JAIR DUTRA JUNIOR", acumulado:162, parque:"BAIXA DO FEIJÃO/RN", suop:"WILDNER"},
+  {mat:"983", nome:"ANTONIO CESAR SILVA CASTRO", acumulado:157, parque:"SÃO FERNANDO/RN", suop:"MAGALHÃES"},
+  {mat:"353", nome:"ÉDIPO CARDOSO DE OLIVEIRA", acumulado:144, parque:"TUCANO/BA", suop:"WILDNER"},
+  {mat:"296", nome:"ALDEMIR CORREIA DE JESUS", acumulado:122, parque:"SANTO AGOSTINHO/RN", suop:"WILDNER"},
+  {mat:"192", nome:"JEFERSON APARECIDO ANTENOR", acumulado:118, parque:"SANTO AGOSTINHO/RN", suop:"WILDNER"},
+  {mat:"48", nome:"LERNITON SILVA DE ANDRADE", acumulado:109, parque:"SANTO AGOSTINHO/RN", suop:"WILDNER"},
+  {mat:"369", nome:"ALESSANDRO OLIVEIRA GUIMARÃES DA SILVA", acumulado:102, parque:"SÃO FERNANDO/RN", suop:"MAGALHÃES"},
+  {mat:"49", nome:"JOHN LENON VIEIRA ALVES", acumulado:96, parque:"OITIS/PI", suop:"EVAIR"},
+  {mat:"46", nome:"WILLAMES LEANDRO SILVA DA HORA", acumulado:92, parque:"BAIXA DO FEIJÃO/RN", suop:"WILDNER"},
+  {mat:"189", nome:"FRANCSICO AVILA LIMA DA SILVA", acumulado:92, parque:"BAIXA DO FEIJÃO/RN", suop:"WILDNER"}
+];
+var tbodyTec = document.getElementById('tbodyTecnicos');
+tecnicosAtivos.forEach(function(t){
+  var tr = document.createElement('tr');
+  tr.innerHTML = '<td>'+(t.mat||'-')+'</td><td>'+t.nome+'</td><td class="num">'+(t.acumulado!=null?t.acumulado+' dias':'-')+'</td><td>'+t.parque+'</td><td>'+t.suop+'</td>';
+  tbodyTec.appendChild(tr);
+});
+
+function aggregate(key){ var m={}; parques.forEach(function(p){ m[p[key]]=(m[p[key]]||0)+p.real; }); return m; }
+var doughnutQtdLabelsPlugin = {
+  id: 'doughnutQtdLabels',
+  afterDatasetsDraw: function(chart){
+    if(chart.canvas.id !== 'chartSuop' && chart.canvas.id !== 'chartCliente') return;
+    var ctx = chart.ctx;
+    var meta = chart.getDatasetMeta(0);
+    meta.data.forEach(function(arc, i){
+      var val = chart.data.datasets[0].data[i];
+      if(!val) return;
+      var pos = arc.tooltipPosition();
+      ctx.save();
+      ctx.fillStyle = '#0f1720';
+      ctx.font = 'bold 12px Segoe UI, Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(String(val), pos.x, pos.y);
+      ctx.restore();
+    });
+  }
+};
+Chart.register(doughnutQtdLabelsPlugin);
+
+var clienteAgg = aggregate('cliente');
+new Chart(document.getElementById('chartCliente'), {
+  type:'doughnut',
+  data:{labels:Object.keys(clienteAgg), datasets:[{data:Object.values(clienteAgg), backgroundColor:['#1C8CE8','#FFFFFF','#12A874'], borderColor:'#0F2A40', borderWidth:2}]},
+  options:{responsive:true, plugins:{legend:{position:'bottom', labels:{boxWidth:12, font:{size:11}}},
+    tooltip:{callbacks:{label:function(ctx){ return ctx.label + ': ' + ctx.parsed + ' tecnicos'; }}}}}
+});
+var suopAgg = aggregate('suop');
+new Chart(document.getElementById('chartSuop'), {
+  type:'doughnut',
+  data:{labels:Object.keys(suopAgg), datasets:[{data:Object.values(suopAgg), backgroundColor:['#1C8CE8','#FFFFFF','#12A874','#E0483C'], borderColor:'#0F2A40', borderWidth:2}]},
+  options:{responsive:true, plugins:{legend:{position:'bottom', labels:{boxWidth:12, font:{size:11}}},
+    tooltip:{callbacks:{label:function(ctx){ return ctx.label + ': ' + ctx.parsed + ' tecnicos'; }}}}}
+});
+
+function initHistoricoCharts(){
+var rankingParque = [
+  ["LDV3/PI",83,83,1],
+  ["OITIS/PI",82,79,0],
+  ["TRAIRI/CE",38,35,0],
+  ["COPEL/RN",36,32,1],
+  ["UMBURANAS/BA",31,31,0],
+  ["CAMPO LARGO/BA",25,25,0],
+  ["VENTOS DA BAHIA/BA",25,25,0],
+  ["FONTE DOS VENTOS/PE",24,24,0],
+  ["SINOMA FÁBRICA/BA",21,21,1],
+  ["VSM/RN",21,21,0]
+];
+function shortLabel(s){
+  var parts = s.split('/');
+  var nome = parts[0].trim();
+  var sufixo = parts.length > 1 ? '/' + parts[1].trim() : '';
+  var maxNome = 12;
+  if(nome.length > maxNome){ nome = nome.slice(0, maxNome - 1).trim() + '…'; }
+  return nome + sufixo;
+}
+
+var chartRankingParque = new Chart(document.getElementById('chartRankingParque'), {
+  type:'bar',
+  data:{ labels: rankingParque.map(function(p){return p[0];}),
+    datasets:[
+      {label:'Mobilizacao', data:rankingParque.map(function(p){return p[1];}), backgroundColor:'#1C8CE8'},
+      {label:'Desmobilizacao', data:rankingParque.map(function(p){return p[2];}), backgroundColor:'#9b59b6'},
+      {label:'Cancelamento', data:rankingParque.map(function(p){return p[3];}), backgroundColor:'#E0483C'}
+    ]},
+  options:{indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'top', labels:{boxWidth:12, font:{size:11}}},
+    tooltip:{callbacks:{title:function(items){ return rankingParque[items[0].dataIndex][0]; }}}},
+    scales:{x:{stacked:true, grid:{color:'#2a3746'}},
+      y:{stacked:true, grid:{display:false}, ticks:{autoSkip:false, callback:function(value){ return shortLabel(this.getLabelForValue(value)); }}}}}
+});
+
+var rankingCliente = [
+  ["GE",393,384,4],
+  ["SIEMENS",206,183,1],
+  ["NORDEX / LWS",62,56,0],
+  ["SINOMA BLADES",21,21,1],
+  ["LM",11,11,0],
+  ["EÓLICAS BABILÔNIA",5,5,0],
+  ["ELETROBRAS",4,4,0],
+  ["VESTAS",2,2,0]
+];
+var chartRankingCliente = new Chart(document.getElementById('chartRankingCliente'), {
+  type:'bar',
+  data:{ labels: rankingCliente.map(function(p){return p[0];}),
+    datasets:[
+      {label:'Mobilizacao', data:rankingCliente.map(function(p){return p[1];}), backgroundColor:'#1C8CE8'},
+      {label:'Desmobilizacao', data:rankingCliente.map(function(p){return p[2];}), backgroundColor:'#9b59b6'},
+      {label:'Cancelamento', data:rankingCliente.map(function(p){return p[3];}), backgroundColor:'#E0483C'}
+    ]},
+  options:{indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'top', labels:{boxWidth:12, font:{size:11}}},
+    tooltip:{callbacks:{title:function(items){ return rankingCliente[items[0].dataIndex][0]; }}}},
+    scales:{x:{stacked:true, grid:{color:'#2a3746'}},
+      y:{stacked:true, grid:{display:false}, ticks:{autoSkip:false, callback:function(value){ return shortLabel(this.getLabelForValue(value)); }}}}}
+});
+
+var mesesTodos = ["Jan/24","Fev/24","Mar/24","Abr/24","Mai/24","Jun/24","Jul/24","Ago/24","Set/24","Out/24","Nov/24","Dez/24","Jan/25","Fev/25","Mar/25","Abr/25","Mai/25","Jun/25","Jul/25","Ago/25","Set/25","Out/25","Nov/25","Dez/25","Jan/26","Fev/26","Mar/26","Abr/26","Mai/26","Jun/26","Jul/26","Ago/26"];
+var motivoClienteTodos = [16,3,16,26,15,24,10,21,21,6,25,10,38,15,20,29,43,28,30,34,33,25,50,59,71,34,42,41,44,25,30,1];
+var motivoExtremeTodos = [11,5,5,7,14,22,17,14,11,17,16,8,7,7,15,11,21,19,10,12,7,9,9,18,19,19,28,56,34,22,20,1];
+
+// Mes atual + ultimos 12 meses (13 barras no total)
+var JANELA_MESES = 13;
+var meses = mesesTodos.slice(-JANELA_MESES);
+var motivoCliente = motivoClienteTodos.slice(-JANELA_MESES);
+var motivoExtreme = motivoExtremeTodos.slice(-JANELA_MESES);
+var motivoTotais = motivoCliente.map(function(v,i){ return v + motivoExtreme[i]; });
+var somaCliente = motivoCliente.reduce(function(a,b){return a+b;},0);
+var somaExtreme = motivoExtreme.reduce(function(a,b){return a+b;},0);
+var somaGeralMotivo = somaCliente + somaExtreme;
+var pctClienteGeral = (somaCliente/somaGeralMotivo*100).toFixed(1);
+var pctExtremeGeral = (somaExtreme/somaGeralMotivo*100).toFixed(1);
+document.getElementById('motivoResumo').textContent = 'Ultimos 12 meses + mes atual: Cliente ' + pctClienteGeral + '% (' + somaCliente + ') | Extreme ' + pctExtremeGeral + '% (' + somaExtreme + ') de ' + somaGeralMotivo + ' solicitacoes';
+
+var pctLabelsPlugin = {
+  id: 'pctLabelsMotivo',
+  afterDatasetsDraw: function(chart){
+    if(chart.canvas.id !== 'chartMotivo') return;
+    var ctx = chart.ctx;
+    chart.data.datasets.forEach(function(ds, dsIndex){
+      var meta = chart.getDatasetMeta(dsIndex);
+      meta.data.forEach(function(bar, i){
+        var val = ds.data[i];
+        var total = motivoTotais[i];
+        if(!total || !val) return;
+        var pct = Math.round(val/total*100);
+        var h = Math.abs(bar.base - bar.y);
+        if(h < 11) return;
+        ctx.save();
+        ctx.fillStyle = '#0f1720';
+        ctx.font = 'bold 8px Segoe UI, Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(pct+'%', bar.x, (bar.y + bar.base)/2);
+        ctx.restore();
+      });
+    });
+  }
+};
+Chart.register(pctLabelsPlugin);
+
+var chartMotivo = new Chart(document.getElementById('chartMotivo'), {
+  type:'bar',
+  data:{ labels: meses,
+    datasets:[
+      {label:'Solicitacao Cliente', data:motivoCliente, backgroundColor:'#1C8CE8', stack:'s'},
+      {label:'Solicitacao Extreme', data:motivoExtreme, backgroundColor:'#D89A2B', stack:'s'}
+    ]},
+  options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'top', labels:{boxWidth:12, font:{size:11}}},
+    tooltip:{callbacks:{label:function(ctx){
+      var val = ctx.parsed.y;
+      var total = motivoTotais[ctx.dataIndex];
+      var pct = total ? Math.round(val/total*100) : 0;
+      return ctx.dataset.label + ': ' + val + ' (' + pct + '%)';
+    }}}},
+    scales:{x:{stacked:true, ticks:{font:{size:9}, autoSkip:false, maxRotation:60, minRotation:60}, grid:{display:false}}, y:{stacked:true, beginAtZero:true, grid:{color:'#2a3746'}}}}
+});
+}
+
+// ---- Buscar Tecnico (3a aba) ----
+// TECNICOS_DATA e CLIENTES_TEC sao gerados pelo gerar_dashboards.py (build_tecnicos_data),
+// a partir da aba "DADOS" do Diario de Bordo -- mesma logica de pareamento
+// MOBILIZACAO/DESMOBILIZACAO e mesma lista de palavras-chave negativas que a
+// aba "RESUMOS TECNICOS" da planilha original usa.
+var TECNICOS_DATA = [{"mat": "356", "mats": ["356"], "nome": "ADEMIR BENATO", "dias_ano": {"2026": 63}, "dias_ano_cliente": {"2026": {"GE": 63}}, "negativos": [], "dias_total": 63, "classificacao": null}, {"mat": "337", "mats": ["337"], "nome": "ADSON DOS SANTOS FRANÇA", "dias_ano": {"2026": 41}, "dias_ano_cliente": {"2026": {"GE": 41}}, "negativos": [], "dias_total": 41, "classificacao": null}, {"mat": "138", "mats": ["138"], "nome": "ALAN BRUNO GOMES MOTA", "dias_ano": {"2024": 5}, "dias_ano_cliente": {"2024": {"SINOMA BLADES": 5}}, "negativos": [], "dias_total": 5, "classificacao": null}, {"mat": "9", "mats": ["9"], "nome": "ALDAIR NASCIMENTO MACIEL", "dias_ano": {"2024": 11}, "dias_ano_cliente": {"2024": {"GE": 11}}, "negativos": [], "dias_total": 11, "classificacao": "N1"}, {"mat": "139", "mats": ["139"], "nome": "ALDECIR LEITE DE AMORIM NETO", "dias_ano": {"2024": 5}, "dias_ano_cliente": {"2024": {"SINOMA BLADES": 5}}, "negativos": [], "dias_total": 5, "classificacao": "N1"}, {"mat": "296", "mats": ["296"], "nome": "ALDEMIR CORREIA DE JESUS", "dias_ano": {"2026": 179}, "dias_ano_cliente": {"2026": {"SIEMENS": 179}}, "negativos": [], "dias_total": 179, "classificacao": "N3"}, {"mat": "76", "mats": ["76"], "nome": "ALESSANDRO AUGUSTO CASTILHO DE SOUZA LIMA", "dias_ano": {"2024": 44}, "dias_ano_cliente": {"2024": {"SIEMENS": 44}}, "negativos": [], "dias_total": 44, "classificacao": "N2"}, {"mat": "369", "mats": ["369"], "nome": "ALESSANDRO OLIVEIRA GUIMARÃES DA SILVA", "dias_ano": {"2026": 103}, "dias_ano_cliente": {"2026": {"NORDEX / LWS": 103}}, "negativos": [], "dias_total": 103, "classificacao": "N1"}, {"mat": "945", "mats": ["945"], "nome": "ALESSANDRO RODRIGUES IBARRA", "dias_ano": {"2026": 111}, "dias_ano_cliente": {"2026": {"NORDEX / LWS": 111}}, "negativos": [], "dias_total": 111, "classificacao": "N1"}, {"mat": "944", "mats": ["944"], "nome": "ALESSANDRO SILVA DE CARVALHO", "dias_ano": {"2025": 31, "2026": 86}, "dias_ano_cliente": {"2025": {"NORDEX / LWS": 31}, "2026": {"NORDEX / LWS": 86}}, "negativos": [{"data": "31/03/2026", "parque": "CAJUÍNA/RN", "motivo": "SOLICITAÇÃO LEAN WAY - SUBSTITUIÇÃO A PEDIDO DA SUPERVISÃO POR PROBLEMAS COMPORTAMENTAIS COM MEMBROS DA EQUIPE"}], "dias_total": 117, "classificacao": "N1"}, {"mat": "106", "mats": ["106", "970"], "nome": "ALEX SALES DA CUNHA", "dias_ano": {"2024": 66, "2025": 272, "2026": 161}, "dias_ano_cliente": {"2024": {"LM": 28, "SINOMA BLADES": 38}, "2025": {"GE": 272}, "2026": {"GE": 16, "SIEMENS": 17, "NORDEX / LWS": 128}}, "negativos": [], "dias_total": 499, "classificacao": "N1"}, {"mat": "244", "mats": ["244"], "nome": "ALEXANDRE CANTILHO DE OLIVEIRA", "dias_ano": {"2025": 135, "2026": 69}, "dias_ano_cliente": {"2025": {"GE": 135}, "2026": {"GE": 69}}, "negativos": [], "dias_total": 204, "classificacao": "N1"}, {"mat": "194", "mats": ["194"], "nome": "ALEXSANDRO JOSE DA SILVA", "dias_ano": {"2025": 81, "2026": 123}, "dias_ano_cliente": {"2025": {"GE": 61, "SIEMENS": 20}, "2026": {"SIEMENS": 123}}, "negativos": [], "dias_total": 204, "classificacao": "N1"}, {"mat": "7", "mats": ["7"], "nome": "ANDERSON MARTINS SANTOS", "dias_ano": {"2024": 72}, "dias_ano_cliente": {"2024": {"GE": 72}}, "negativos": [], "dias_total": 72, "classificacao": "N2"}, {"mat": "149", "mats": ["149"], "nome": "ANDERSON NUNES FREITAS", "dias_ano": {"2024": 3}, "dias_ano_cliente": {"2024": {"SINOMA BLADES": 3}}, "negativos": [], "dias_total": 3, "classificacao": "N1"}, {"mat": "9002", "mats": ["9002"], "nome": "ANDRE PEREIRA RAMOS", "dias_ano": {"2024": 67}, "dias_ano_cliente": {"2024": {"SIEMENS": 67}}, "negativos": [], "dias_total": 67, "classificacao": null}, {"mat": "169", "mats": ["169", "896"], "nome": "ANGELICA DE LEMOS SCOTT HOOD", "dias_ano": {"2024": 33, "2025": 329}, "dias_ano_cliente": {"2024": {"GE": 33}, "2025": {"GE": 293, "NORDEX / LWS": 36}}, "negativos": [], "dias_total": 362, "classificacao": "N3"}, {"mat": "28", "mats": ["28"], "nome": "ANTONIO CESAR ARAUJO CARDOSO", "dias_ano": {"2024": 220}, "dias_ano_cliente": {"2024": {"GE": 220}}, "negativos": [], "dias_total": 220, "classificacao": "N1"}, {"mat": "21", "mats": ["21", "983"], "nome": "ANTONIO CESAR SILVA CASTRO", "dias_ano": {"2024": 58, "2026": 157}, "dias_ano_cliente": {"2024": {"GE": 58}, "2026": {"NORDEX / LWS": 157}}, "negativos": [], "dias_total": 215, "classificacao": "N1"}, {"mat": "206", "mats": ["206"], "nome": "ANTONIO EDSON BERNARDO DA COSTA", "dias_ano": {"2025": 115, "2026": 129}, "dias_ano_cliente": {"2025": {"GE": 115}, "2026": {"GE": 129}}, "negativos": [], "dias_total": 244, "classificacao": "N1"}, {"mat": "318", "mats": ["318", "979"], "nome": "ANTONIO ERIVAGUINO ALVES MOTA", "dias_ano": {"2026": 160}, "dias_ano_cliente": {"2026": {"NORDEX / LWS": 115, "SIEMENS": 45}}, "negativos": [], "dias_total": 160, "classificacao": "N1"}, {"mat": "54", "mats": ["54"], "nome": "ANTONIO JEFFERSON DO NASCIMENTO SILVA", "dias_ano": {"2024": 9}, "dias_ano_cliente": {"2024": {"GE": 9}}, "negativos": [], "dias_total": 9, "classificacao": "N1"}, {"mat": "140", "mats": ["140"], "nome": "ANTONIO LINDEJUNIO RODRIGUES RAMALHO", "dias_ano": {"2024": 37, "2025": 129, "2026": 69}, "dias_ano_cliente": {"2024": {"SINOMA BLADES": 37}, "2025": {"GE": 129}, "2026": {"GE": 69}}, "negativos": [], "dias_total": 235, "classificacao": null}, {"mat": "4", "mats": ["4"], "nome": "ANTONIO ROMARIO TEIXEIRA DE OLIVEIRA", "dias_ano": {"2024": 63, "2025": 289, "2026": 21}, "dias_ano_cliente": {"2024": {"GE": 29, "SINOMA BLADES": 34}, "2025": {"EÓLICAS BABILÔNIA": 42, "GE": 247}, "2026": {"GE": 21}}, "negativos": [], "dias_total": 373, "classificacao": "N2"}, {"mat": "100", "mats": ["100"], "nome": "ANTONIO VICTOR BANDEIRA FREITAS", "dias_ano": {"2024": 49}, "dias_ano_cliente": {"2024": {"GE": 49}}, "negativos": [], "dias_total": 49, "classificacao": "N1"}, {"mat": "980", "mats": ["980"], "nome": "ANTÔNIO ERIVANDO AGOSTINHO DA SILVA", "dias_ano": {"2026": 138}, "dias_ano_cliente": {"2026": {"NORDEX / LWS": 113, "SIEMENS": 25}}, "negativos": [], "dias_total": 138, "classificacao": "N2"}, {"mat": "364", "mats": ["364"], "nome": "APARECIDO PINTO LAUREANO", "dias_ano": {"2026": 134}, "dias_ano_cliente": {"2026": {"NORDEX / LWS": 134}}, "negativos": [], "dias_total": 134, "classificacao": "N2"}, {"mat": "51", "mats": ["51"], "nome": "ARLINDO DA SILVA FLORINDO", "dias_ano": {"2024": 91, "2025": 321, "2026": 133}, "dias_ano_cliente": {"2024": {"GE": 91}, "2025": {"SIEMENS": 321}, "2026": {"SIEMENS": 133}}, "negativos": [], "dias_total": 545, "classificacao": "N1"}, {"mat": "181", "mats": ["181", "919"], "nome": "ARTHUR LEONIDAS ARAUJO DA SILVA", "dias_ano": {"2025": 255, "2026": 107}, "dias_ano_cliente": {"2025": {"SIEMENS": 99, "GE": 114, "NORDEX / LWS": 42}, "2026": {"NORDEX / LWS": 107}}, "negativos": [], "dias_total": 362, "classificacao": "N2"}, {"mat": "330", "mats": ["330"], "nome": "BELMIRO OLIVEIRA DA SILVA JÚNIOR", "dias_ano": {"2026": 41}, "dias_ano_cliente": {"2026": {"GE": 41}}, "negativos": [], "dias_total": 41, "classificacao": null}, {"mat": "175", "mats": ["175"], "nome": "BRUNO BARBOSA PEREIRA", "dias_ano": {"2025": 235}, "dias_ano_cliente": {"2025": {"SIEMENS": 137, "GE": 98}}, "negativos": [{"data": "16/11/2025", "parque": "SÃO VITOR/BA", "motivo": "SOLICITAÇÃO EXTREME - ABANDONOU PROJETO SEM AVISO PRÉVIO."}], "dias_total": 235, "classificacao": "N3"}, {"mat": "89", "mats": ["89"], "nome": "CAIO DANILO DA SILVA CHAGAS", "dias_ano": {"2024": 190, "2025": 235, "2026": 71}, "dias_ano_cliente": {"2024": {"LM": 1, "GE": 160, "SIEMENS": 29}, "2025": {"SIEMENS": 170, "GE": 65}, "2026": {"SIEMENS": 71}}, "negativos": [], "dias_total": 496, "classificacao": "N1"}, {"mat": "209", "mats": ["209"], "nome": "CARLOS ALBERTO ALVES DE NOJOSE", "dias_ano": {"2025": 237, "2026": 134}, "dias_ano_cliente": {"2025": {"GE": 237}, "2026": {"GE": 134}}, "negativos": [{"data": "18/12/2025", "parque": "COPEL/RN", "motivo": "SOLICITAÇÃO EXTREME - ABANDONOU PROJETO NO MEIO DO ATESTADO"}], "dias_total": 371, "classificacao": "N1"}, {"mat": "357", "mats": ["357"], "nome": "CARLOS ALBERTO MIMO", "dias_ano": {"2026": 63}, "dias_ano_cliente": {"2026": {"GE": 63}}, "negativos": [], "dias_total": 63, "classificacao": null}, {"mat": "44", "mats": ["44"], "nome": "CARLOS EDUARDO RODRIGUES MARQUES", "dias_ano": {"2024": 316, "2025": 307, "2026": 177}, "dias_ano_cliente": {"2024": {"GE": 316}, "2025": {"SIEMENS": 108, "GE": 199}, "2026": {"GE": 177}}, "negativos": [], "dias_total": 800, "classificacao": "N1"}, {"mat": "222", "mats": ["222"], "nome": "CARLOS HENRIQUE  SOUZA DE OLIVEIRA", "dias_ano": {"2025": 124}, "dias_ano_cliente": {"2025": {"GE": 124}}, "negativos": [], "dias_total": 124, "classificacao": "N1"}, {"mat": "225", "mats": ["225"], "nome": "CARLOS ITALO COLIMODIO DOS SANTOS", "dias_ano": {"2026": 112}, "dias_ano_cliente": {"2026": {"SIEMENS": 23, "GE": 89}}, "negativos": [{"data": "16/03/2026", "parque": "TRAIRI/CE", "motivo": "SOLICITAÇÃO EXTREME - SOLICITAÇÃO DE DESMOB A PEDIDO DA SUPERVISÃO POR DESCONFIANÇA DO TÉCNICO ESTAR QUEIMANDO A EMPRESA COM O CLIENTE"}], "dias_total": 112, "classificacao": "N3"}, {"mat": "5", "mats": ["5"], "nome": "CEZAR VINICIUS SIMOES DE SOUZA", "dias_ano": {"2024": 72}, "dias_ano_cliente": {"2024": {"GE": 72}}, "negativos": [], "dias_total": 72, "classificacao": "N1"}, {"mat": "36", "mats": ["36"], "nome": "CLAUDIO NICOLAS SILVA JORGE", "dias_ano": {"2024": 66}, "dias_ano_cliente": {"2024": {"GE": 66}}, "negativos": [], "dias_total": 66, "classificacao": "N1"}, {"mat": "361", "mats": ["361"], "nome": "CLEIDE DIAS SANTOS", "dias_ano": {"2026": 24}, "dias_ano_cliente": {"2026": {"GE": 24}}, "negativos": [], "dias_total": 24, "classificacao": null}, {"mat": "161", "mats": ["161"], "nome": "CLEILTON PAULINO SOUZA", "dias_ano": {"2024": 30}, "dias_ano_cliente": {"2024": {"SINOMA BLADES": 30}}, "negativos": [], "dias_total": 30, "classificacao": null}, {"mat": "69", "mats": ["69"], "nome": "CLEITON RODRIGO NUNES DA SILVA", "dias_ano": {"2024": 121}, "dias_ano_cliente": {"2024": {"GE": 121}}, "negativos": [{"data": "28/06/2024", "parque": "OITIS/PI", "motivo": "SOLICITAÇÃO EXTREME - ABANDONO DE EMPREGO"}], "dias_total": 121, "classificacao": "N3"}, {"mat": "82", "mats": ["82"], "nome": "CRISTIAN FERREIRA DA SILVA", "dias_ano": {"2024": 175, "2025": 263, "2026": 69}, "dias_ano_cliente": {"2024": {"GE": 175}, "2025": {"GE": 263}, "2026": {"SIEMENS": 57, "GE": 12}}, "negativos": [], "dias_total": 507, "classificacao": "N1"}, {"mat": "346", "mats": ["346"], "nome": "CÉLIO RICARDO LUCCAS", "dias_ano": {"2026": 51}, "dias_ano_cliente": {"2026": {"GE": 51}}, "negativos": [], "dias_total": 51, "classificacao": null}, {"mat": "137", "mats": ["137"], "nome": "DANIEL AZEVEDO KLEM DE MATTOS", "dias_ano": {"2024": 26}, "dias_ano_cliente": {"2024": {"GE": 26}}, "negativos": [], "dias_total": 26, "classificacao": "N3"}, {"mat": "332", "mats": ["332"], "nome": "DANIEL CASTRO REIS LOBO", "dias_ano": {"2026": 35}, "dias_ano_cliente": {"2026": {"SIEMENS": 35}}, "negativos": [{"data": "22/03/2026", "parque": "SÃO VITOR/BA", "motivo": "SOLICITAÇÃO EXTREME - DESMOBILIZAÇÃO POR PROBLEMAS COMPORTAMENTAIS E CONFLITO COM OUTRO TÉCNICO ALEXSANDRO JOSÉ"}], "dias_total": 35, "classificacao": "N1"}, {"mat": "314", "mats": ["314"], "nome": "DANIEL OLIVEIRA ARAÚJO", "dias_ano": {"2026": 5}, "dias_ano_cliente": {"2026": {"GE": 5}}, "negativos": [{"data": "21/01/2026", "parque": "OITIS/PI", "motivo": "SOLICITAÇÃO EXTREME - ABANDONOU PROJETO PARA ATENDER OUTRA EMPRESA"}], "dias_total": 5, "classificacao": "N3"}, {"mat": "73", "mats": ["73"], "nome": "DANIEL VITOR ALENCAR RODRIGUES", "dias_ano": {"2024": 149}, "dias_ano_cliente": {"2024": {"GE": 149}}, "negativos": [], "dias_total": 149, "classificacao": "N2"}, {"mat": "135", "mats": ["135"], "nome": "DAVI RIBEIRO DE MORAIS", "dias_ano": {"2024": 64, "2025": 45, "2026": 16}, "dias_ano_cliente": {"2024": {"GE": 64}, "2025": {"SIEMENS": 45}, "2026": {"GE": 16}}, "negativos": [{"data": "06/04/2026", "parque": "OITIS/PI", "motivo": "SOLICITAÇÃO EXTREME - TÉCNICO ABANDONOU O PROJETO APÓS DESENTENDIMENTO COM OUTRO TÉCNICO E TENTATIVA DE HOMÍCIDIO"}], "dias_total": 125, "classificacao": "N3"}, {"mat": "285", "mats": ["285"], "nome": "DIEGO BARBOSA DA SILVA", "dias_ano": {"2026": 51}, "dias_ano_cliente": {"2026": {"SIEMENS": 51}}, "negativos": [], "dias_total": 51, "classificacao": "N1"}, {"mat": "267", "mats": ["267"], "nome": "DIEGO DE SOUZA NARCISO", "dias_ano": {"2025": 148}, "dias_ano_cliente": {"2025": {"GE": 148}}, "negativos": [], "dias_total": 148, "classificacao": "N3"}, {"mat": "170", "mats": ["170"], "nome": "DIEGO ELIAS SEZINI DA SILVA GONÇALVES", "dias_ano": {"2025": 111, "2026": 33}, "dias_ano_cliente": {"2025": {"SIEMENS": 111}, "2026": {"SIEMENS": 33}}, "negativos": [], "dias_total": 144, "classificacao": "N3"}, {"mat": "269", "mats": ["269"], "nome": "DIEGO PEREIRA BERNARDINO", "dias_ano": {"2026": 108}, "dias_ano_cliente": {"2026": {"SIEMENS": 108}}, "negativos": [], "dias_total": 108, "classificacao": "N1"}, {"mat": "15", "mats": ["15"], "nome": "DIEGO RIBEIRO SERRA DE OLIVEIRA", "dias_ano": {"2024": 25}, "dias_ano_cliente": {"2024": {"GE": 25}}, "negativos": [], "dias_total": 25, "classificacao": "N2"}, {"mat": "960", "mats": ["960"], "nome": "EDINEI MATOS GONCALVES", "dias_ano": {"2026": 25}, "dias_ano_cliente": {"2026": {"NORDEX / LWS": 25}}, "negativos": [], "dias_total": 25, "classificacao": "N2"}, {"mat": "95", "mats": ["95"], "nome": "EDMUNDO LIRA DA SILVA FILHO", "dias_ano": {"2024": 60}, "dias_ano_cliente": {"2024": {"SIEMENS": 60}}, "negativos": [], "dias_total": 60, "classificacao": "N1"}, {"mat": "349", "mats": ["349"], "nome": "EDUARDO DANIEL DA ROSA", "dias_ano": {"2026": 37}, "dias_ano_cliente": {"2026": {"GE": 37}}, "negativos": [], "dias_total": 37, "classificacao": null}, {"mat": "345", "mats": ["345"], "nome": "EDUARDO JOSE DE SANTANA", "dias_ano": {"2026": 116}, "dias_ano_cliente": {"2026": {"GE": 116}}, "negativos": [], "dias_total": 116, "classificacao": null}, {"mat": "246", "mats": ["246"], "nome": "EDUARDO NUNES DOS SANTOS JUNIOR", "dias_ano": {"2025": 32}, "dias_ano_cliente": {"2025": {"GE": 32}}, "negativos": [], "dias_total": 32, "classificacao": "N1"}, {"mat": "308", "mats": ["308"], "nome": "ELIELSON SANTOS DA SILVA", "dias_ano": {"2026": 175}, "dias_ano_cliente": {"2026": {"GE": 141, "SIEMENS": 34}}, "negativos": [], "dias_total": 175, "classificacao": "N3"}, {"mat": "70", "mats": ["70"], "nome": "ELISEU DE SOUZA NASCIMENTO", "dias_ano": {"2024": 143}, "dias_ano_cliente": {"2024": {"GE": 143}}, "negativos": [], "dias_total": 143, "classificacao": "N3"}, {"mat": "325", "mats": ["325"], "nome": "ELSON OLIVEIRA GOMES", "dias_ano": {"2026": 139}, "dias_ano_cliente": {"2026": {"GE": 139}}, "negativos": [], "dias_total": 139, "classificacao": "N3"}, {"mat": "380", "mats": ["380"], "nome": "ELVIS AZEVEDO RODRIGUES", "dias_ano": {"2026": 17}, "dias_ano_cliente": {"2026": {"GE": 17}}, "negativos": [{"data": "26/06/2026", "parque": "TRAIRI/CE", "motivo": "SOLICITAÇÃO EXTREME - ABANDONOU PROJETO PARA REALIZAR UM CURSO EM NATAL"}], "dias_total": 17, "classificacao": "N3"}, {"mat": "187", "mats": ["187"], "nome": "ELVIS BAZETH DE AGUIAR", "dias_ano": {"2025": 75}, "dias_ano_cliente": {"2025": {"SIEMENS": 75}}, "negativos": [], "dias_total": 75, "classificacao": "N3"}, {"mat": "249", "mats": ["249"], "nome": "EMANUEL ISAAC DO NASCIMENTO CELES SILVA", "dias_ano": {"2025": 34}, "dias_ano_cliente": {"2025": {"GE": 34}}, "negativos": [], "dias_total": 34, "classificacao": "N1"}, {"mat": "218", "mats": ["218"], "nome": "EMERSON DE MORAES MANOEL", "dias_ano": {"2025": 78}, "dias_ano_cliente": {"2025": {"GE": 61, "SIEMENS": 17}}, "negativos": [], "dias_total": 78, "classificacao": "N1"}, {"mat": "268", "mats": ["268"], "nome": "EVERTON MONTEIRO DA SILVA", "dias_ano": {"2025": 141, "2026": 117}, "dias_ano_cliente": {"2025": {"GE": 141}, "2026": {"GE": 117}}, "negativos": [], "dias_total": 258, "classificacao": "N3"}, {"mat": "50", "mats": ["50"], "nome": "EZEQUIAS BARROS UCHOA", "dias_ano": {"2024": 76}, "dias_ano_cliente": {"2024": {"GE": 58, "LM": 18}}, "negativos": [], "dias_total": 76, "classificacao": "N1"}, {"mat": "259", "mats": ["259"], "nome": "FABIANO MEDEIROS DE ALMEIDA", "dias_ano": {"2025": 76, "2026": 140}, "dias_ano_cliente": {"2025": {"GE": 76}, "2026": {"GE": 81, "SIEMENS": 59}}, "negativos": [], "dias_total": 216, "classificacao": "N3"}, {"mat": "347", "mats": ["347"], "nome": "FABIO FRANCISCO DE SOUSA", "dias_ano": {"2026": 34}, "dias_ano_cliente": {"2026": {"GE": 34}}, "negativos": [], "dias_total": 34, "classificacao": null}, {"mat": "131", "mats": ["131"], "nome": "FABIO LUIS DA LUZ PAZ", "dias_ano": {"2024": 108}, "dias_ano_cliente": {"2024": {"GE": 108}}, "negativos": [{"data": "06/12/2024", "parque": "SERRA DA BABILÔNIA/BA", "motivo": "SOLICITAÇÃO EXTREME - ABANDONO DE EMPREGO ALEGANDO QUESTÕES DE SAÚDE"}], "dias_total": 108, "classificacao": "N3"}, {"mat": "30", "mats": ["30", "897"], "nome": "FELIPE DE LIMA SERPA", "dias_ano": {"2024": 291, "2025": 309, "2026": 217}, "dias_ano_cliente": {"2024": {"GE": 286, "SINOMA BLADES": 5}, "2025": {"GE": 159, "NORDEX / LWS": 150}, "2026": {"GE": 217}}, "negativos": [], "dias_total": 817, "classificacao": "N2"}, {"mat": "120", "mats": ["120"], "nome": "FELIPE DIAS COSTA", "dias_ano": {"2024": 45, "2025": 307}, "dias_ano_cliente": {"2024": {"GE": 45}, "2025": {"GE": 307}}, "negativos": [], "dias_total": 352, "classificacao": "N1"}, {"mat": "199", "mats": ["199"], "nome": "FELIPE GASPAR DE OLIVEIRA MARTINS", "dias_ano": {"2025": 34}, "dias_ano_cliente": {"2025": {"GE": 34}}, "negativos": [], "dias_total": 34, "classificacao": "N1"}, {"mat": "286", "mats": ["286"], "nome": "FELIPE HENRICHS COTTY DOS SANTOS", "dias_ano": {"2026": 37}, "dias_ano_cliente": {"2026": {"SIEMENS": 37}}, "negativos": [], "dias_total": 37, "classificacao": "N3"}, {"mat": "71", "mats": ["71"], "nome": "FELIPE RAMOS SILVA", "dias_ano": {"2024": 100}, "dias_ano_cliente": {"2024": {"GE": 100}}, "negativos": [], "dias_total": 100, "classificacao": "N3"}, {"mat": "182", "mats": ["182"], "nome": "FERNANDO PRUDENCIO FLORIANO", "dias_ano": {"2025": 64}, "dias_ano_cliente": {"2025": {"SIEMENS": 64}}, "negativos": [], "dias_total": 64, "classificacao": "N3"}, {"mat": "200", "mats": ["200"], "nome": "FLAVIANE SOUZA DO NASCIMENTO", "dias_ano": {"2025": 45}, "dias_ano_cliente": {"2025": {"SIEMENS": 45}}, "negativos": [], "dias_total": 45, "classificacao": "N3"}, {"mat": "55", "mats": ["55"], "nome": "FLAVIO CARNEIRO DE SOUSA JUNIOR", "dias_ano": {"2024": 238}, "dias_ano_cliente": {"2024": {"GE": 238}}, "negativos": [], "dias_total": 238, "classificacao": "N1"}, {"mat": "126", "mats": ["126"], "nome": "FLAVIO JOSE DA SILVA", "dias_ano": {"2024": 19}, "dias_ano_cliente": {"2024": {"GE": 19}}, "negativos": [], "dias_total": 19, "classificacao": "N1"}, {"mat": "219", "mats": ["219"], "nome": "FRANCIELDER DOS SANTOS GOMES", "dias_ano": {"2025": 233, "2026": 105}, "dias_ano_cliente": {"2025": {"GE": 233}, "2026": {"GE": 105}}, "negativos": [], "dias_total": 338, "classificacao": "N1"}, {"mat": "243", "mats": ["243"], "nome": "FRANCISCO ANDRIELTON DOS SANTOS FERREIRA", "dias_ano": {"2025": 141, "2026": 46}, "dias_ano_cliente": {"2025": {"GE": 141}, "2026": {"GE": 46}}, "negativos": [], "dias_total": 187, "classificacao": "N1"}, {"mat": "188", "mats": ["188"], "nome": "FRANCISCO DANISIO TRAJANO DE GOIS DOS SANTOS", "dias_ano": {"2025": 89}, "dias_ano_cliente": {"2025": {"SIEMENS": 22, "GE": 67}}, "negativos": [], "dias_total": 89, "classificacao": "N1"}, {"mat": "210", "mats": ["210"], "nome": "FRANCISCO DE ASSIS AZEVEDO PEREIRA", "dias_ano": {"2025": 41}, "dias_ano_cliente": {"2025": {"GE": 41}}, "negativos": [], "dias_total": 41, "classificacao": "N3"}, {"mat": "220", "mats": ["220"], "nome": "FRANCISCO DE ASSIS NUNES DA SILVA", "dias_ano": {"2025": 21, "2026": 159}, "dias_ano_cliente": {"2025": {"SIEMENS": 21}, "2026": {"SIEMENS": 102, "GE": 57}}, "negativos": [], "dias_total": 180, "classificacao": null}, {"mat": "10", "mats": ["10"], "nome": "FRANCISCO DEIDE BRAUNA DE HOLANDA", "dias_ano": {"2024": 11}, "dias_ano_cliente": {"2024": {"GE": 11}}, "negativos": [], "dias_total": 11, "classificacao": "N1"}, {"mat": "328", "mats": ["328"], "nome": "FRANCISCO DJONES MOURA DE AGUIAR", "dias_ano": {"2026": 55}, "dias_ano_cliente": {"2026": {"GE": 55}}, "negativos": [], "dias_total": 55, "classificacao": null}, {"mat": "971", "mats": ["971"], "nome": "FRANCISCO EDVANDO BARBOSA DE OLIVEIRA MATIAS", "dias_ano": {"2026": 139}, "dias_ano_cliente": {"2026": {"NORDEX / LWS": 139}}, "negativos": [], "dias_total": 139, "classificacao": "N1"}, {"mat": "186", "mats": ["186"], "nome": "FRANCISCO ELDER DO NASCIMENTO OLIVEIRA", "dias_ano": {"2025": 233}, "dias_ano_cliente": {"2025": {"GE": 233}}, "negativos": [], "dias_total": 233, "classificacao": "N1"}, {"mat": "292", "mats": ["292"], "nome": "FRANCISCO ELINALDO SILVA QUINTO", "dias_ano": {"2025": 35, "2026": 217}, "dias_ano_cliente": {"2025": {"GE": 35}, "2026": {"GE": 217}}, "negativos": [], "dias_total": 252, "classificacao": "N1"}, {"mat": "305", "mats": ["305"], "nome": "FRANCISCO EVERSON BARBOSA VASCONCELOS", "dias_ano": {"2026": 111}, "dias_ano_cliente": {"2026": {"GE": 111}}, "negativos": [], "dias_total": 111, "classificacao": "N1"}, {"mat": "213", "mats": ["213"], "nome": "FRANCISCO JOEL MENEZES DA COSTA", "dias_ano": {"2025": 38, "2026": 26}, "dias_ano_cliente": {"2025": {"SIEMENS": 38}, "2026": {"SIEMENS": 26}}, "negativos": [{"data": "05/02/2026", "parque": "TRAIRI/CE", "motivo": "SOLICITAÇÃO CLIENTE SIEMENS - DESMOBILIZAÇÃO POR ABANDONO DE PROJETO PARA ATENDER OUTRA EMPRESA NO EXTERIOR"}], "dias_total": 64, "classificacao": "N2"}, {"mat": "358", "mats": ["358"], "nome": "FRANCISCO LEONE BEZERRA DA SILVA", "dias_ano": {"2026": 70}, "dias_ano_cliente": {"2026": {"GE": 70}}, "negativos": [], "dias_total": 70, "classificacao": "N1"}, {"mat": "141", "mats": ["141"], "nome": "FRANCISCO LUCAS DE OLIVEIRA RODRIGUES", "dias_ano": {"2024": 58, "2025": 224, "2026": 181}, "dias_ano_cliente": {"2024": {"SINOMA BLADES": 37, "VESTAS": 2, "SIEMENS": 19}, "2025": {"SIEMENS": 140, "GE": 84}, "2026": {"SIEMENS": 116, "GE": 65}}, "negativos": [], "dias_total": 463, "classificacao": "N1"}, {"mat": "254", "mats": ["254"], "nome": "FRANCISCO MILLER SILVA DE SOUSA", "dias_ano": {"2025": 99}, "dias_ano_cliente": {"2025": {"GE": 99}}, "negativos": [{"data": "25/12/2025", "parque": "COPEL/RN", "motivo": "SOLICITAÇÃO EXTREME - ABANDONOU PROJETO PARA ATENDER OUTRA EMPRESA"}], "dias_total": 99, "classificacao": "N1"}, {"mat": "257", "mats": ["257"], "nome": "FRANCISCO TADEU DE OLIVEIRA FILHO", "dias_ano": {"2025": 104, "2026": 93}, "dias_ano_cliente": {"2025": {"GE": 104}, "2026": {"GE": 93}}, "negativos": [], "dias_total": 197, "classificacao": "N1"}, {"mat": "150", "mats": ["150"], "nome": "FRANCISCO THIAGO DUARTE DE FREITAS", "dias_ano": {"2024": 12}, "dias_ano_cliente": {"2024": {"SINOMA BLADES": 12}}, "negativos": [], "dias_total": 12, "classificacao": null}, {"mat": "342", "mats": ["342"], "nome": "FRANCISCO VAGNER DOS SANTOS PEREIRA", "dias_ano": {"2026": 35}, "dias_ano_cliente": {"2026": {"GE": 35}}, "negativos": [], "dias_total": 35, "classificacao": null}, {"mat": "299", "mats": ["299", "972"], "nome": "FRANCISCO WESLEY DE MESQUITA", "dias_ano": {"2025": 26, "2026": 26}, "dias_ano_cliente": {"2025": {"GE": 26}, "2026": {"NORDEX / LWS": 26}}, "negativos": [], "dias_total": 52, "classificacao": "N2"}, {"mat": "109", "mats": ["109"], "nome": "FRANCISCO YURI DA SILVA", "dias_ano": {"2024": 202, "2025": 44}, "dias_ano_cliente": {"2024": {"GE": 202}, "2025": {"GE": 10, "SIEMENS": 34}}, "negativos": [{"data": "07/03/2025", "parque": "VSM/RN", "motivo": "SOLICITAÇÃO EXTREME - ABANDONO DE EMPREGO ALEGANDO ATENDER OUTRA EMPRESA"}], "dias_total": 246, "classificacao": "N1"}, {"mat": "189", "mats": ["189"], "nome": "FRANCSICO AVILA LIMA DA SILVA", "dias_ano": {"2025": 135, "2026": 202}, "dias_ano_cliente": {"2025": {"GE": 80, "SIEMENS": 55}, "2026": {"SIEMENS": 202}}, "negativos": [], "dias_total": 337, "classificacao": "N1"}, {"mat": "338", "mats": ["338"], "nome": "GABRIEL HENRIQUE SANTOS LINO", "dias_ano": {"2026": 41}, "dias_ano_cliente": {"2026": {"GE": 41}}, "negativos": [], "dias_total": 41, "classificacao": null}, {"mat": "201", "mats": ["201"], "nome": "GABRIEL RODRIGUES DE LIMA", "dias_ano": {"2025": 85}, "dias_ano_cliente": {"2025": {"EÓLICAS BABILÔNIA": 19, "GE": 66}}, "negativos": [], "dias_total": 85, "classificacao": "N3"}, {"mat": "228", "mats": ["228"], "nome": "GEPSON GILMAR LIRA TEIXEIRA", "dias_ano": {"2025": 57}, "dias_ano_cliente": {"2025": {"SIEMENS": 57}}, "negativos": [], "dias_total": 57, "classificacao": null}, {"mat": "973", "mats": ["973"], "nome": "GERSEY JONATHAN MANO LADISLAU", "dias_ano": {"2026": 68}, "dias_ano_cliente": {"2026": {"NORDEX / LWS": 68}}, "negativos": [{"data": "15/04/2026", "parque": "SÃO FERNANDO/RN", "motivo": "SOLICITAÇÃO LEAN WAY - DESMOBILIZAÇÃO POR PROBLEMAS COMPORTAMENTAMENTAIS E OMIÇÃO REAL DE PRODUTIVIDADE E PROBLEMAS COM ALTURA"}], "dias_total": 68, "classificacao": "N1"}, {"mat": "101", "mats": ["101"], "nome": "GUILHERME FERREIRA LOPES", "dias_ano": {"2024": 58, "2025": 49}, "dias_ano_cliente": {"2024": {"SIEMENS": 58}, "2025": {"SIEMENS": 49}}, "negativos": [], "dias_total": 107, "classificacao": "N1"}, {"mat": "91", "mats": ["91"], "nome": "GUSTAVO HENRIQUE ALVES DA SILVA", "dias_ano": {"2024": 184, "2025": 316, "2026": 204}, "dias_ano_cliente": {"2024": {"LM": 72, "GE": 112}, "2025": {"GE": 316}, "2026": {"GE": 170, "SIEMENS": 34}}, "negativos": [], "dias_total": 704, "classificacao": "N1"}, {"mat": "132", "mats": ["132"], "nome": "GUSTAVO RABELAIS BANDEIRA DE MELLO CANTANHEDA", "dias_ano": {"2024": 38}, "dias_ano_cliente": {"2024": {"GE": 38}}, "negativos": [{"data": "14/09/2024", "parque": "OITIS/PI", "motivo": "SOLICITAÇÃO EXTREME - DESMOBILIZAÇÃO POR INDISCIPLINA"}], "dias_total": 38, "classificacao": "N3"}, {"mat": "86", "mats": ["86"], "nome": "HEBERT JANOS DE SOUZA PEREIRA", "dias_ano": {"2024": 5}, "dias_ano_cliente": {"2024": {"GE": 5}}, "negativos": [], "dias_total": 5, "classificacao": "N3"}, {"mat": "105", "mats": ["105", "935"], "nome": "HELIO COSTA DE FREITAS", "dias_ano": {"2024": 106, "2025": 292, "2026": 184}, "dias_ano_cliente": {"2024": {"SIEMENS": 67, "GE": 39}, "2025": {"GE": 292}, "2026": {"NORDEX / LWS": 145, "GE": 39}}, "negativos": [], "dias_total": 582, "classificacao": "N2"}, {"mat": "25", "mats": ["25"], "nome": "IGOR COSTA", "dias_ano": {"2024": 168}, "dias_ano_cliente": {"2024": {"GE": 168}}, "negativos": [], "dias_total": 168, "classificacao": "N3"}, {"mat": "343", "mats": ["343"], "nome": "IGOR PEREIRA DE OLIVEIRA", "dias_ano": {"2026": 67}, "dias_ano_cliente": {"2026": {"GE": 67}}, "negativos": [{"data": "30/04/2026", "parque": "LDV3/PI", "motivo": "SOLICITAÇÃO EXTREME - ABANDONOU PROJETO POR MOTIVOS PESSOAIS"}], "dias_total": 67, "classificacao": null}, {"mat": "247", "mats": ["247"], "nome": "ISRAEL SOARES DE MATOS", "dias_ano": {"2025": 82}, "dias_ano_cliente": {"2025": {"GE": 57, "SIEMENS": 25}}, "negativos": [], "dias_total": 82, "classificacao": "N3"}, {"mat": "221", "mats": ["221"], "nome": "JAIR DUTRA JUNIOR", "dias_ano": {"2025": 221, "2026": 179}, "dias_ano_cliente": {"2025": {"SIEMENS": 221}, "2026": {"SIEMENS": 179}}, "negativos": [], "dias_total": 400, "classificacao": "N3"}, {"mat": "163", "mats": ["163"], "nome": "JARDEL BARBOSA DOS SANTOS", "dias_ano": {"2024": 33}, "dias_ano_cliente": {"2024": {"SINOMA BLADES": 31, "VESTAS": 2}}, "negativos": [], "dias_total": 33, "classificacao": null}, {"mat": "341", "mats": ["341"], "nome": "JARDERSON COSTA NASCIMENTO", "dias_ano": {"2026": 97}, "dias_ano_cliente": {"2026": {"GE": 97}}, "negativos": [], "dias_total": 97, "classificacao": null}, {"mat": "192", "mats": ["192"], "nome": "JEFERSON APARECIDO ANTENOR", "dias_ano": {"2025": 159, "2026": 195}, "dias_ano_cliente": {"2025": {"GE": 138, "SIEMENS": 21}, "2026": {"SIEMENS": 195}}, "negativos": [], "dias_total": 354, "classificacao": "N1"}, {"mat": "270", "mats": ["270"], "nome": "JEFERSON DA ROCHA CARDOSO", "dias_ano": {"2025": 23}, "dias_ano_cliente": {"2025": {"GE": 23}}, "negativos": [], "dias_total": 23, "classificacao": "N1"}, {"mat": "377", "mats": ["377"], "nome": "JOAB BEZERRA DE SALES", "dias_ano": {"2026": 66}, "dias_ano_cliente": {"2026": {"SIEMENS": 66}}, "negativos": [], "dias_total": 66, "classificacao": "N3"}, {"mat": "195", "mats": ["195"], "nome": "JOAO ANDRADE SANTOS NETO", "dias_ano": {"2025": 26}, "dias_ano_cliente": {"2025": {"SIEMENS": 14, "EÓLICAS BABILÔNIA": 12}}, "negativos": [], "dias_total": 26, "classificacao": "N3"}, {"mat": "239", "mats": ["239"], "nome": "JOAO PAULO SILVA SANTOS", "dias_ano": {"2025": 13, "2026": 80}, "dias_ano_cliente": {"2025": {"GE": 13}, "2026": {"SIEMENS": 80}}, "negativos": [], "dias_total": 93, "classificacao": "N2"}, {"mat": "340", "mats": ["340"], "nome": "JOAO TORQUATO DA SILVA NETO", "dias_ano": {"2026": 95}, "dias_ano_cliente": {"2026": {"GE": 95}}, "negativos": [], "dias_total": 95, "classificacao": null}, {"mat": "204", "mats": ["204"], "nome": "JOAO VIANEI LUZ", "dias_ano": {"2025": 67}, "dias_ano_cliente": {"2025": {"GE": 67}}, "negativos": [{"data": "30/05/2025", "parque": "UMBURANAS/BA", "motivo": "SOLICITAÇÃO EXTREME - DESMOBILIZOU POR CONTA PRÓPRIA ABANDONANDO PROJETO E MATERIAIS"}], "dias_total": 67, "classificacao": "N3"}, {"mat": "127", "mats": ["127"], "nome": "JOAO VICTOR BENTO DE SOUZA", "dias_ano": {"2024": 33, "2025": 285, "2026": 168}, "dias_ano_cliente": {"2024": {"GE": 14, "SIEMENS": 19}, "2025": {"SIEMENS": 126, "GE": 159}, "2026": {"GE": 14, "SIEMENS": 154}}, "negativos": [], "dias_total": 486, "classificacao": "N1"}, {"mat": "92", "mats": ["92"], "nome": "JODEVAL DA SILVA ROSA JUNIOR", "dias_ano": {"2024": 60}, "dias_ano_cliente": {"2024": {"LM": 55, "SINOMA BLADES": 5}}, "negativos": [], "dias_total": 60, "classificacao": null}, {"mat": "49", "mats": ["49"], "nome": "JOHN LENON VIEIRA ALVES", "dias_ano": {"2024": 321, "2025": 303, "2026": 208}, "dias_ano_cliente": {"2024": {"GE": 321}, "2025": {"GE": 303}, "2026": {"GE": 208}}, "negativos": [], "dias_total": 832, "classificacao": "N1"}, {"mat": "29", "mats": ["29", "932"], "nome": "JONATO DIAS FEITOZA", "dias_ano": {"2024": 174, "2025": 273, "2026": 195}, "dias_ano_cliente": {"2024": {"GE": 174}, "2025": {"GE": 231, "NORDEX / LWS": 42}, "2026": {"GE": 88, "NORDEX / LWS": 107}}, "negativos": [{"data": "04/08/2024", "parque": "SÃO CLEMENTE/PE", "motivo": "SOLICITAÇÃO EXTREME - FOLGOU E NÃO RETORNOU"}], "dias_total": 642, "classificacao": "N1"}, {"mat": "378", "mats": ["378"], "nome": "JORGE JOSÉ RUFINO DE OLIVEIRA", "dias_ano": {"2026": 25}, "dias_ano_cliente": {"2026": {"SIEMENS": 25}}, "negativos": [], "dias_total": 25, "classificacao": "N2"}, {"mat": "344", "mats": ["344"], "nome": "JOSE AIRTON MOREIRA DE SOUSA", "dias_ano": {"2026": 98}, "dias_ano_cliente": {"2026": {"GE": 98}}, "negativos": [], "dias_total": 98, "classificacao": null}, {"mat": "102", "mats": ["102"], "nome": "JOSE AMERICO DA SILVA FILHO", "dias_ano": {"2024": 60}, "dias_ano_cliente": {"2024": {"GE": 60}}, "negativos": [], "dias_total": 60, "classificacao": "N1"}, {"mat": "93", "mats": ["93"], "nome": "JOSE ANTONIO DA SILVA FILHO", "dias_ano": {"2024": 92, "2025": 57}, "dias_ano_cliente": {"2024": {"LM": 54, "SINOMA BLADES": 38}, "2025": {"SIEMENS": 57}}, "negativos": [], "dias_total": 149, "classificacao": null}, {"mat": "113", "mats": ["113"], "nome": "JOSE ANTONIO DE PAULA MACHADO LIBANIO JUNIOR", "dias_ano": {"2024": 68}, "dias_ano_cliente": {"2024": {"GE": 68}}, "negativos": [], "dias_total": 68, "classificacao": "N3"}, {"mat": "39", "mats": ["39"], "nome": "JOSE DA SILVA DE FREITAS", "dias_ano": {"2024": 110}, "dias_ano_cliente": {"2024": {"GE": 110}}, "negativos": [], "dias_total": 110, "classificacao": "N1"}, {"mat": "915", "mats": ["915"], "nome": "JOSE GEISON DE OLIVEIRA RODRIGUES", "dias_ano": {"2025": 69}, "dias_ano_cliente": {"2025": {"NORDEX / LWS": 69}}, "negativos": [], "dias_total": 69, "classificacao": "N1"}, {"mat": "350", "mats": ["350"], "nome": "JOSE GLEIBSON DE SOUZA", "dias_ano": {"2026": 81}, "dias_ano_cliente": {"2026": {"GE": 81}}, "negativos": [], "dias_total": 81, "classificacao": "N1"}, {"mat": "176", "mats": ["176"], "nome": "JOSE INACIO PIMENTEL ROSSI", "dias_ano": {"2025": 131}, "dias_ano_cliente": {"2025": {"GE": 131}}, "negativos": [], "dias_total": 131, "classificacao": "N3"}, {"mat": "110", "mats": ["110"], "nome": "JOSE MARIA DA SILVA ALBERTO", "dias_ano": {"2024": 75}, "dias_ano_cliente": {"2024": {"GE": 75}}, "negativos": [], "dias_total": 75, "classificacao": "N1"}, {"mat": "111", "mats": ["111", "982"], "nome": "JOSE MILTON ANDRADE DA SILVA", "dias_ano": {"2024": 114, "2026": 88}, "dias_ano_cliente": {"2024": {"GE": 114}, "2026": {"SIEMENS": 42, "NORDEX / LWS": 46}}, "negativos": [{"data": "18/10/2024", "parque": "FONTE DOS VENTOS/PE", "motivo": "SOLICITAÇÃO CLIENTE GE - DESMOBILIZAÇÃO POR BRIGA INTERPESSOAL NA EQUIPE E PROBLEMAS COMPORTAMENTAIS NA DESMOBILIZAÇÃO"}], "dias_total": 202, "classificacao": "N1"}, {"mat": "322", "mats": ["322"], "nome": "JOSE ORLI COSTA LIMA", "dias_ano": {"2026": 95}, "dias_ano_cliente": {"2026": {"SIEMENS": 95}}, "negativos": [], "dias_total": 95, "classificacao": "N1"}, {"mat": "207", "mats": ["207", "969"], "nome": "JOSE WEDESON MENEZES DA COSTA", "dias_ano": {"2025": 65, "2026": 173}, "dias_ano_cliente": {"2025": {"SIEMENS": 65}, "2026": {"NORDEX / LWS": 173}}, "negativos": [], "dias_total": 238, "classificacao": "N2"}, {"mat": "313", "mats": ["313"], "nome": "JOÃO VITOR RAMOS DE SOUZA", "dias_ano": {"2026": 20}, "dias_ano_cliente": {"2026": {"SIEMENS": 20}}, "negativos": [], "dias_total": 20, "classificacao": "N1"}, {"mat": "240", "mats": ["240"], "nome": "KAYWAN FELIPE MARQUES SILVA", "dias_ano": {"2025": 187, "2026": 131}, "dias_ano_cliente": {"2025": {"GE": 187}, "2026": {"GE": 131}}, "negativos": [], "dias_total": 318, "classificacao": "N2"}, {"mat": "142", "mats": ["142"], "nome": "KLEBER DE SOUZA SANTIAGO", "dias_ano": {"2024": 26}, "dias_ano_cliente": {"2024": {"SINOMA BLADES": 26}}, "negativos": [{"data": "25/10/2024", "parque": "SINOMA FÁBRICA/BA", "motivo": "SOLICITAÇÃO EXTREME - PROBLEMA INTERPESSOAL COM A EQUIPE E LIDERANÇA"}], "dias_total": 26, "classificacao": null}, {"mat": "253", "mats": ["253"], "nome": "KLEBER LUCAS RAMOS", "dias_ano": {"2025": 106, "2026": 40}, "dias_ano_cliente": {"2025": {"GE": 106}, "2026": {"GE": 40}}, "negativos": [], "dias_total": 146, "classificacao": null}, {"mat": "27", "mats": ["27", "261"], "nome": "LAECIO FELIPE DE OLIVEIRA MOURA", "dias_ano": {"2024": 172, "2025": 107}, "dias_ano_cliente": {"2024": {"GE": 172}, "2025": {"GE": 107}}, "negativos": [], "dias_total": 279, "classificacao": "N1"}, {"mat": "298", "mats": ["298"], "nome": "LEANDRO DE OLIVEIRA BELO", "dias_ano": {"2025": 16}, "dias_ano_cliente": {"2025": {"GE": 16}}, "negativos": [], "dias_total": 16, "classificacao": "N3"}, {"mat": "324", "mats": ["324"], "nome": "LEANDRO ROSA DE OLIVEIRA", "dias_ano": {"2026": 96}, "dias_ano_cliente": {"2026": {"SIEMENS": 96}}, "negativos": [], "dias_total": 96, "classificacao": "N3"}, {"mat": "279", "mats": ["279", "937"], "nome": "LENNON ALMEIDA DE SOUZA", "dias_ano": {"2025": 25, "2026": 167}, "dias_ano_cliente": {"2025": {"GE": 25}, "2026": {"GE": 57, "NORDEX / LWS": 110}}, "negativos": [], "dias_total": 192, "classificacao": "N1"}, {"mat": "61", "mats": ["61"], "nome": "LEONARDO COELHO DA SILVA", "dias_ano": {"2024": 81}, "dias_ano_cliente": {"2024": {"GE": 81}}, "negativos": [], "dias_total": 81, "classificacao": "N3"}, {"mat": "48", "mats": ["48"], "nome": "LERNITON SILVA DE ANDRADE", "dias_ano": {"2024": 183, "2025": 235, "2026": 194}, "dias_ano_cliente": {"2024": {"GE": 183}, "2025": {"SIEMENS": 122, "GE": 113}, "2026": {"SIEMENS": 194}}, "negativos": [{"data": "16/10/2024", "parque": "FONTE DOS VENTOS/PE", "motivo": "SOLICITAÇÃO CLIENTE GE - DESMOBILIZAÇÃO POR BRIGA INTERPESSOAL NA EQUIPE"}], "dias_total": 612, "classificacao": "N2"}, {"mat": "310", "mats": ["310"], "nome": "LUANN CANAL ARAUJO", "dias_ano": {"2026": 181}, "dias_ano_cliente": {"2026": {"GE": 181}}, "negativos": [], "dias_total": 181, "classificacao": "N3"}, {"mat": "42", "mats": ["42"], "nome": "LUCAS ALMEIDA NASCIMENTO", "dias_ano": {"2024": 49}, "dias_ano_cliente": {"2024": {"GE": 49}}, "negativos": [], "dias_total": 49, "classificacao": "N1"}, {"mat": "193", "mats": ["193"], "nome": "LUCAS SANTOS MENDES", "dias_ano": {"2025": 172, "2026": 14}, "dias_ano_cliente": {"2025": {"EÓLICAS BABILÔNIA": 44, "ELETROBRAS": 33, "GE": 95}, "2026": {"GE": 14}}, "negativos": [], "dias_total": 186, "classificacao": "N1"}, {"mat": "245", "mats": ["245", "898"], "nome": "LUCENILIO BATISTA ARRUDA", "dias_ano": {"2025": 60, "2026": 106}, "dias_ano_cliente": {"2025": {"GE": 49, "NORDEX / LWS": 11}, "2026": {"NORDEX / LWS": 106}}, "negativos": [{"data": "14/07/2025", "parque": "AREIA BRANCA/RN", "motivo": "SOLICITAÇÃO CLIENTE NORDEX - ABANDONO DE PROJETO PARA OUTRA EMPRESA"}], "dias_total": 166, "classificacao": "N2"}, {"mat": "40", "mats": ["40"], "nome": "LUCIANO OLIVEIRA FERRAZ", "dias_ano": {"2024": 29}, "dias_ano_cliente": {"2024": {"GE": 29}}, "negativos": [], "dias_total": 29, "classificacao": "N3"}, {"mat": "359", "mats": ["359"], "nome": "LUCIMARIO FREIRE DA SILVA", "dias_ano": {"2026": 22}, "dias_ano_cliente": {"2026": {"GE": 22}}, "negativos": [{"data": "21/04/2026", "parque": "SERRA DA BABILÔNIA/BA", "motivo": "SOLICITAÇÃO CLIENTE GE - ABANDONOU PROJETO PARA ATENDER OUTRA EMPRESA"}], "dias_total": 22, "classificacao": "N1"}, {"mat": "178", "mats": ["178"], "nome": "LUIS CLAUDIO RODRIGUES ROSA", "dias_ano": {"2025": 205}, "dias_ano_cliente": {"2025": {"SIEMENS": 70, "GE": 135}}, "negativos": [], "dias_total": 205, "classificacao": "N3"}, {"mat": "223", "mats": ["223"], "nome": "LUIVERSON LIMA SOARES", "dias_ano": {"2026": 8}, "dias_ano_cliente": {"2026": {"GE": 8}}, "negativos": [], "dias_total": 8, "classificacao": "N3"}, {"mat": "251", "mats": ["251"], "nome": "MADSON ANDRE MACHADO PINTO", "dias_ano": {"2025": 8}, "dias_ano_cliente": {"2025": {"GE": 8}}, "negativos": [{"data": "27/08/2025", "parque": "OITIS/PI", "motivo": "SOLICITAÇÃO EXTREME - DESMOBILIZADO POR MAL COMPORTAMENTO NA MOB E EM CAMPO (AVALIAÇÃO DO SUOP)"}], "dias_total": 8, "classificacao": "N1"}, {"mat": "53", "mats": ["53"], "nome": "MADSON FRANCISCO RODRIGUES DA SILVA", "dias_ano": {"2024": 240, "2025": 2}, "dias_ano_cliente": {"2024": {"GE": 171, "SIEMENS": 69}, "2025": {"GE": 2}}, "negativos": [], "dias_total": 242, "classificacao": "N1"}, {"mat": "368", "mats": ["368"], "nome": "MANOEL VICENTE DA SILVA", "dias_ano": {"2026": 37}, "dias_ano_cliente": {"2026": {"GE": 37}}, "negativos": [], "dias_total": 37, "classificacao": "N1"}, {"mat": "203", "mats": ["203"], "nome": "MARCOS DE OLIVEIRA SILVA", "dias_ano": {"2025": 203}, "dias_ano_cliente": {"2025": {"GE": 203}}, "negativos": [], "dias_total": 203, "classificacao": "N3"}, {"mat": "329", "mats": ["329"], "nome": "MARCOS JOSE MUNIZ", "dias_ano": {"2026": 115}, "dias_ano_cliente": {"2026": {"SIEMENS": 115}}, "negativos": [], "dias_total": 115, "classificacao": null}, {"mat": "307", "mats": ["307", "965"], "nome": "MARCOS ROBERTO RODRIGUES SARAIVA", "dias_ano": {"2026": 150}, "dias_ano_cliente": {"2026": {"NORDEX / LWS": 67, "GE": 48, "SIEMENS": 35}}, "negativos": [{"data": "21/03/2026", "parque": "SÃO FERNANDO/RN", "motivo": "SOLICITAÇÃO CLIENTE NORDEX - DESMOBILIZOU POR CONTA PRÓPRIA E ABANDONOU O PROJETO ALEGANDO MOTIVOS DE VERGONHA DO DESEMPENHO DA EQUIPE"}], "dias_total": 150, "classificacao": "N1"}, {"mat": "45", "mats": ["45"], "nome": "MARDONIO DOS SANTOS SAMPAIO", "dias_ano": {"2024": 8}, "dias_ano_cliente": {"2024": {"GE": 8}}, "negativos": [], "dias_total": 8, "classificacao": "N1"}, {"mat": "41", "mats": ["41"], "nome": "MARIO CALDAS LOPES JUNIOR", "dias_ano": {"2024": 6}, "dias_ano_cliente": {"2024": {"GE": 6}}, "negativos": [], "dias_total": 6, "classificacao": "N3"}, {"mat": "278", "mats": ["278"], "nome": "MATEUS FERREIRA DE ANDRADE", "dias_ano": {"2025": 48}, "dias_ano_cliente": {"2025": {"GE": 48}}, "negativos": [], "dias_total": 48, "classificacao": "N1"}, {"mat": "43", "mats": ["43", "916"], "nome": "MATEUS GOMES DA SILVA", "dias_ano": {"2024": 202, "2025": 311, "2026": 206}, "dias_ano_cliente": {"2024": {"GE": 202}, "2025": {"GE": 189, "SIEMENS": 15, "NORDEX / LWS": 107}, "2026": {"GE": 79, "SIEMENS": 35, "NORDEX / LWS": 92}}, "negativos": [{"data": "07/07/2025", "parque": "LDV3/PI", "motivo": "SOLICITAÇÃO EXTREME - DESMOBILIZAÇÃO POR PEDIDO DO CLIENTE ALEGANDO INDISCIPLINA DO TÉCNICO POR DIRIJIR COM VELOCIDADE ACIMA DO PERMITIDO"}], "dias_total": 719, "classificacao": "N1"}, {"mat": "276", "mats": ["276"], "nome": "MATEUS JUVENAL DA SILVA", "dias_ano": {"2025": 51, "2026": 37}, "dias_ano_cliente": {"2025": {"GE": 51}, "2026": {"GE": 37}}, "negativos": [], "dias_total": 88, "classificacao": "N1"}, {"mat": "323", "mats": ["323"], "nome": "MATEUS MOURA DE ARAÚJO", "dias_ano": {"2026": 60}, "dias_ano_cliente": {"2026": {"GE": 60}}, "negativos": [], "dias_total": 60, "classificacao": "N1"}, {"mat": "327", "mats": ["327"], "nome": "MATTHEAUS ANTÔNIO PIMENTEL COSTA", "dias_ano": {"2026": 127}, "dias_ano_cliente": {"2026": {"GE": 127}}, "negativos": [], "dias_total": 127, "classificacao": "N1"}, {"mat": "958", "mats": ["958"], "nome": "MAURICIO CESAR DE ANDRADE DE MOURA", "dias_ano": {"2026": 211}, "dias_ano_cliente": {"2026": {"NORDEX / LWS": 211}}, "negativos": [], "dias_total": 211, "classificacao": "N1"}, {"mat": "248", "mats": ["248"], "nome": "MEZAC MARQUES DA ROCHA", "dias_ano": {"2025": 86, "2026": 153}, "dias_ano_cliente": {"2025": {"GE": 67, "SIEMENS": 19}, "2026": {"SIEMENS": 93, "GE": 60}}, "negativos": [], "dias_total": 239, "classificacao": "N1"}, {"mat": "65", "mats": ["65"], "nome": "MICHAEL DA COSTA LOURENÇO", "dias_ano": {"2024": 189}, "dias_ano_cliente": {"2024": {"GE": 189}}, "negativos": [], "dias_total": 189, "classificacao": "N3"}, {"mat": "144", "mats": ["144"], "nome": "MICHAEL ULISSES DE SOUSA", "dias_ano": {"2024": 37}, "dias_ano_cliente": {"2024": {"SINOMA BLADES": 37}}, "negativos": [], "dias_total": 37, "classificacao": null}, {"mat": "75", "mats": ["75"], "nome": "MICHEL JULIO DE JESUS", "dias_ano": {}, "dias_ano_cliente": {}, "negativos": [], "dias_total": 0, "classificacao": "N3"}, {"mat": "129", "mats": ["129"], "nome": "MULLER LESSA DOMINGUES", "dias_ano": {"2025": 50, "2026": 111}, "dias_ano_cliente": {"2025": {"SIEMENS": 50}, "2026": {"SIEMENS": 111}}, "negativos": [{"data": "27/03/2026", "parque": "TUCANO/BA", "motivo": "SOLICITAÇÃO EXTREME - ABANDONOU PROJETO PARA RENOVAR IRATA N3 NACIONAL"}], "dias_total": 161, "classificacao": "N3"}, {"mat": "234", "mats": ["234"], "nome": "NAILSON SILVA SOUSA", "dias_ano": {"2025": 64, "2026": 60}, "dias_ano_cliente": {"2025": {"GE": 64}, "2026": {"GE": 60}}, "negativos": [{"data": "05/03/2026", "parque": "CAMPO LARGO/BA", "motivo": "SOLICITAÇÃO EXTREME - DESMOBILIZAÇÃO A PEDIDO DO SUPERVISOR POR DESEMPENHO E COMPORTAMENTO"}], "dias_total": 124, "classificacao": "N1"}, {"mat": "164", "mats": ["164"], "nome": "NEIRTON GOMES BANDEIRA SOUSA", "dias_ano": {"2024": 31}, "dias_ano_cliente": {"2024": {"SINOMA BLADES": 31}}, "negativos": [], "dias_total": 31, "classificacao": null}, {"mat": "172", "mats": ["172"], "nome": "NILTON VENTURA DO NASCIMENTO", "dias_ano": {"2025": 70, "2026": 18}, "dias_ano_cliente": {"2025": {"SIEMENS": 39, "GE": 31}, "2026": {"GE": 18}}, "negativos": [], "dias_total": 88, "classificacao": "N3"}, {"mat": "130", "mats": ["130"], "nome": "ODILON BRAZ DA SILVA", "dias_ano": {"2024": 101, "2025": 265, "2026": 50}, "dias_ano_cliente": {"2024": {"GE": 101}, "2025": {"GE": 251, "EÓLICAS BABILÔNIA": 14}, "2026": {"GE": 6, "NORDEX / LWS": 44}}, "negativos": [{"data": "18/10/2024", "parque": "FONTE DOS VENTOS/PE", "motivo": "SOLICITAÇÃO CLIENTE GE - DESMOBILIZAÇÃO POR BRIGA INTERPESSOAL NA EQUIPE"}, {"data": "28/04/2026", "parque": "SÃO FERNANDO/RN", "motivo": "SOLICITAÇÃO LEAN WAY - DESMOBILIZAÇÃO POR PROBLEMAS COMPORTAMENTAIS DE NÃO QUERER FAZER OS TREINAMENTOS DE OUTRO CLIENTE"}], "dias_total": 416, "classificacao": "N3"}, {"mat": "191", "mats": ["191"], "nome": "OSEAS DOS SANTOS PEREIRA HELFENSTENS", "dias_ano": {"2025": 75, "2026": 50}, "dias_ano_cliente": {"2025": {"SIEMENS": 28, "GE": 47}, "2026": {"GE": 50}}, "negativos": [{"data": "05/03/2026", "parque": "FONTE DOS VENTOS/PE", "motivo": "SOLICITAÇÃO EXTREME - DESMOBILIZAÇÃO POR PROBLEMAS COMPORTAMENTAIS"}], "dias_total": 125, "classificacao": "N1"}, {"mat": "893", "mats": ["893"], "nome": "OSEIAS DA SILVA DOS SANTOS", "dias_ano": {"2025": 127}, "dias_ano_cliente": {"2025": {"NORDEX / LWS": 127}}, "negativos": [], "dias_total": 127, "classificacao": "N1"}, {"mat": "208", "mats": ["208"], "nome": "PATRICK VINICIUS RIBEIRO TARDELLI", "dias_ano": {"2025": 42}, "dias_ano_cliente": {"2025": {"ELETROBRAS": 13, "SIEMENS": 29}}, "negativos": [], "dias_total": 42, "classificacao": "N1"}, {"mat": "37", "mats": ["37"], "nome": "PAULO CESAR DA SILVA FILHO", "dias_ano": {"2024": 62}, "dias_ano_cliente": {"2024": {"LM": 29, "GE": 33}}, "negativos": [{"data": "28/06/2024", "parque": "FONTE DOS VENTOS/PE", "motivo": "SOLICITAÇÃO EXTREME - ABANDONO DE EMPREGO"}], "dias_total": 62, "classificacao": "N1"}, {"mat": "366", "mats": ["366"], "nome": "PAULO ROBSON DIAS DA SILVA", "dias_ano": {"2026": 19}, "dias_ano_cliente": {"2026": {"GE": 19}}, "negativos": [], "dias_total": 19, "classificacao": "N1"}, {"mat": "148", "mats": ["148"], "nome": "PAULO VICTOR LIMA DE SOUSA", "dias_ano": {"2024": 12}, "dias_ano_cliente": {"2024": {"SINOMA BLADES": 12}}, "negativos": [], "dias_total": 12, "classificacao": null}, {"mat": "309", "mats": ["309"], "nome": "PEDRO HENRIQUE DA COSTA MARCONDES", "dias_ano": {"2026": 100}, "dias_ano_cliente": {"2026": {"GE": 100}}, "negativos": [], "dias_total": 100, "classificacao": "N1"}, {"mat": "216", "mats": ["216", "899"], "nome": "PEDRO LUCAS DA CRUZ DA SILVA", "dias_ano": {"2025": 167, "2026": 212}, "dias_ano_cliente": {"2025": {"ELETROBRAS": 34, "GE": 85, "NORDEX / LWS": 48}, "2026": {"GE": 212}}, "negativos": [], "dias_total": 379, "classificacao": "N3"}, {"mat": "94", "mats": ["94"], "nome": "PEDRO LUCAS SAMPAIO DUARTE", "dias_ano": {"2024": 183, "2025": 261}, "dias_ano_cliente": {"2024": {"SIEMENS": 70, "GE": 113}, "2025": {"GE": 261}}, "negativos": [], "dias_total": 444, "classificacao": "N1"}, {"mat": "303", "mats": ["303"], "nome": "PEDRO VICTOR NASCIMENTO DE ALMEIDA", "dias_ano": {"2026": 62}, "dias_ano_cliente": {"2026": {"SIEMENS": 19, "NORDEX / LWS": 43}}, "negativos": [], "dias_total": 62, "classificacao": "N1"}, {"mat": "84", "mats": ["84"], "nome": "PETER JESUS MOSQUEIRA DAVILA", "dias_ano": {"2024": 15}, "dias_ano_cliente": {"2024": {"GE": 15}}, "negativos": [], "dias_total": 15, "classificacao": "N3"}, {"mat": "104", "mats": ["104"], "nome": "PETERSON LUIZ FELIX FERREIRA", "dias_ano": {"2024": 5}, "dias_ano_cliente": {"2024": {"GE": 5}}, "negativos": [{"data": "14/06/2024", "parque": "SERVENG/RN", "motivo": "SOLICITAÇÃO EXTREME - ABANDONO DE EMPREGO"}], "dias_total": 5, "classificacao": "N3"}, {"mat": "282", "mats": ["282"], "nome": "RAFAELA PEREIRA SANTOS", "dias_ano": {"2025": 46, "2026": 97}, "dias_ano_cliente": {"2025": {"GE": 46}, "2026": {"GE": 97}}, "negativos": [], "dias_total": 143, "classificacao": "N3"}, {"mat": "235", "mats": ["235"], "nome": "REGENILSON DO NASCIMENTO MORAES", "dias_ano": {"2025": 103, "2026": 144}, "dias_ano_cliente": {"2025": {"GE": 103}, "2026": {"GE": 144}}, "negativos": [], "dias_total": 247, "classificacao": "N1"}, {"mat": "143", "mats": ["143"], "nome": "REINALDO REIS DE BARROS SILVA", "dias_ano": {"2024": 56, "2025": 52}, "dias_ano_cliente": {"2024": {"SINOMA BLADES": 37, "SIEMENS": 19}, "2025": {"SIEMENS": 52}}, "negativos": [], "dias_total": 108, "classificacao": "N1"}, {"mat": "948", "mats": ["948"], "nome": "ROBERTO CARLOS ARAUJO DE SOUZA", "dias_ano": {"2026": 45}, "dias_ano_cliente": {"2026": {"NORDEX / LWS": 45}}, "negativos": [{"data": "23/02/2026", "parque": "SÃO MIGUEL DO GOSTOSO/RN", "motivo": "SOLICITAÇÃO LEAN WAY - ABANDONOU PROJETO PARA ATENDER OUTRA EMPRESA"}], "dias_total": 45, "classificacao": "N1"}, {"mat": "198", "mats": ["198", "926"], "nome": "ROBERTO DA SILVA BARRETO", "dias_ano": {"2025": 99, "2026": 139}, "dias_ano_cliente": {"2025": {"GE": 99}, "2026": {"GE": 36, "NORDEX / LWS": 103}}, "negativos": [], "dias_total": 238, "classificacao": "N1"}, {"mat": "166", "mats": ["166", "9001"], "nome": "ROBSON ANTÔNIO ALMEIDA LINS", "dias_ano": {"2024": 95, "2025": 365, "2026": 217}, "dias_ano_cliente": {"2024": {"SINOMA BLADES": 95}, "2025": {"SINOMA BLADES": 365}, "2026": {"SINOMA BLADES": 217}}, "negativos": [], "dias_total": 677, "classificacao": null}, {"mat": "371", "mats": ["371"], "nome": "RODRIGO BRUNO DOS SANTOS", "dias_ano": {"2026": 54}, "dias_ano_cliente": {"2026": {"GE": 54}}, "negativos": [], "dias_total": 54, "classificacao": "N3"}, {"mat": "381", "mats": ["381"], "nome": "RODRIGO BUENO DE CAMARGO", "dias_ano": {"2026": 80}, "dias_ano_cliente": {"2026": {"SIEMENS": 80}}, "negativos": [], "dias_total": 80, "classificacao": "N3"}, {"mat": "97", "mats": ["97"], "nome": "ROGERIO BELO DA SILVA JUNIOR", "dias_ano": {"2024": 202, "2025": 181}, "dias_ano_cliente": {"2024": {"GE": 202}, "2025": {"GE": 9, "SIEMENS": 172}}, "negativos": [], "dias_total": 383, "classificacao": "N1"}, {"mat": "56", "mats": ["56"], "nome": "ROGERIO SANTANA CASECA", "dias_ano": {"2024": 142, "2025": 299, "2026": 94}, "dias_ano_cliente": {"2024": {"GE": 113, "SIEMENS": 29}, "2025": {"SIEMENS": 37, "GE": 262}, "2026": {"GE": 94}}, "negativos": [], "dias_total": 535, "classificacao": "N1"}, {"mat": "315", "mats": ["315", "978"], "nome": "SALOMÃO DE SOUZA PAULINO", "dias_ano": {"2026": 63}, "dias_ano_cliente": {"2026": {"NORDEX / LWS": 29, "GE": 34}}, "negativos": [], "dias_total": 63, "classificacao": "N1"}, {"mat": "145", "mats": ["145"], "nome": "SAMILA MARIA ALVES FROTA", "dias_ano": {}, "dias_ano_cliente": {}, "negativos": [], "dias_total": 0, "classificacao": null}, {"mat": "233", "mats": ["233"], "nome": "SAMUEL SANTOS ARAUJO", "dias_ano": {"2025": 149, "2026": 199}, "dias_ano_cliente": {"2025": {"SIEMENS": 47, "GE": 102}, "2026": {"GE": 179, "SIEMENS": 20}}, "negativos": [], "dias_total": 348, "classificacao": "N2"}, {"mat": "162", "mats": ["162"], "nome": "SAMUEL WENDEL DOS SANTOS LOPES", "dias_ano": {"2024": 30}, "dias_ano_cliente": {"2024": {"SINOMA BLADES": 30}}, "negativos": [], "dias_total": 30, "classificacao": null}, {"mat": "295", "mats": ["295"], "nome": "SANDRELINO MACIEL DE FREITAS", "dias_ano": {"2025": 18, "2026": 209}, "dias_ano_cliente": {"2025": {"GE": 18}, "2026": {"GE": 209}}, "negativos": [], "dias_total": 227, "classificacao": "N1"}, {"mat": "348", "mats": ["348"], "nome": "SAULO RIBEIRO CLARISMUNDO", "dias_ano": {"2026": 43}, "dias_ano_cliente": {"2026": {"GE": 43}}, "negativos": [], "dias_total": 43, "classificacao": null}, {"mat": "304", "mats": ["304"], "nome": "SERGIO MATEUS DA SILVA MARTINS", "dias_ano": {"2025": 7, "2026": 204}, "dias_ano_cliente": {"2025": {"GE": 7}, "2026": {"GE": 204}}, "negativos": [], "dias_total": 211, "classificacao": "N3"}, {"mat": "250", "mats": ["250"], "nome": "SIDNEI DA SILVA REIS", "dias_ano": {"2026": 58}, "dias_ano_cliente": {"2026": {"GE": 58}}, "negativos": [], "dias_total": 58, "classificacao": "N3"}, {"mat": "57", "mats": ["57"], "nome": "SILAS DA SILVA NASCIMENTO", "dias_ano": {"2024": 163}, "dias_ano_cliente": {"2024": {"GE": 163}}, "negativos": [], "dias_total": 163, "classificacao": "N1"}, {"mat": "79", "mats": ["79"], "nome": "TASSIO RAFAEL MACHADO TINOCO DE SOUSA", "dias_ano": {"2024": 27}, "dias_ano_cliente": {"2024": {"LM": 17, "GE": 10}}, "negativos": [{"data": "20/06/2024", "parque": "TRAIRI/CE", "motivo": "SOLICITAÇÃO EXTREME - ABANDONO DE EMPREGO"}], "dias_total": 27, "classificacao": "N3"}, {"mat": "98", "mats": ["98"], "nome": "TAYLAN DE OLIVEIRA CAMPOS", "dias_ano": {"2024": 162, "2025": 253, "2026": 173}, "dias_ano_cliente": {"2024": {"GE": 162}, "2025": {"GE": 233, "ELETROBRAS": 20}, "2026": {"GE": 173}}, "negativos": [], "dias_total": 588, "classificacao": "N1"}, {"mat": "241", "mats": ["241"], "nome": "THIAGO DOS SANTOS COSTA", "dias_ano": {"2025": 88}, "dias_ano_cliente": {"2025": {"GE": 88}}, "negativos": [], "dias_total": 88, "classificacao": "N3"}, {"mat": "67", "mats": ["67"], "nome": "THIAGO JOSE DA SILVA TEIXIERA", "dias_ano": {"2024": 103}, "dias_ano_cliente": {"2024": {"GE": 103}}, "negativos": [], "dias_total": 103, "classificacao": "N1"}, {"mat": "197", "mats": ["197"], "nome": "TIAGO CARVALHO BALBINO", "dias_ano": {"2025": 182, "2026": 141}, "dias_ano_cliente": {"2025": {"SIEMENS": 41, "GE": 141}, "2026": {"GE": 60, "NORDEX / LWS": 61, "SIEMENS": 20}}, "negativos": [], "dias_total": 323, "classificacao": "N1"}, {"mat": "281", "mats": ["281"], "nome": "TIAGO PEREIRA DA SILVA", "dias_ano": {"2025": 20, "2026": 61}, "dias_ano_cliente": {"2025": {"SIEMENS": 20}, "2026": {"SIEMENS": 61}}, "negativos": [], "dias_total": 81, "classificacao": "N1"}, {"mat": "255", "mats": ["255"], "nome": "TIE DOS SANTOS PINHO", "dias_ano": {"2025": 71, "2026": 34}, "dias_ano_cliente": {"2025": {"GE": 71}, "2026": {"GE": 34}}, "negativos": [{"data": "06/02/2026", "parque": "OITIS/PI", "motivo": "SOLICITAÇÃO EXTREME - ABANDONOU PROJETO DEVIDO PROBLEMAS FAMILIARES DE SAÚDE"}], "dias_total": 105, "classificacao": "N3"}, {"mat": "335", "mats": ["335"], "nome": "VAGNER DA SILVA BERNARDO", "dias_ano": {"2026": 47}, "dias_ano_cliente": {"2026": {"NORDEX / LWS": 47}}, "negativos": [], "dias_total": 47, "classificacao": "N1"}, {"mat": "124", "mats": ["124"], "nome": "VALNEY GOMES DOS SANTOS", "dias_ano": {"2024": 74}, "dias_ano_cliente": {"2024": {"GE": 74}}, "negativos": [], "dias_total": 74, "classificacao": "N3"}, {"mat": "58", "mats": ["58"], "nome": "VICENTE PAULO SOUSA DAMASCENA", "dias_ano": {"2024": 210, "2025": 111}, "dias_ano_cliente": {"2024": {"GE": 210}, "2025": {"SIEMENS": 111}}, "negativos": [], "dias_total": 321, "classificacao": "N1"}, {"mat": "376", "mats": ["376"], "nome": "VICTOR HENRIQUE DE LIRA TAVARES", "dias_ano": {"2026": 60}, "dias_ano_cliente": {"2026": {"SIEMENS": 60}}, "negativos": [], "dias_total": 60, "classificacao": "N2"}, {"mat": "355", "mats": ["355"], "nome": "VICTOR HUGO GOMES", "dias_ano": {"2026": 94}, "dias_ano_cliente": {"2026": {"GE": 77, "SIEMENS": 17}}, "negativos": [], "dias_total": 94, "classificacao": "N1"}, {"mat": "379", "mats": ["379"], "nome": "WADSON MARCELO PINTO LINDOSO", "dias_ano": {"2026": 81}, "dias_ano_cliente": {"2026": {"SIEMENS": 81}}, "negativos": [], "dias_total": 81, "classificacao": "N2"}, {"mat": "375", "mats": ["375"], "nome": "WAGNER DOS SANTOS SILVA", "dias_ano": {"2026": 80}, "dias_ano_cliente": {"2026": {"SIEMENS": 80}}, "negativos": [], "dias_total": 80, "classificacao": "N2"}, {"mat": "81", "mats": ["81"], "nome": "WALDYR JOSE DE SALLES FELIX", "dias_ano": {"2025": 111}, "dias_ano_cliente": {"2025": {"SIEMENS": 111}}, "negativos": [{"data": "16/07/2025", "parque": "VILA ACRE (VSM)/RN", "motivo": "SOLICITAÇÃO EXTREME - SAÍDA DO PARQUE DEVIDO PROBLEMAS INTERPESSOAL COM OS TÉCNICOS"}], "dias_total": 111, "classificacao": "N3"}, {"mat": "96", "mats": ["96"], "nome": "WALEFF AUGUSTO DE SOUSA BRAGA", "dias_ano": {"2024": 132, "2025": 223}, "dias_ano_cliente": {"2024": {"SIEMENS": 32, "GE": 100}, "2025": {"SIEMENS": 65, "GE": 158}}, "negativos": [], "dias_total": 355, "classificacao": "N1"}, {"mat": "211", "mats": ["211"], "nome": "WARLLEY MOEZINHO DOS SANTOS", "dias_ano": {"2025": 20}, "dias_ano_cliente": {"2025": {"SIEMENS": 20}}, "negativos": [], "dias_total": 20, "classificacao": "N3"}, {"mat": "99", "mats": ["99"], "nome": "WELLINGTON MATHEUS VALENTE DOS SANTOS", "dias_ano": {"2024": 102}, "dias_ano_cliente": {"2024": {"GE": 102}}, "negativos": [], "dias_total": 102, "classificacao": "N2"}, {"mat": "291", "mats": ["291"], "nome": "WERIKE DE SOUZA CASTRO", "dias_ano": {"2025": 20, "2026": 150}, "dias_ano_cliente": {"2025": {"SIEMENS": 20}, "2026": {"SIEMENS": 150}}, "negativos": [{"data": "09/06/2026", "parque": "MARAL/RN", "motivo": "SOLICITAÇÃO EXTREME - ABANDONOU PROJETO POR TRABALHO NO EXTERIOR"}], "dias_total": 170, "classificacao": "N1"}, {"mat": "160", "mats": ["160"], "nome": "WESLEY TAVARES DA SILVA", "dias_ano": {"2024": 31}, "dias_ano_cliente": {"2024": {"SINOMA BLADES": 31}}, "negativos": [], "dias_total": 31, "classificacao": null}, {"mat": "46", "mats": ["46"], "nome": "WILLAMES LEANDRO SILVA DA HORA", "dias_ano": {"2024": 274, "2025": 323, "2026": 204}, "dias_ano_cliente": {"2024": {"GE": 274}, "2025": {"SIEMENS": 323}, "2026": {"SIEMENS": 204}}, "negativos": [], "dias_total": 801, "classificacao": "N1"}, {"mat": "90", "mats": ["90"], "nome": "WILLAMES WAGNER DA SILVA", "dias_ano": {"2024": 228, "2025": 200, "2026": 156}, "dias_ano_cliente": {"2024": {"LM": 71, "GE": 157}, "2025": {"GE": 167, "SIEMENS": 33}, "2026": {"SIEMENS": 156}}, "negativos": [], "dias_total": 584, "classificacao": "N1"}, {"mat": "953", "mats": ["953"], "nome": "WILLIAM CASSIANO DO NASCIMENTO", "dias_ano": {"2026": 180}, "dias_ano_cliente": {"2026": {"NORDEX / LWS": 180}}, "negativos": [], "dias_total": 180, "classificacao": "N2"}, {"mat": "205", "mats": ["205", "374"], "nome": "WILLIAM DUARTE COSTA", "dias_ano": {"2025": 94, "2026": 71}, "dias_ano_cliente": {"2025": {"GE": 94}, "2026": {"GE": 71}}, "negativos": [], "dias_total": 165, "classificacao": "N1"}, {"mat": "63", "mats": ["63"], "nome": "WILLIAM JAMIS XAVIER NUNES", "dias_ano": {"2024": 18}, "dias_ano_cliente": {"2024": {"LM": 18}}, "negativos": [], "dias_total": 18, "classificacao": "N1"}, {"mat": "31", "mats": ["31"], "nome": "WILLIAM PINTO XAVIER", "dias_ano": {"2024": 171}, "dias_ano_cliente": {"2024": {"GE": 171}}, "negativos": [{"data": "24/08/2024", "parque": "SERRA DAS VACAS/PE", "motivo": "SOLICITAÇÃO EXTREME - DESMOBILIZAÇÃO POR INDISCIPLINA E SOLICITAÇÃO DO SITE MANAGER GE"}], "dias_total": 171, "classificacao": "N3"}, {"mat": "62", "mats": ["62"], "nome": "YAN BRUNO DIAS", "dias_ano": {"2024": 107, "2025": 243, "2026": 120}, "dias_ano_cliente": {"2024": {"LM": 56, "GE": 51}, "2025": {"SIEMENS": 113, "GE": 130}, "2026": {"SIEMENS": 120}}, "negativos": [], "dias_total": 470, "classificacao": "N1"}, {"mat": "353", "mats": ["353"], "nome": "ÉDIPO CARDOSO DE OLIVEIRA", "dias_ano": {"2026": 142}, "dias_ano_cliente": {"2026": {"SIEMENS": 142}}, "negativos": [], "dias_total": 142, "classificacao": "N3"}];
+var CLIENTES_TEC = ["GE", "SIEMENS", "NORDEX / LWS", "VESTAS", "ELETROBRAS", "EÓLICAS BABILÔNIA", "LM", "SINOMA BLADES"];
+
+// Rankings (aba "Rankings", ao lado de "Buscar Tecnico"): usam "classificacao"
+// (IRATA: N1/N2/N3, coluna D da aba DADOS) e "dias_total" (ciclos ja fechados
+// + streak atual em campo, se aplicavel) que ja vem calculado por tecnico em
+// TECNICOS_DATA (build_tecnicos_data no gerar_dashboards.py) -- tecnico sem
+// classificacao N1/N2/N3 valida fica de fora dos dois rankings.
+function renderRankingLinha(pos, tec){
+  var tr = document.createElement('tr');
+  tr.innerHTML = '<td>'+pos+'</td><td>'+tec.nome+'</td><td>'+(tec.classificacao||'-')+'</td><td class="num">'+tec.dias_total+' dias</td>';
+  return tr;
+}
+function renderRankings(){
+  var top20 = TECNICOS_DATA.filter(function(t){ return t.classificacao === 'N1' || t.classificacao === 'N2'; })
+    .sort(function(a,b){ return b.dias_total - a.dias_total; }).slice(0, 20);
+  var top5 = TECNICOS_DATA.filter(function(t){ return t.classificacao === 'N3'; })
+    .sort(function(a,b){ return b.dias_total - a.dias_total; }).slice(0, 5);
+  var tbody20 = document.getElementById('tbodyRankTop20');
+  top20.forEach(function(tec, i){ tbody20.appendChild(renderRankingLinha(i+1, tec)); });
+  var tbody5 = document.getElementById('tbodyRankTop5');
+  top5.forEach(function(tec, i){ tbody5.appendChild(renderRankingLinha(i+1, tec)); });
+}
+renderRankings();
+
+var PALETA_CLIENTES_TEC = ['#1C8CE8', '#12A874', '#9b59b6', '#D89A2B', '#E0483C', '#4FC3F7', '#8BC34A', '#FF7043'];
+
+// Rotula % diretamente nas fatias das pizzas de tecnico (em campo/em casa e
+// por cliente), igual ao padrao ja usado nos doughnuts "Por cliente"/"Por
+// supervisor" da 1a aba (que rotulam com a quantidade -- aqui rotulamos com %).
+var pctLabelsTecPlugin = {
+  id: 'pctLabelsTec',
+  afterDatasetsDraw: function(chart){
+    var id = chart.canvas.id || '';
+    if(id.indexOf('chartTecAno') !== 0 && id !== 'chartTecCliente') return;
+    var ctx = chart.ctx;
+    var dados = chart.data.datasets[0].data;
+    var total = dados.reduce(function(a, b){ return a + b; }, 0);
+    var meta = chart.getDatasetMeta(0);
+    meta.data.forEach(function(arc, i){
+      var val = dados[i];
+      if(!val || !total) return;
+      var pct = Math.round(val / total * 100);
+      var pos = arc.tooltipPosition();
+      ctx.save();
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 11px Segoe UI, Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(pct + '%', pos.x, pos.y);
+      ctx.restore();
+    });
+  }
+};
+Chart.register(pctLabelsTecPlugin);
+
+function isLeapYearTec(ano){
+  return (ano % 4 === 0 && ano % 100 !== 0) || ano % 400 === 0;
+}
+// Dias de referencia pra comparar "em campo x em casa": anos ja encerrados
+// usam o total de dias do ano; o ano corrente usa so os dias ja decorridos
+// ate hoje (o resto do ano ainda nao aconteceu, entao nao deve contar como
+// "em casa").
+function diasNoAnoTec(anoStr){
+  var ano = parseInt(anoStr, 10);
+  var hoje = new Date();
+  var anoAtual = hoje.getFullYear();
+  if(ano === anoAtual){
+    var inicioAno = new Date(ano, 0, 1);
+    return Math.floor((hoje - inicioAno) / 86400000) + 1;
+  }
+  return isLeapYearTec(ano) ? 366 : 365;
+}
+
+(function(){
+  var input = document.getElementById('buscaTecInput');
+  var sugestoesBox = document.getElementById('buscaTecSugestoes');
+  var resultado = document.getElementById('buscaTecResultado');
+  var tecClienteChart = null;
+
+  function normaliza(s){
+    return (s || '').toString().trim().toUpperCase()
+      .normalize('NFD').replace(/[̀-ͯ]/g, '');
+  }
+
+  function buscarCandidatos(termo){
+    var t = normaliza(termo);
+    if(!t) return [];
+    // matricula: numero exato tem prioridade (cada pessoa ja vem unificada com
+    // TODAS as matriculas que ela teve, entao qualquer uma delas resolve pra
+    // o mesmo registro consolidado)
+    var termoTrim = termo.trim();
+    var porMat = TECNICOS_DATA.filter(function(tec){ return (tec.mats || [tec.mat]).indexOf(termoTrim) !== -1; });
+    if(porMat.length) return porMat;
+    return TECNICOS_DATA.filter(function(tec){ return normaliza(tec.nome).indexOf(t) !== -1; }).slice(0, 20);
+  }
+
+  function matsLabel(tec){
+    var mats = tec.mats || [tec.mat];
+    return mats.length > 1 ? ('MAT ' + mats.join(', ')) : ('MAT ' + mats[0]);
+  }
+
+  function renderSugestoes(lista){
+    if(!lista.length){ sugestoesBox.style.display = 'none'; sugestoesBox.innerHTML=''; return; }
+    sugestoesBox.style.display = 'block';
+    sugestoesBox.innerHTML = lista.map(function(tec, i){
+      return '<div class="sugestao-item" data-idx="'+i+'" style="padding:8px 10px; border-bottom:1px solid var(--line); cursor:pointer; font-size:13px;">'+
+        '<b>'+tec.nome+'</b> <span style="color:var(--muted);">'+matsLabel(tec)+'</span></div>';
+    }).join('');
+    Array.prototype.forEach.call(sugestoesBox.querySelectorAll('.sugestao-item'), function(el, i){
+      el.addEventListener('click', function(){
+        var tec = lista[i];
+        if(tec){ input.value = tec.nome; sugestoesBox.style.display='none'; renderTecnico(tec); }
+      });
+      el.addEventListener('mouseenter', function(){ el.style.background = 'rgba(255,255,255,.06)'; });
+      el.addEventListener('mouseleave', function(){ el.style.background = 'transparent'; });
+    });
+  }
+
+  function renderTecnico(tec){
+    resultado.style.display = 'block';
+    document.getElementById('buscaTecNome').innerHTML = tec.nome + ' <span>'+matsLabel(tec)+'</span>';
+
+    var anos = Object.keys(tec.dias_ano || {}).sort();
+    var tbodyAno = document.getElementById('tbodyTecAno');
+    tbodyAno.innerHTML = '';
+    document.getElementById('buscaTecSemDados').style.display = anos.length ? 'none' : 'block';
+    anos.forEach(function(ano){
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td>'+ano+'</td><td class="num">'+tec.dias_ano[ano]+' dias</td>';
+      tbodyAno.appendChild(tr);
+    });
+    if(anos.length){
+      var totAno = anos.reduce(function(s,a){ return s + tec.dias_ano[a]; }, 0);
+      var trTot = document.createElement('tr');
+      trTot.style.fontWeight='700'; trTot.style.borderTop='2px solid #2a3746';
+      trTot.innerHTML = '<td>Total</td><td class="num">'+totAno+' dias</td>';
+      tbodyAno.appendChild(trTot);
+    }
+
+    // Pizza por ano: % do ano em campo (mobilizado) x em casa. Anos ja
+    // encerrados usam o total de dias do ano (365/366); o ano corrente usa
+    // so os dias ja decorridos ate hoje (nao faz sentido comparar contra um
+    // ano ainda nao terminado).
+    var pizzasBox = document.getElementById('tecPizzasAno');
+    pizzasBox.innerHTML = '';
+    anos.forEach(function(ano){
+      var diasCampo = tec.dias_ano[ano];
+      var diasTotalAno = diasNoAnoTec(ano);
+      var diasCasa = Math.max(0, diasTotalAno - diasCampo);
+      var box = document.createElement('div');
+      box.style.cssText = 'background:#0B2338; border:1px solid var(--line); border-radius:10px; padding:12px; width:160px; text-align:center;';
+      var canvasId = 'chartTecAno' + ano;
+      box.innerHTML = '<div style="font-size:12px; color:var(--muted); margin-bottom:6px;">'+ano+'</div><canvas id="'+canvasId+'" width="130" height="130"></canvas>';
+      pizzasBox.appendChild(box);
+      new Chart(document.getElementById(canvasId), {
+        type: 'doughnut',
+        data: { labels: ['Em campo', 'Em casa'], datasets: [{ data: [diasCampo, diasCasa], backgroundColor: ['#1C8CE8', '#2a3746'], borderColor: '#0B2338', borderWidth: 2 }] },
+        options: {
+          responsive: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: function(ctx){ var v = ctx.parsed; var pct = diasTotalAno ? Math.round(v / diasTotalAno * 100) : 0; return ctx.label + ': ' + v + ' dias (' + pct + '%)'; } } }
+          }
+        }
+      });
+    });
+
+    var thead = document.getElementById('theadTecAnoCliente');
+    thead.innerHTML = '<th>Ano</th>' + CLIENTES_TEC.map(function(c){ return '<th class="num">'+c+'</th>'; }).join('');
+    var tbodyAC = document.getElementById('tbodyTecAnoCliente');
+    tbodyAC.innerHTML = '';
+    var anosCliente = Object.keys(tec.dias_ano_cliente || {}).sort();
+    var totalPorCliente = {};
+    CLIENTES_TEC.forEach(function(c){ totalPorCliente[c] = 0; });
+    anosCliente.forEach(function(ano){
+      var porCliente = tec.dias_ano_cliente[ano] || {};
+      var cells = CLIENTES_TEC.map(function(c){
+        var v = porCliente[c] || 0;
+        totalPorCliente[c] += v;
+        return '<td class="num">'+(v || '-')+'</td>';
+      }).join('');
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td>'+ano+'</td>'+cells;
+      tbodyAC.appendChild(tr);
+    });
+    var grandTotal = CLIENTES_TEC.reduce(function(s,c){ return s + totalPorCliente[c]; }, 0);
+    if(anosCliente.length){
+      var trTotalCli = document.createElement('tr');
+      trTotalCli.style.fontWeight = '700'; trTotalCli.style.borderTop = '2px solid #2a3746';
+      trTotalCli.innerHTML = '<td>Total</td>' + CLIENTES_TEC.map(function(c){
+        return '<td class="num">'+(totalPorCliente[c] || '-')+'</td>';
+      }).join('');
+      tbodyAC.appendChild(trTotalCli);
+
+      var trPctCli = document.createElement('tr');
+      trPctCli.innerHTML = '<td style="color:var(--muted);">%</td>' + CLIENTES_TEC.map(function(c){
+        var pct = grandTotal ? Math.round(totalPorCliente[c] / grandTotal * 100) : 0;
+        return '<td class="num" style="color:var(--muted);">'+(totalPorCliente[c] ? pct+'%' : '-')+'</td>';
+      }).join('');
+      tbodyAC.appendChild(trPctCli);
+    }
+
+    // Pizza de % de atendimento por cliente (mesmos totais da tabela acima).
+    var clienteChartBox = document.getElementById('tecPizzaClienteBox');
+    if(grandTotal > 0){
+      clienteChartBox.style.display = 'block';
+      var labelsCli = [], dataCli = [], coresCli = [];
+      CLIENTES_TEC.forEach(function(c, idx){
+        if(totalPorCliente[c] > 0){
+          labelsCli.push(c);
+          dataCli.push(totalPorCliente[c]);
+          coresCli.push(PALETA_CLIENTES_TEC[idx % PALETA_CLIENTES_TEC.length]);
+        }
+      });
+      if(tecClienteChart){ tecClienteChart.destroy(); }
+      tecClienteChart = new Chart(document.getElementById('chartTecCliente'), {
+        type: 'doughnut',
+        data: { labels: labelsCli, datasets: [{ data: dataCli, backgroundColor: coresCli, borderColor: '#0B2338', borderWidth: 2 }] },
+        options: {
+          responsive: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+            tooltip: { callbacks: { label: function(ctx){ var v = ctx.parsed; var pct = grandTotal ? Math.round(v / grandTotal * 100) : 0; return ctx.label + ': ' + v + ' dias (' + pct + '%)'; } } }
+          }
+        }
+      });
+    } else {
+      clienteChartBox.style.display = 'none';
+      if(tecClienteChart){ tecClienteChart.destroy(); tecClienteChart = null; }
+    }
+
+    var negativos = tec.negativos || [];
+    var tbodyNeg = document.getElementById('tbodyTecNegativos');
+    tbodyNeg.innerHTML = '';
+    document.getElementById('buscaTecSemNegativos').style.display = negativos.length ? 'none' : 'block';
+    negativos.forEach(function(n){
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td>'+(n.data||'-')+'</td><td>'+(n.parque||'-')+'</td><td>'+(n.motivo||'-')+'</td>';
+      tbodyNeg.appendChild(tr);
+    });
+  }
+
+  input.addEventListener('input', function(){
+    var termo = input.value;
+    if(!termo.trim()){ sugestoesBox.style.display='none'; resultado.style.display='none'; return; }
+    var candidatos = buscarCandidatos(termo);
+    if(candidatos.length === 1){
+      sugestoesBox.style.display = 'none';
+      renderTecnico(candidatos[0]);
+    } else {
+      renderSugestoes(candidatos);
+    }
+  });
+  document.addEventListener('click', function(e){
+    if(e.target !== input && !sugestoesBox.contains(e.target)) sugestoesBox.style.display = 'none';
+  });
+
+  // Gancho global usado pelo campo de busca do menu lateral (index.html):
+  // preenche o campo aqui dentro e dispara a mesma busca, sem duplicar logica.
+  window.abrirBuscaTecnico = function(termo){
+    if(typeof termo !== 'string' || !termo.trim()) return;
+    input.value = termo;
+    input.dispatchEvent(new Event('input'));
+  };
+})();
+</script>
+</body>
+</html>
