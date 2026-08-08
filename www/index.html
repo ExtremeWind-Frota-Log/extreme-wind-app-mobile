@@ -66,8 +66,8 @@
   .topbar .badge{background:var(--panel2); border:1px solid var(--line); color:var(--muted); font-size:11.5px; padding:6px 12px; border-radius:20px;}
 
   .view{flex:1; position:relative; overflow:hidden;}
-  .view iframe{position:absolute; inset:0; width:100%; height:100%; border:0; display:none; background:#0f1720;}
-  .view iframe.active{display:block;}
+  .view > iframe{position:absolute; inset:0; width:100%; height:100%; border:0; display:none; background:#0f1720;}
+  .view > iframe.active{display:block;}
 
   .home{position:absolute; inset:0; overflow-y:auto; padding:32px; display:none;}
   .home.active{display:block;}
@@ -199,122 +199,66 @@
             &#128506; Mapa de Clientes <span style="font-weight:400; color:var(--muted); font-size:12px;">projetos ativos por localização</span>
           </div>
 
-          <!-- Mapa proprio com Leaflet + OpenStreetMap (sem depender de
-               embed do Google My Maps, que passou a ser bloqueado tanto no
-               WebView do app quanto no site). Funciona igual no site e no
-               app -- sem necessidade de imagem estatica de fallback. -->
-          <div id="mapa-clientes-container" style="position:absolute; inset:0;">
-            <div id="mapa-clientes-leaflet" style="position:absolute; inset:0; background:#0f1720;"></div>
-          </div>
-
-          <div class="card" data-view="equipes" style="position:absolute; bottom:7px; right:7px; z-index:3; width:115px; padding:7px 8px; margin:0;">
-            <div class="card-title" style="font-size:9px; margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">&#128101; Equipes</div>
-            <div class="kpirow" style="gap:4px 6px;">
-              <div><div class="n" style="font-size:12px;">31</div><div class="l" style="font-size:7px;">Ativos</div></div>
-              <div><div class="n" style="color:var(--warn); font-size:12px;">5</div><div class="l" style="font-size:7px;">Desmob.</div></div>
-              <div><div class="n" style="font-size:12px;">10/10</div><div class="l" style="font-size:7px;">Parques</div></div>
-            </div>
-            <div class="go" style="margin-top:4px; font-size:7px;">Ver mais →</div>
-          </div>
+          <!-- No site (navegador normal) o iframe ao vivo do Google My Maps
+                       funciona sem problema -- so o WebView do app Android bloqueia
+                       esse iframe (net::ERR_BLOCKED_BY_RESPONSE). Por isso mostramos
+                       o mapa ao vivo por padrao aqui, e so troca pra imagem estatica
+                       (via script abaixo) quando detecta que esta rodando dentro do
+                       app nativo (Capacitor). Sem link/botao para abrir em outra
+                       aba -- o mapa fica visivel direto no proprio painel. -->
+                  <div id="mapa-clientes-container" style="position:absolute; inset:0;">
+                              <iframe src="https://www.google.com/maps/d/u/0/embed?mid=10Tb-6WWrSx-gk6TIM6r05paJrYBBXcg&amp;ehbc=2E312F"
+                                              style="position:absolute; inset:0; width:100%; height:100%; border:0;" loading="lazy"
+                                              title="Mapa de clientes ativos Extreme Wind"></iframe>iframe>
+                  </div>div>
+        
+                  <div class="card" data-view="equipes" style="position:absolute; bottom:7px; right:7px; z-index:3; width:115px; padding:7px 8px; margin:0;">
+                              <div class="card-title" style="font-size:9px; margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">&#128101; Equipes</div>div>
+                              <div class="kpirow" style="gap:4px 6px;">
+                                            <div><div class="n" style="font-size:12px;">31</div><div class="l" style="font-size:7px;">Ativos</div></div>
+                                            <div><div class="n" style="color:var(--warn); font-size:12px;">5</div><div class="l" style="font-size:7px;">Desmob.</div></div>
+                                            <div><div class="n" style="font-size:12px;">10/10</div><div class="l" style="font-size:7px;">Parques</div></div>
+                              </div>
+                              <div class="go" style="margin-top:4px; font-size:7px;">Ver mais →</div>
+                  </div>
         </div>
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-        <script>
-          (function () {
-            // Marcadores extraidos do antigo mapa Google My Maps
-            // (mid=10Tb-6WWrSx-gk6TIM6r05paJrYBBXcg), agrupados por categoria/layer.
-            var GRUPOS = [
-              {
-                nome: 'Extreme Wind',
-                cor: '#1C8CE8',
-                pontos: [
-                  { nome: 'ESCRITÓRIO EXTREME WIND', desc: '', lat: -8.11641, lng: -34.90276 },
-                  { nome: 'EUROCONTAINERS BRASIL / Almoxarifado', desc: '', lat: -8.07404, lng: -34.98178 },
-                  { nome: 'ESCRITÓRIO EXTREME WIND — Filial Caucaia/CE', desc: '', lat: -3.73632, lng: -38.65651 }
-                ]
-              },
-              {
-                nome: 'Cliente GE',
-                cor: '#12BFA8',
-                pontos: [
-                  { nome: 'OITIS/PI', desc: 'Dom Inocêncio', lat: -9.04846, lng: -41.73539 },
-                  { nome: 'COPEL/RN', desc: 'João Câmara', lat: -5.25477, lng: -35.8494 }
-                ]
-              },
-              {
-                nome: 'Cliente Siemens',
-                cor: '#D89A2B',
-                pontos: [
-                  { nome: 'TUCANO/BA', desc: 'Caldas do Jorro', lat: -11.19248, lng: -38.78007 },
-                  { nome: 'SÃO VITOR/BA', desc: 'Xique-Xique', lat: -10.98128, lng: -42.56059 },
-                  { nome: 'DELTA/PI', desc: 'Parnaíba', lat: -2.8359, lng: -41.7234 },
-                  { nome: 'TRAIRI/CE', desc: 'Fleicheiras', lat: -3.24189, lng: -39.29634 },
-                  { nome: 'INTERMARÍTIMA/BA', desc: 'Simões Filho', lat: -12.82923, lng: -38.40819 },
-                  { nome: 'SANTO AGOSTINHO/RN', desc: 'Lajes', lat: -5.60488, lng: -36.18981 },
-                  { nome: 'BAIXA DO FEIJÃO/RN', desc: 'Jandaíra', lat: -5.35479, lng: -36.05342 }
-                ]
-              },
-              {
-                nome: 'Nordex/Acciona',
-                cor: '#E0483C',
-                pontos: [
-                  { nome: 'SÃO FERNANDO/RN', desc: 'Caiçara do Norte', lat: -5.17516, lng: -36.03305 }
-                ]
-              }
-            ];
-
-            function iniciarMapa() {
-              var el = document.getElementById('mapa-clientes-leaflet');
-              if (!el || !window.L) return;
-
-              var map = L.map(el, { scrollWheelZoom: false }).setView([-7.5, -38.5], 6);
-
-              L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap',
-                maxZoom: 18
-              }).addTo(map);
-
-              var todosPontos = [];
-              GRUPOS.forEach(function (grupo) {
-                grupo.pontos.forEach(function (p) {
-                  var marker = L.circleMarker([p.lat, p.lng], {
-                    radius: 8,
-                    color: '#fff',
-                    weight: 1.5,
-                    fillColor: grupo.cor,
-                    fillOpacity: 0.9
-                  }).addTo(map);
-                  var label = p.nome + (p.desc ? ' — ' + p.desc : '') + '<br><span style="color:' + grupo.cor + '; font-size:11px;">' + grupo.nome + '</span>';
-                  marker.bindPopup(label);
-                  todosPontos.push([p.lat, p.lng]);
-                });
-              });
-
-              if (todosPontos.length) {
-                map.fitBounds(todosPontos, { padding: [24, 24] });
-              }
-
-              // Reabilita o zoom por scroll so quando o mapa esta em foco
-              // (clique), pra nao atrapalhar o scroll da pagina.
-              map.on('focus', function () { map.scrollWheelZoom.enable(); });
-              map.on('blur', function () { map.scrollWheelZoom.disable(); });
-              el.addEventListener('click', function () { map.scrollWheelZoom.enable(); });
-
-              setTimeout(function () { map.invalidateSize(); }, 150);
-            }
-
-            if (window.L) {
-              iniciarMapa();
-            } else {
-              var script = document.querySelector('script[src*="leaflet.js"]');
-              if (script) {
-                script.addEventListener('load', iniciarMapa);
-              } else {
-                window.addEventListener('load', iniciarMapa);
-              }
-            }
-          })();
-        </script>
+              <script>
+                        (function () {
+                                      var dentroDoApp = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+                                      if (!dentroDoApp) return; // no site normal, mantem o iframe ao vivo acima
+                                      var container = document.getElementById('mapa-clientes-container');
+                                      if (!container) return;
+                                      container.innerHTML =
+                                                      '<img src="assets/mapa-clientes.png" alt="Mapa de clientes ativos Extreme Wind" ' +
+                                                      'style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; border:0; display:block; background:#0f1720; cursor:zoom-in;" ' +
+                                                      'onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';">' +
+                                                      '<div style="display:none; position:absolute; inset:0; align-items:center; justify-content:center; color:var(--muted); font-size:12.5px; text-align:center; padding:20px;">' +
+                                                      'Mapa indisponível no momento.</div>';
+                          
+                                     // Dentro do app, a imagem nao e mais um link para o Google My
+                                      // Maps -- ao tocar, so amplia a propria imagem em tela cheia
+                                      // (lightbox local, sem navegar pra lugar nenhum). Toca de novo
+                                      // (ou no X) pra fechar.
+                                      var img = container.querySelector('img');
+                                      if (img) {
+                                                      img.addEventListener('click', function () {
+                                                                        var overlay = document.createElement('div');
+                                                                        overlay.style.cssText =
+                                                                                            'position:fixed; inset:0; z-index:9999; background:rgba(2,10,18,.94); ' +
+                                                                                            'display:flex; align-items:center; justify-content:center; padding:16px;';
+                                                                        overlay.innerHTML =
+                                                                                            '<img src="assets/mapa-clientes.png" alt="Mapa de clientes ativos Extreme Wind" ' +
+                                                                                            'style="max-width:100%; max-height:100%; object-fit:contain; border-radius:8px;">' +
+                                                                                            '<div style="position:absolute; top:14px; right:16px; width:36px; height:36px; border-radius:50%; ' +
+                                                                                            'background:rgba(255,255,255,.12); color:#fff; font-size:20px; line-height:36px; text-align:center; cursor:pointer;">&#10005;</div>';
+                                                                        overlay.addEventListener('click', function () {
+                                                                                            overlay.remove();
+                                                                        });
+                                                                        document.body.appendChild(overlay);
+                                                      });
+                                      }
+                        })();
+              </div></div></script>
 
         <div class="cards">
           <div class="card" data-view="frota">
