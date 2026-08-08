@@ -66,8 +66,8 @@
   .topbar .badge{background:var(--panel2); border:1px solid var(--line); color:var(--muted); font-size:11.5px; padding:6px 12px; border-radius:20px;}
 
   .view{flex:1; position:relative; overflow:hidden;}
-  .view iframe{position:absolute; inset:0; width:100%; height:100%; border:0; display:none; background:#0f1720;}
-  .view iframe.active{display:block;}
+  .view > iframe{position:absolute; inset:0; width:100%; height:100%; border:0; display:none; background:#0f1720;}
+  .view > iframe.active{display:block;}
 
   .home{position:absolute; inset:0; overflow-y:auto; padding:32px; display:none;}
   .home.active{display:block;}
@@ -195,10 +195,7 @@
         </div>
 
         <div class="note-box" style="position:relative; padding:0; overflow:hidden; margin-bottom:28px; height:340px; isolation:isolate;">
-          <div style="position:absolute; top:0; left:0; right:0; padding:16px 20px 4px; font-weight:700; color:var(--text); font-size:14.5px; z-index:2; pointer-events:none; background:linear-gradient(180deg, rgba(15,42,64,.85), rgba(15,42,64,0));">
-            &#128506; Mapa de Clientes <span style="font-weight:400; color:var(--muted); font-size:12px;">projetos ativos por localização</span>
-          </div>
-
+          
           <!-- No site (navegador normal) o iframe ao vivo do Google My Maps
                funciona sem problema -- so o WebView do app Android bloqueia
                esse iframe (net::ERR_BLOCKED_BY_RESPONSE). Por isso mostramos
