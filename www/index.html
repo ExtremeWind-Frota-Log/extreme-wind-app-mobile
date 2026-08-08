@@ -66,8 +66,8 @@
   .topbar .badge{background:var(--panel2); border:1px solid var(--line); color:var(--muted); font-size:11.5px; padding:6px 12px; border-radius:20px;}
 
   .view{flex:1; position:relative; overflow:hidden;}
-  .view > iframe{position:absolute; inset:0; width:100%; height:100%; border:0; display:none; background:#0f1720;}
-  .view > iframe.active{display:block;}
+  .view iframe{position:absolute; inset:0; width:100%; height:100%; border:0; display:none; background:#0f1720;}
+  .view iframe.active{display:block;}
 
   .home{position:absolute; inset:0; overflow-y:auto; padding:32px; display:none;}
   .home.active{display:block;}
@@ -195,67 +195,70 @@
         </div>
 
         <div class="note-box" style="position:relative; padding:0; overflow:hidden; margin-bottom:28px; height:340px; isolation:isolate;">
-          
+          <div style="position:absolute; top:0; left:0; right:0; padding:16px 20px 4px; font-weight:700; color:var(--text); font-size:14.5px; z-index:2; pointer-events:none; background:linear-gradient(180deg, rgba(15,42,64,.85), rgba(15,42,64,0));">
+            &#128506; Mapa de Clientes <span style="font-weight:400; color:var(--muted); font-size:12px;">projetos ativos por localização</span>
+          </div>
+
           <!-- No site (navegador normal) o iframe ao vivo do Google My Maps
-                       funciona sem problema -- so o WebView do app Android bloqueia
-                       esse iframe (net::ERR_BLOCKED_BY_RESPONSE). Por isso mostramos
-                       o mapa ao vivo por padrao aqui, e so troca pra imagem estatica
-                       (via script abaixo) quando detecta que esta rodando dentro do
-                       app nativo (Capacitor). Sem link/botao para abrir em outra
-                       aba -- o mapa fica visivel direto no proprio painel. -->
-                  <div id="mapa-clientes-container" style="position:absolute; inset:0;">
-                              <iframe src="https://www.google.com/maps/d/u/0/embed?mid=10Tb-6WWrSx-gk6TIM6r05paJrYBBXcg&amp;ehbc=2E312F"
-                                              style="position:absolute; inset:0; width:100%; height:100%; border:0;" loading="lazy"
-                                              title="Mapa de clientes ativos Extreme Wind"></iframe>iframe>
-                  </div>div>
-        
-                  <div class="card" data-view="equipes" style="position:absolute; bottom:7px; right:7px; z-index:3; width:115px; padding:7px 8px; margin:0;">
-                              <div class="card-title" style="font-size:9px; margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">&#128101; Equipes</div>div>
-                              <div class="kpirow" style="gap:4px 6px;">
-                                            <div><div class="n" style="font-size:12px;">31</div><div class="l" style="font-size:7px;">Ativos</div></div>
-                                            <div><div class="n" style="color:var(--warn); font-size:12px;">5</div><div class="l" style="font-size:7px;">Desmob.</div></div>
-                                            <div><div class="n" style="font-size:12px;">10/10</div><div class="l" style="font-size:7px;">Parques</div></div>
-                              </div>
-                              <div class="go" style="margin-top:4px; font-size:7px;">Ver mais →</div>
-                  </div>
+               funciona sem problema -- so o WebView do app Android bloqueia
+               esse iframe (net::ERR_BLOCKED_BY_RESPONSE). Por isso mostramos
+               o mapa ao vivo por padrao aqui, e so troca pra imagem estatica
+               (via script abaixo) quando detecta que esta rodando dentro do
+               app nativo (Capacitor). Sem link/botao para abrir em outra
+               aba -- o mapa fica visivel direto no proprio painel. -->
+          <div id="mapa-clientes-container" style="position:absolute; inset:0;">
+            <iframe src="https://www.google.com/maps/d/u/0/embed?mid=10Tb-6WWrSx-gk6TIM6r05paJrYBBXcg&amp;ehbc=2E312F"
+              style="position:absolute; inset:0; width:100%; height:100%; border:0;" loading="lazy"
+              title="Mapa de clientes ativos Extreme Wind"></iframe>
+          </div>
+
+          <div class="card" data-view="equipes" style="position:absolute; bottom:7px; right:7px; z-index:3; width:115px; padding:7px 8px; margin:0;">
+            <div class="card-title" style="font-size:9px; margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">&#128101; Equipes</div>
+            <div class="kpirow" style="gap:4px 6px;">
+              <div><div class="n" style="font-size:12px;">31</div><div class="l" style="font-size:7px;">Ativos</div></div>
+              <div><div class="n" style="color:var(--warn); font-size:12px;">5</div><div class="l" style="font-size:7px;">Desmob.</div></div>
+              <div><div class="n" style="font-size:12px;">10/10</div><div class="l" style="font-size:7px;">Parques</div></div>
+            </div>
+            <div class="go" style="margin-top:4px; font-size:7px;">Ver mais →</div>
+          </div>
         </div>
-              <script>
-                        (function () {
-                                      var dentroDoApp = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
-                                      if (!dentroDoApp) return; // no site normal, mantem o iframe ao vivo acima
-                                      var container = document.getElementById('mapa-clientes-container');
-                                      if (!container) return;
-                                      container.innerHTML =
-                                                      '<img src="assets/mapa-clientes.png" alt="Mapa de clientes ativos Extreme Wind" ' +
-                                                      'style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; border:0; display:block; background:#0f1720; cursor:zoom-in;" ' +
-                                                      'onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';">' +
-                                                      '<div style="display:none; position:absolute; inset:0; align-items:center; justify-content:center; color:var(--muted); font-size:12.5px; text-align:center; padding:20px;">' +
-                                                      'Mapa indisponível no momento.</div>';
-                          
-                                     // Dentro do app, a imagem nao e mais um link para o Google My
-                                      // Maps -- ao tocar, so amplia a propria imagem em tela cheia
-                                      // (lightbox local, sem navegar pra lugar nenhum). Toca de novo
-                                      // (ou no X) pra fechar.
-                                      var img = container.querySelector('img');
-                                      if (img) {
-                                                      img.addEventListener('click', function () {
-                                                                        var overlay = document.createElement('div');
-                                                                        overlay.style.cssText =
-                                                                                            'position:fixed; inset:0; z-index:9999; background:rgba(2,10,18,.94); ' +
-                                                                                            'display:flex; align-items:center; justify-content:center; padding:16px;';
-                                                                        overlay.innerHTML =
-                                                                                            '<img src="assets/mapa-clientes.png" alt="Mapa de clientes ativos Extreme Wind" ' +
-                                                                                            'style="max-width:100%; max-height:100%; object-fit:contain; border-radius:8px;">' +
-                                                                                            '<div style="position:absolute; top:14px; right:16px; width:36px; height:36px; border-radius:50%; ' +
-                                                                                            'background:rgba(255,255,255,.12); color:#fff; font-size:20px; line-height:36px; text-align:center; cursor:pointer;">&#10005;</div>';
-                                                                        overlay.addEventListener('click', function () {
-                                                                                            overlay.remove();
-                                                                        });
-                                                                        document.body.appendChild(overlay);
-                                                      });
-                                      }
-                        })();
-              </div></div></script>
+        <script>
+          (function () {
+            var dentroDoApp = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+            if (!dentroDoApp) return; // no site normal, mantem o iframe ao vivo acima
+            var container = document.getElementById('mapa-clientes-container');
+            if (!container) return;
+            container.innerHTML =
+              '<img src="assets/mapa-clientes.png" alt="Mapa de clientes ativos Extreme Wind" ' +
+              'style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; border:0; display:block; background:#0f1720; cursor:zoom-in;" ' +
+              'onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';">' +
+              '<div style="display:none; position:absolute; inset:0; align-items:center; justify-content:center; color:var(--muted); font-size:12.5px; text-align:center; padding:20px;">' +
+              'Mapa indisponível no momento.</div>';
+
+            // Dentro do app, a imagem nao e mais um link para o Google My
+            // Maps -- ao tocar, so amplia a propria imagem em tela cheia
+            // (lightbox local, sem navegar pra lugar nenhum). Toca de novo
+            // (ou no X) pra fechar.
+            var img = container.querySelector('img');
+            if (img) {
+              img.addEventListener('click', function () {
+                var overlay = document.createElement('div');
+                overlay.style.cssText =
+                  'position:fixed; inset:0; z-index:9999; background:rgba(2,10,18,.94); ' +
+                  'display:flex; align-items:center; justify-content:center; padding:16px;';
+                overlay.innerHTML =
+                  '<img src="assets/mapa-clientes.png" alt="Mapa de clientes ativos Extreme Wind" ' +
+                  'style="max-width:100%; max-height:100%; object-fit:contain; border-radius:8px;">' +
+                  '<div style="position:absolute; top:14px; right:16px; width:36px; height:36px; border-radius:50%; ' +
+                  'background:rgba(255,255,255,.12); color:#fff; font-size:20px; line-height:36px; text-align:center; cursor:pointer;">&#10005;</div>';
+                overlay.addEventListener('click', function () {
+                  overlay.remove();
+                });
+                document.body.appendChild(overlay);
+              });
+            }
+          })();
+        </script>
 
         <div class="cards">
           <div class="card" data-view="frota">
