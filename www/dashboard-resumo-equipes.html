@@ -110,11 +110,10 @@
 
 <div class="panel active" id="panel-ativos">
 <div class="kpis">
-  <div class="kpi"><div class="label">Tecnicos ativos</div><div class="value">27</div><div class="sub">1 em desmobilizacao ate </div></div>
-  <div class="kpi"><div class="label">Planejado (headcount)</div><div class="value">26</div><div class="sub">meta de equipes</div></div>
-  <div class="kpi"><div class="label">Deficit total</div><div class="value red">0</div><div class="sub">abaixo do plano</div></div>
-  <div class="kpi"><div class="label">Parques ativos</div><div class="value">8<span class="sub" style="font-size:16px;"> / 8</span></div><div class="sub">0 parques vazios</div></div>
-  <div class="kpi"><div class="label">Em desmobilizacao</div><div class="value amber">1</div><div class="sub">saida ja decidida, viagem ate </div></div>
+  <div class="kpi"><div class="label">Tecnicos ativos</div><div class="value">26</div><div class="sub">em campo agora</div></div>
+  <div class="kpi"><div class="label">Planejado (headcount)</div><div class="value">29</div><div class="sub">meta de equipes</div></div>
+  <div class="kpi"><div class="label">Deficit total</div><div class="value red">-3</div><div class="sub">abaixo do plano</div></div>
+  <div class="kpi"><div class="label">Parques ativos</div><div class="value">8<span class="sub" style="font-size:16px;"> / 9</span></div><div class="sub">1 parques vazios</div></div>
 </div>
 <div class="grid2">
   <div class="card"><h2>Por cliente <span>tecnicos ativos</span></h2><canvas id="chartCliente"></canvas></div>
@@ -279,9 +278,10 @@ var parques = [
   {nome:"BAIXA DO FEIJÃO/RN", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
   {nome:"SANTO AGOSTINHO/RN", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
   {nome:"TUCANO/BA", cliente:"SIEMENS", suop:"WILDNER", real:3, plano:3},
+  {nome:"BABILÔNIA/BA", cliente:"SIEMENS", suop:"WILDNER", real:0, plano:3},
   {nome:"INTERMARÍTIMA/BA", cliente:"SIEMENS", suop:"WILDNER", real:2, plano:2}
 ];
-var emDesmobQtd = 1;
+var emDesmobQtd = 0;
 function badgeClass(c){ return {GE:'ge',NORDEX:'nordex',SIEMENS:'siemens'}[c] || 'ge'; }
 var tbody = document.getElementById('tbodyParques');
 parques.forEach(function(p){
@@ -404,7 +404,7 @@ var chartRankingParque = new Chart(document.getElementById('chartRankingParque')
 
 var rankingCliente = [
   ["GE",393,385,4],
-  ["SIEMENS",206,191,1],
+  ["SIEMENS",206,192,1],
   ["NORDEX / LWS",62,56,0],
   ["SINOMA BLADES",21,21,1],
   ["LM",11,11,0],
@@ -427,7 +427,7 @@ var chartRankingCliente = new Chart(document.getElementById('chartRankingCliente
 });
 
 var mesesTodos = ["Jan/24","Fev/24","Mar/24","Abr/24","Mai/24","Jun/24","Jul/24","Ago/24","Set/24","Out/24","Nov/24","Dez/24","Jan/25","Fev/25","Mar/25","Abr/25","Mai/25","Jun/25","Jul/25","Ago/25","Set/25","Out/25","Nov/25","Dez/25","Jan/26","Fev/26","Mar/26","Abr/26","Mai/26","Jun/26","Jul/26","Ago/26"];
-var motivoClienteTodos = [16,3,16,26,15,24,10,21,21,6,25,10,38,15,20,29,43,28,30,34,33,25,50,59,71,34,42,41,44,25,30,9];
+var motivoClienteTodos = [16,3,16,26,15,24,10,21,21,6,25,10,38,15,20,29,43,28,30,34,33,25,50,59,71,34,42,41,44,25,30,10];
 var motivoExtremeTodos = [11,5,5,7,14,22,17,14,11,17,16,8,7,7,15,11,21,19,10,12,7,9,9,18,19,19,28,56,34,22,20,2];
 
 // Mes atual + ultimos 12 meses (13 barras no total)
