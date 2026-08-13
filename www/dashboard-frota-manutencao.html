@@ -272,7 +272,7 @@
   </div>
   <div class="kpi">
     <div class="label">Média de KM</div>
-    <div class="value" id="kmValue" data-km="28771" style="color: var(--ok);">28.771</div>
+    <div class="value" id="kmValue" data-km="27726" style="color: var(--ok);">27.726</div>
     <div class="foot">Limite p/ renovação: ≥ 30.000 km</div>
   </div>
 </div>
@@ -966,8 +966,8 @@
       </tr>
     </thead>
     <tbody>
-      <tr><td>KM Ponto de Troca</td><td class="cell-warn">78%</td><td class="cell-warn">77%</td><td class="cell-warn">77%</td><td class="cell-warn">77%</td><td class="cell-warn cur">73%</td></tr>
-      <tr><td>Saldo Extra</td><td class="cell-nok">67%</td><td class="cell-nok">69%</td><td class="cell-nok">69%</td><td class="cell-nok">69%</td><td class="cell-nok cur">64%</td></tr>
+      <tr><td>KM Ponto de Troca</td><td class="cell-warn">71%</td><td class="cell-warn">73%</td><td class="cell-warn">73%</td><td class="cell-warn">73%</td><td class="cell-warn cur">73%</td></tr>
+      <tr><td>Saldo Extra</td><td class="cell-nok">57%</td><td class="cell-nok">64%</td><td class="cell-nok">64%</td><td class="cell-nok">64%</td><td class="cell-nok cur">64%</td></tr>
       <tr><td>Checklist</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok cur">100%</td></tr>
       <tr><td>Revisão</td><td class="cell-ok">93%</td><td class="cell-ok">94%</td><td class="cell-warn">87%</td><td class="cell-ok">91%</td><td class="cell-ok cur">91%</td></tr>
       <tr><td>Estepe Extra</td><td class="cell-warn">87%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok">100%</td><td class="cell-ok cur">100%</td></tr>
@@ -1037,7 +1037,7 @@
 const rows = [
 ["TYA7G48","LOCALIZA","3","SÃO FERNANDO 1/RN","Siemens","19/02/2026","5,80","N/OK","N/OK","OK","OK","OK","OK","OK","10,74","OK","N/A"],
 ["TER0D54","LOCALIZA","1","COPEL/RN","GE Blade","06/12/2025","8,30","N/OK","OK","OK","OK","OK","N/OK","OK","13,90","OK","N/A"],
-["TXZ5J79","LOCALIZA","1","DELTA 1/MA","Siemens","21/02/2026","5,73","OK","N/OK","OK","OK","OK","OK","OK","9,19","OK","N/A"],
+["TXZ5J79","LOCALIZA","1","AMD 2","Siemens","21/02/2026","5,73","OK","N/OK","OK","OK","OK","OK","OK","9,19","OK","N/A"],
 ["TET3C50","UNIDAS","2","BAIXA DO FEIJÃO/RN","Nordex","06/02/2026","6,23","N/OK","OK","OK","OK","OK","N/OK","OK","10,11","N/A","N/A"],
 ["TWY4C61","UNIDAS","2","TUCANO/BA","Nordex","18/08/2025","11,97","OK","OK","-","OK","OK","N/OK","OK","10,21","N/A","N/A"],
 ["TXY8H30","LOCALIZA","2","SÃO FERNANDO 2/RN","Siemens","20/02/2026","5,77","OK","N/OK","OK","OK","OK","OK","OK","10,11","N/A","N/A"],
@@ -1197,13 +1197,13 @@ const histData = [
   { wk:"WK23", geral:91.0, cats:[80.0,60.0,90.0,75.0,95.2,95.0,100,null,100.0,100.0] },
   { wk:"WK24", geral:85.0, cats:[80.0,73.3,80.0,65.0,90.0,90.0,100,null,100.0,100.0] },
   { wk:"WK25", geral:89.0, cats:[80.0,73.3,90.0,70.0,100,85.0,100,null,100.0,100.0] },
-  { wk:"WK26", geral:91.6, cats:[81.8,63.6,89.5,78.9,94.7,100,94.7,null,100.0,100.0] },
-  { wk:"WK27", geral:96.2, cats:[77.8,60.0,93.8,93.8,100,100,93.8,null,100.0,null] },
-  { wk:"WK28", geral:98.8, cats:[77.8,66.7,93.8,100,100,100,100,null,100.0,null] },
-  { wk:"WK29", geral:94.7, cats:[77.8,66.7,100,93.3,86.7,93.3,100,null,100.0,null] },
-  { wk:"WK30", geral:96.2, cats:[76.9,69.2,100,93.8,100,87.5,100,null,100.0,null] },
-  { wk:"WK31", geral:96.0, cats:[76.9,69.2,100,86.7,100,93.3,100,null,100.0,null] },
-  { wk:"WK32", geral:92.7, cats:[76.9,69.2,100,90.9,100,72.7,100,null,100.0,null] },
+  { wk:"WK26", geral:91.6, cats:[75.0,55.6,89.5,78.9,94.7,100,94.7,null,100.0,100.0] },
+  { wk:"WK27", geral:96.2, cats:[71.4,55.6,93.8,93.8,100,100,93.8,null,100.0,null] },
+  { wk:"WK28", geral:98.8, cats:[71.4,57.1,93.8,100,100,100,100,null,100.0,null] },
+  { wk:"WK29", geral:94.7, cats:[71.4,57.1,100,93.3,86.7,93.3,100,null,100.0,null] },
+  { wk:"WK30", geral:96.2, cats:[72.7,63.6,100,93.8,100,87.5,100,null,100.0,null] },
+  { wk:"WK31", geral:96.0, cats:[72.7,63.6,100,86.7,100,93.3,100,null,100.0,null] },
+  { wk:"WK32", geral:92.7, cats:[72.7,63.6,100,90.9,100,72.7,100,null,100.0,null] },
   { wk:"WK33", geral:92.7, cats:[72.7,63.6,100.0,90.9,100.0,72.7,100.0,null,100.0,null] },
 ];
 // Consumo, Doc Postado e Doc Entregue removidos desta tabela por pedido do
@@ -1285,14 +1285,17 @@ toggleHist.addEventListener("click", () => {
 
 // Plano de Ação — WK29 (aba BASE DESHBOARD, colunas V–AD, linhas 1231–1262)
 const acaoData = [
-  { acao:"REVISÃO", tipo:"PREVENTIVA", parque:"INTERMARÍTIMA/BA", quem:"JOÃO/ALEX SALES", status:"08/08/2026", obs:"Alinhar c/ Locadora" },
-  { acao:"40K de KM RODADOS/SALDO ESTOURADO", tipo:"ADMINISTRATIVA", parque:"SF1", quem:"JOÃO/ANTÔNIO CÉSAR", status:"NA DESMOB", obs:"DEVOLUÇÃO NA DESMOB" },
-  { acao:"40K de KM RODADOS", tipo:"ADMINISTRATIVA", parque:"COPEL", quem:"JOÃO/SERPA", status:"NA DESMOB", obs:"DEVOLUÇÃO NA DESMOB" },
+  { acao:"40K de KM RODADOS/SALDO ESTOURADO", tipo:"ADMINISTRATIVA", parque:"SF1", quem:"JOÃO/", status:"NA DESMOB", obs:"" },
+  { acao:"MEDIÇÃO PNEU N/OK - CONFIRMAR COM PAQUÍMETRO", tipo:"PREVENTIVA", parque:"SF1", quem:"JOÃO/", status:"07/08/2026", obs:"AGUARDANDO MEDIÇÃO COM PAQUÍMETRO" },
+  { acao:"40K de KM RODADOS", tipo:"ADMINISTRATIVA", parque:"COPEL", quem:"JOÃO/", status:"NA DESMOB", obs:"" },
+  { acao:"MEDIÇÃO PNEU N/OK - CONFIRMAR COM PAQUÍMETRO", tipo:"PREVENTIVA", parque:"COPEL", quem:"JOÃO/", status:"09/08/2026", obs:"AGUARDANDO MEDIÇÃO COM PAQUÍMETRO" },
+  { acao:"40K de KM RODADOS", tipo:"ADMINISTRATIVA", parque:"BAIXA DO FEIJÃO", quem:"JOÃO/", status:"NA DESMOB", obs:"" },
+  { acao:"MEDIÇÃO PNEU N/OK - CONFIRMAR COM PAQUÍMETRO", tipo:"PREVENTIVA", parque:"BAIXA DO FEIJÃO", quem:"JOÃO/", status:"10/08/2026", obs:"AGUARDANDO MEDIÇÃO COM PAQUÍMETRO" },
+  { acao:"MEDIÇÃO PNEU N/OK - CONFIRMAR COM PAQUÍMETRO", tipo:"PREVENTIVA", parque:"TUCANO", quem:"JOÃO/", status:"", obs:"AGUARDANDO MEDIÇÃO COM PAQUÍMETRO" },
+  { acao:"SALDO CONTRATO ESTOURADO", tipo:"ADMINISTRATIVA", parque:"DELTA 1", quem:"JOÃO/", status:"ACOMPANHAR", obs:"SALDO EXTRA- EM PROJETO PARA RECUPERAR" },
   { acao:"SALDO CONTRATO ESTOURADO", tipo:"ADMINISTRATIVA", parque:"SF2", quem:"JOÃO/", status:"ACOMPANHAR", obs:"SALDO EXTRA- EM PROJETO PARA RECUPERAR" },
   { acao:"SALDO CONTRATO ESTOURADO", tipo:"ADMINISTRATIVA", parque:"OITIS 1", quem:"JOÃO/", status:"ACOMPANHAR", obs:"SALDO EXTRA- EM PROJETO PARA RECUPERAR" },
-  { acao:"SALDO CONTRATO ESTOURADO", tipo:"ADMINISTRATIVA", parque:"ADM1", quem:"JOÃO/", status:"ACOMPANHAR", obs:"SALDO EXTRA- EM PROJETO PARA RECUPERAR" },
-  { acao:"SALDO CONTRATO ESTOURADO", tipo:"ADMINISTRATIVA", parque:"INTERMARÍTIMA/BA", quem:"JOÃO/ALEX SALES", status:"ACOMPANHAR", obs:"RECÉM-MOBILIZADO" },
-  { acao:"MEDIÇÃO PNEU N/OK - CONFIRMAR COM PAQUÍMETRO", tipo:"PREVENTIVA", parque:"TUCANO", quem:"JOÃO/ÉDIPO CARDOSO", status:"07/08/2026", obs:"AGUARDANDO MEDIÇÃO COM PAQUÍMETRO" }
+  { acao:"REVISÃO", tipo:"PREVENTIVA", parque:"INTERMARÍTIMA/BA", quem:"JOÃO/", status:"", obs:"Alinhar c/ Locadora" }
 ];
 
 function acaoStatusTag(s){
