@@ -155,7 +155,7 @@
     </div>
   </div>
   <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap">
-    <div class="badge-week" id="badgeAtualizado">Atualizado 13/08/2026</div>
+    <div class="badge-week" id="badgeAtualizado">Atualizado 16/08/2026</div>
     <button class="toggle-btn" id="navAcao" style="background:var(--nok)">Plano de Ação</button>
   </div>
 </header>
@@ -171,7 +171,7 @@
   </div>
   <div class="kpi kpi-fill-green">
     <div class="label">Entregues 2026 (Log.)</div>
-    <div class="n" id="kpiEntregues">515</div>
+    <div class="n" id="kpiEntregues">526</div>
   </div>
   <div class="kpi kpi-fill-red">
     <div class="label">Canceladas 2026 (Almox.)</div>
@@ -183,10 +183,10 @@
   <h2>Resumo — Requisições em Aberto 2026</h2>
   <p class="panel-note">Situações que ainda aguardam ação (Almoxarifado ou Logística)</p>
   <div class="aberto" id="abertoBadges">
-    <div class="aberto-badge"><div class="n" id="abEmSeparacao">1</div><div class="l">Em separação</div></div>
-    <div class="aberto-badge"><div class="n" id="abAguardandoColeta">18</div><div class="l">Aguardando coleta</div></div>
-    <div class="aberto-badge warn"><div class="n" id="abEmTrajeto">4</div><div class="l">Em trajeto</div></div>
-    <div class="aberto-badge total"><div class="n" id="abTotal">23</div><div class="l">Total em aberto</div></div>
+    <div class="aberto-badge"><div class="n" id="abEmSeparacao">0</div><div class="l">Em separação</div></div>
+    <div class="aberto-badge"><div class="n" id="abAguardandoColeta">11</div><div class="l">Aguardando coleta</div></div>
+    <div class="aberto-badge warn"><div class="n" id="abEmTrajeto">1</div><div class="l">Em trajeto</div></div>
+    <div class="aberto-badge total"><div class="n" id="abTotal">12</div><div class="l">Total em aberto</div></div>
   </div>
 </div>
 
@@ -213,9 +213,9 @@
 
   <div class="collapsible" id="acaoBody">
   <div class="aberto" style="max-width:620px; margin:6px 0 16px">
-    <div class="aberto-badge"><div class="n" id="acaoCountAlmox">19</div><div class="l">Ações Almoxarifado</div></div>
-    <div class="aberto-badge"><div class="n" id="acaoCountLog">4</div><div class="l">Ações Logística</div></div>
-    <div class="aberto-badge warn"><div class="n" id="acaoCountAssinatura">4</div><div class="l">Aguardando Assinatura</div></div>
+    <div class="aberto-badge"><div class="n" id="acaoCountAlmox">11</div><div class="l">Ações Almoxarifado</div></div>
+    <div class="aberto-badge"><div class="n" id="acaoCountLog">1</div><div class="l">Ações Logística</div></div>
+    <div class="aberto-badge warn"><div class="n" id="acaoCountAssinatura">3</div><div class="l">Aguardando Assinatura</div></div>
   </div>
 
   <h3 style="font-size:12.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:0 0 8px;">Ações Almoxarifado</h3>
@@ -223,17 +223,9 @@
   <table>
     <thead><tr><th>Projeto</th><th>Responsável</th><th>Prazo para Entrega</th><th>Destinatário</th><th>Status</th></tr></thead>
     <tbody id="acoesAlmox">
-    <tr><td>COPEL</td><td>POLLYANA</td><td>27/07/2026</td><td>SERGIO MATEUS</td><td>A SEPARAR</td></tr>
     <tr><td>SANTO AGOSTINHO</td><td>JAMILE</td><td>03/08/2026</td><td></td><td>AGUARDANDO COLETA</td></tr>
     <tr><td>SANTO AGOSTINHO</td><td>JAMILE</td><td>03/08/2026</td><td></td><td>AGUARDANDO COLETA</td></tr>
     <tr><td>SÃO VITOR</td><td>JAMILE</td><td>03/08/2026</td><td></td><td>AGUARDANDO COLETA</td></tr>
-    <tr><td>OITIS</td><td>JAMILE</td><td>17/08/2026</td><td></td><td>AGUARDANDO COLETA</td></tr>
-    <tr><td>COPEL</td><td>JAMILE</td><td>17/08/2026</td><td></td><td>AGUARDANDO COLETA</td></tr>
-    <tr><td>SÃO VITOR</td><td>JAMILE</td><td>17/08/2026</td><td></td><td>AGUARDANDO COLETA</td></tr>
-    <tr><td>TUCANO</td><td>JAMILE</td><td>17/08/2026</td><td></td><td>AGUARDANDO COLETA</td></tr>
-    <tr><td>SÃO VITOR</td><td>WILDNER</td><td>17/08/2026</td><td></td><td>AGUARDANDO COLETA</td></tr>
-    <tr><td>TUCANO</td><td>WILDNER</td><td>17/08/2026</td><td></td><td>AGUARDANDO COLETA</td></tr>
-    <tr><td>COPEL</td><td>EVAIR</td><td>sem previsão</td><td></td><td>AGUARDANDO COLETA</td></tr>
     <tr><td>SERRA DA BABILONIA</td><td>JAMILE</td><td>17/08/2026</td><td></td><td>AGUARDANDO COLETA</td></tr>
     <tr><td>SERRA DA BABILONIA</td><td>JAMILE</td><td>17/08/2026</td><td></td><td>AGUARDANDO COLETA</td></tr>
     <tr><td>SERRA DA BABILONIA</td><td>JAMILE</td><td>17/08/2026</td><td></td><td>AGUARDANDO COLETA</td></tr>
@@ -251,10 +243,7 @@
   <table>
     <thead><tr><th>Projeto</th><th>Responsável</th><th>Prazo para Entrega</th><th>Destinatário</th><th>Data de Entrega</th><th>Status</th></tr></thead>
     <tbody id="acoesLog">
-    <tr class="row-warn"><td>OITIS</td><td>EVAIR</td><td>sem previsão</td><td>John Lenon</td><td>10/08/2026</td><td>EM TRAJETO</td></tr>
-    <tr class="row-warn"><td>SÃO FERNANDO</td><td>JAMILE</td><td>10/08/2026</td><td>William Cassiano</td><td>11/08/2026</td><td>EM TRAJETO</td></tr>
-    <tr class="row-warn"><td>SÃO FERNANDO</td><td>JAMILE</td><td>10/08/2026</td><td>José Wederson</td><td>11/08/2026</td><td>EM TRAJETO</td></tr>
-    <tr class="row-warn"><td>SANTO AGOSTINHO</td><td>WILDER</td><td>10/08/2026</td><td>LERNITON</td><td></td><td>EM TRAJETO</td></tr>
+    <tr class="row-warn"><td>OITIS</td><td>JAMILE</td><td>17/08/2026</td><td>SANDRELINO</td><td></td><td>EM TRAJETO</td></tr>
     </tbody>
   </table>
   </div>
@@ -265,10 +254,9 @@
   <table>
     <thead><tr><th>Projeto</th><th>Responsável</th><th>Prazo para Entrega</th><th>Destinatário</th><th>Data de Entrega</th></tr></thead>
     <tbody id="acoesAssinatura">
-    <tr class="row-warn"><td>OITIS</td><td>EVAIR</td><td>sem previsão</td><td>John Lenon</td><td>10/08/2026</td></tr>
-    <tr class="row-warn"><td>SÃO FERNANDO</td><td>JAMILE</td><td>10/08/2026</td><td>William Cassiano</td><td>11/08/2026</td></tr>
-    <tr class="row-warn"><td>SÃO FERNANDO</td><td>JAMILE</td><td>10/08/2026</td><td>José Wederson</td><td>11/08/2026</td></tr>
-    <tr class="row-warn"><td>SANTO AGOSTINHO</td><td>WILDER</td><td>10/08/2026</td><td>LERNITON</td><td></td></tr>
+    <tr class="row-warn"><td>SANTO AGOSTINHO</td><td>WILDER</td><td>10/08/2026</td><td>LERNITON</td><td>15/08/2026</td></tr>
+    <tr class="row-warn"><td>OITIS</td><td>JAMILE</td><td>17/08/2026</td><td>SANDRELINO</td><td></td></tr>
+    <tr class="row-warn"><td>COPEL</td><td>EVAIR</td><td>sem previsão</td><td>JONATO DIAS FEITOSA</td><td>13/08/2026</td></tr>
     </tbody>
   </table>
   </div>
@@ -280,7 +268,7 @@
 <script>
   var evolucaoMeses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago"];
   var evolucaoReq = [100, 83, 106, 76, 58, 83, 38, 25];
-  var evolucaoEnt = [96, 76, 103, 72, 58, 73, 31, 6];
+  var evolucaoEnt = [96, 76, 103, 72, 58, 73, 32, 16];
   new Chart(document.getElementById("chartEvolucao"), {
     type:"line",
     data:{ labels: evolucaoMeses,
