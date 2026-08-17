@@ -148,6 +148,7 @@
     <nav class="menu">
       <div class="menu-label">Visão</div>
       <div class="menu-item active" data-view="home"><span class="ic">&#8962;</span> Início</div>
+      <div class="menu-item" data-view="reuniao-diaria"><span class="ic">&#128197;</span> Reunião Diária</div>
       <div class="menu-item" data-view="demandas"><span class="ic">&#9888;</span> <span id="menuDemandasLabel">NOSSAS DEMANDAS (HOJE)</span></div>
       <div class="menu-item" data-view="busca-tecnico"><span class="ic">&#128269;</span> Buscar Técnico</div>
       <div style="padding:2px 12px 10px 40px;">
@@ -178,7 +179,7 @@
           <div class="path" id="topPath">Extreme Wind / Logística &amp; Frotas</div>
         </div>
       </div>
-      <div class="badge" id="topBadge">Atualizado 16/08/2026</div>
+      <div class="badge" id="topBadge">Atualizado 13/08/2026</div>
     </div>
 
     <div class="view">
@@ -192,6 +193,11 @@
             <h3>Painel de Logística &amp; Frotas</h3>
             <p>Ponto único de acesso aos dashboards de controle de equipes (mobilização/desmobilização) e de frota/manutenção de veículos da Extreme Wind. Selecione um item no menu ao lado ou em um dos cartões abaixo.</p>
           </div>
+        </div>
+
+        <div class="card" data-view="reuniao-diaria" style="border-left-color:var(--teal); margin-bottom:28px;">
+          <div class="card-title">&#128197; Reunião Diária</div>
+          <div class="go">Abrir o dashboard da reunião diária (RDO) →</div>
         </div>
 
         <div class="note-box" style="position:relative; padding:0; overflow:hidden; margin-bottom:28px; height:340px; isolation:isolate;">
@@ -268,34 +274,14 @@
             <div class="go">Ver detalhamento por veículo e plano de ação →</div>
           </div>
 
-          <div class="card" data-view="boletos">
-            <div class="card-title">&#129534; Controle de Boletos</div>
-            <div class="kpirow">
-              <div><div class="n">2<span style="font-size:14px; color:var(--muted);"> / 0</span></div><div class="l">À vencer (U/L)</div></div>
-              <div><div class="n" style="color:var(--nok)">0<span style="font-size:14px; color:var(--muted);"> / 0</span></div><div class="l">Multas (U/L)</div></div>
-              <div><div class="n" style="color:var(--warn)">3<span style="font-size:14px; color:var(--muted);"> / 1</span></div><div class="l">Contestação (U/L)</div></div>
-            </div>
-            <div class="go">Ver indicadores por locadora e atualizações semanais →</div>
-          </div>
-
           <div class="card" data-view="envios">
             <div class="card-title">&#128230; Envios Logísticos</div>
             <div class="kpirow">
               <div><div class="n">569</div><div class="l">Requisições 2026</div></div>
-              <div><div class="n" style="color:var(--ok)">526</div><div class="l">Entregues (Log.)</div></div>
-              <div><div class="n" style="color:var(--nok)">12</div><div class="l">Em aberto</div></div>
+              <div><div class="n" style="color:var(--ok)">515</div><div class="l">Entregues (Log.)</div></div>
+              <div><div class="n" style="color:var(--nok)">23</div><div class="l">Em aberto</div></div>
             </div>
             <div class="go">Ver requisições de materiais e plano de ação →</div>
-          </div>
-
-          <div class="card" data-view="reembolso">
-            <div class="card-title">&#128176; Reembolso</div>
-            <div class="kpirow">
-              <div><div class="n">R$ 5.404</div><div class="l">Total mês atual</div></div>
-              <div><div class="n">R$ 2.610</div><div class="l">Semana atual (parcial)</div></div>
-              <div><div class="n">R$ 157.062</div><div class="l">Acumulado 2026</div></div>
-            </div>
-            <div class="go">Ver evolução, reembolso por cliente e por categoria →</div>
           </div>
         </div>
 
@@ -304,6 +290,7 @@
         </div>
       </div>
 
+      <iframe id="view-reuniao-diaria" src="dashboard-reuniao-diaria.html" title="Reunião Diária"></iframe>
       <iframe id="view-demandas" src="dashboard-nossas-demandas.html" title="Nossas Demandas"></iframe>
       <iframe id="view-busca-tecnico" src="dashboard-resumo-equipes.html#busca" title="Buscar Técnico"></iframe>
       <iframe id="view-equipes" src="dashboard-resumo-equipes.html" title="Controle de Equipes"></iframe>
@@ -320,6 +307,7 @@
 
   const TITLES = {
     home: { title: "Início", path: "Extreme Wind / Logística & Frotas" },
+    "reuniao-diaria": { title: "Reunião Diária", path: "Extreme Wind / Logística & Frotas / Reunião Diária" },
     demandas: { title: "Nossas Demandas", path: "Extreme Wind / Logística & Frotas / Nossas Demandas" },
     "busca-tecnico": { title: "Buscar Técnico", path: "Extreme Wind / Logística & Frotas / Buscar Técnico" },
     equipes: { title: "Controle de Equipes", path: "Extreme Wind / Logística & Frotas / Controle de Equipes" },
@@ -332,6 +320,7 @@
   function showView(view){
     document.querySelectorAll(".menu-item").forEach(function(el){ el.classList.toggle("active", el.dataset.view === view); });
     document.getElementById("view-home").classList.toggle("active", view === "home");
+    document.getElementById("view-reuniao-diaria").classList.toggle("active", view === "reuniao-diaria");
     document.getElementById("view-demandas").classList.toggle("active", view === "demandas");
     document.getElementById("view-busca-tecnico").classList.toggle("active", view === "busca-tecnico");
     document.getElementById("view-equipes").classList.toggle("active", view === "equipes");
