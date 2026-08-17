@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>Reunião Diária</title>
+<link rel="icon" type="image/png" href="assets/icone-helice-color.png">
+<style>
+  :root{
+    --brand:#00679A; --brand-dark:#055384; --brand-deep:#021C2C;
+    --steel:#1C8CE8; --teal:#12BFA8;
+    --bg:#081C2C; --panel:#0F2A40; --panel2:#123350; --line:#1E4363;
+    --text:#EAF1F7; --muted:#8FA9C0;
+    --ok:#12A874; --nok:#E0483C; --warn:#D89A2B; --na:#5C7A93; --orange:#E8730C;
+  }
+  body.light-mode{
+    --brand-deep:#E4E8EC;
+    --bg:#F4F7FA; --panel:#E7EAED; --panel2:#DBDFE3; --line:#C6CCD1;
+    --text:#1A2733; --muted:#57728A;
+  }
+  .theme-toggle{
+    position:fixed; top:16px; right:16px; z-index:200;
+    background:var(--panel); border:1px solid var(--line); color:var(--text);
+    border-radius:20px; padding:9px 18px; font-size:12.5px; font-weight:700;
+    cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,.25);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:Segoe UI,Arial,sans-serif; background:var(--bg); color:var(--text);
+    padding:24px; line-height:1.4;
+  }
+  .sync-banner{
+    background:#0A2A3A; border:1px solid var(--brand); color:#9FD3EA;
+    padding:10px 16px; border-radius:8px; font-size:12.5px; margin-bottom:18px;
+    display:flex; align-items:center; gap:8px; justify-content:space-between; flex-wrap:wrap;
+  }
+  .sync-banner.err{ border-color:var(--nok); background:#3A0A0A; color:#F2A08C; }
+  .sync-banner .status{ font-weight:700; }
+  header{
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    padding-bottom:18px; border-bottom:1px solid var(--line); margin-bottom:20px;
+  }
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand img{height:36px; width:auto; display:block;}
+  .brand h1{font-size:19px; margin:0;}
+  .brand .sub{font-size:11.5px; color:var(--muted); margin-top:2px;}
+  .badge-week{background:var(--panel2); border:1px solid var(--line); color:var(--muted); font-size:11.5px; padding:6px 14px; border-radius:20px;}
+
+  .kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin-bottom:24px; align-items:start;}
+  .kpi.tech-box{min-width:220px;}
+  .tech-box .sub-label{
+    font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.03em;
+    margin-top:10px; margin-bottom:4px;
+  }
+  .tech-list{list-style:none; margin:0; padding:0; font-size:12.5px;}
+  .tech-list li{padding:4px 0; border-top:1px solid var(--line);}
+  .tech-list li:first-child{border-top:none;}
+  .tech-list [contenteditable="true"]{border-radius:3px; padding:0 3px; cursor:text;}
+  .tech-list [contenteditable="true"]:hover{background:rgba(28,140,232,.06);}
+  .tech-list [contenteditable="true"]:focus{outline:none; background:rgba(28,140,232,.16);}
+  .kpi{background:var(--panel); border:1px solid var(--line); border-left:4px solid var(--brand); border-radius:10px; padding:16px 18px;}
+  .kpi .label{font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.03em;}
+  .kpi .n{font-size:26px; font-weight:700; margin-top:4px;}
+  .kpi.warn{border-left-color:var(--warn);}
+  .kpi.ok{border-left-color:var(--ok);}
+
+  .block-nav{
+    display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap;
+    position:sticky; top:0; z-index:50; background:var(--bg);
+    padding:14px 0; margin-top:-14px; box-shadow:0 8px 12px -8px rgba(0,0,0,.4);
+  }
+  .block-btn{
+    background:var(--panel); border:1px solid var(--line); color:var(--muted);
+    padding:22px 18px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer;
+    transition:background .15s, color .15s, border-color .15s;
+    display:inline-block; vertical-align:top;
+    width:230px; white-space:normal; text-align:center; line-height:1.3;
+  }
+  .block-btn:hover{background:var(--panel2); color:var(--text);}
+  .block-btn.active{background:var(--brand); color:#fff; border-color:var(--brand);}
+  .block-btn img.gif-icon{
+    height:56px; width:auto; border-radius:6px; vertical-align:middle; margin-right:6px;
+    display:inline-block; border:1px solid rgba(255,255,255,.25);
+  }
+  .btn-icons{display:inline-flex; margin-right:4px;}
+  .block-btn .count{font-weight:400; opacity:.8; margin-left:4px;}
+
+  .block-view{display:none;}
+  .block-view.active{display:block;}
+
+  .panel{background:var(--panel); border:1px solid var(--line); border-radius:10px; margin-bottom:18px; overflow:hidden;}
+  .panel.blank-panel{border-style:dashed; opacity:.72;}
+  .panel.blank-panel:focus-within{opacity:1;}
+  .placeholder-title{color:var(--muted); font-style:italic;}
+  .placeholder-title:focus{color:var(--text); font-style:normal;}
+  .panel-head{
+    background:var(--panel2); padding:14px 18px; display:flex; align-items:flex-start;
+    justify-content:space-between; gap:12px; flex-wrap:wrap;
+  }
+  .panel-head h2{font-size:14px; margin:0 0 10px 0; display:flex; align-items:center; gap:8px;}
+  .park-info{flex:1; min-width:200px; text-align:left;}
+  .logo-picker{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:6px; flex:none; width:100px;
+  }
+  .mfr-logo{
+    height:64px; width:auto; max-width:96px; object-fit:contain; border-radius:6px;
+    background:#fff; padding:6px 10px; border:1px solid var(--line);
+  }
+  .logo-select{
+    background:var(--panel2); color:var(--muted); border:1px solid var(--line);
+    border-radius:5px; font-size:10px; padding:2px 4px; cursor:pointer; max-width:96px;
+    text-align:center;
+  }
+  .info-chips{display:flex; flex-wrap:wrap; gap:10px;}
+  .chip{
+    background:var(--brand-deep); border:1px solid var(--line); border-radius:8px;
+    padding:6px 14px; display:flex; flex-direction:column; gap:2px; min-width:84px;
+  }
+  .chip-label{
+    font-size:9.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em;
+  }
+  .chip-value{
+    font-size:13px; color:var(--text); font-weight:700; white-space:nowrap;
+    border-radius:4px; padding:1px 4px; margin:-1px -4px;
+  }
+  .chip-value:focus{outline:none; background:rgba(28,140,232,.18); box-shadow:0 0 0 1px var(--steel);}
+  .status-select{
+    font-size:11.5px; padding:5px 10px; border-radius:20px; font-weight:700; white-space:nowrap;
+    cursor:pointer; font-family:inherit;
+  }
+  .status-select.st-ativa{background:rgba(18,168,116,.18); color:var(--ok); border:1px solid var(--ok);}
+  .status-select.st-standby{background:rgba(216,154,42,.18); color:var(--warn); border:1px solid var(--warn);}
+  .status-select.st-desmob{background:rgba(232,115,12,.18); color:var(--orange); border:1px solid var(--orange);}
+  .status-select.st-stop{background:rgba(224,72,60,.18); color:var(--nok); border:1px solid var(--nok);}
+  .status-select option{background:var(--panel); color:var(--text);}
+
+  table{width:100%; border-collapse:collapse; font-size:12px;}
+  thead th{
+    text-align:left; padding:8px 12px; background:var(--brand-deep); color:var(--muted);
+    font-size:10px; text-transform:uppercase; letter-spacing:.03em; white-space:nowrap;
+  }
+  tbody td{padding:8px 12px; border-top:1px solid var(--line); vertical-align:top;}
+  tbody tr:hover{background:rgba(255,255,255,.02);}
+  .obs{color:var(--muted); font-size:11.5px;}
+  .aprovados-box{padding:12px 18px; border-top:1px solid var(--line); background:rgba(255,255,255,.015);}
+  .aprovados-box .ap-title{font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.03em; margin-bottom:8px;}
+  .ap-names{display:flex; flex-wrap:wrap; gap:6px;}
+  .ap-name{
+    display:inline-flex; align-items:center; gap:4px;
+    background:var(--panel2); border:1px solid var(--line); border-radius:12px;
+    padding:3px 6px 3px 4px; font-size:11.5px; font-weight:600;
+  }
+  .ap-name.drag-over{outline:2px dashed var(--steel); outline-offset:1px;}
+  .ap-handle{cursor:grab; opacity:.5; font-size:12px; user-select:none;}
+  .ap-handle:active{cursor:grabbing;}
+  .ap-text[contenteditable="true"]{cursor:text; outline:none; min-width:8px;}
+  .ap-text[contenteditable="true"]:focus{background:rgba(28,140,232,.14); border-radius:3px;}
+  .ap-name:nth-of-type(-n+3) .ap-text{color:#22B24C;}
+  .ap-name:nth-of-type(n+4) .ap-text{color:var(--text);}
+  tbody td[contenteditable="true"]{cursor:text;}
+  tbody td[contenteditable="true"]:hover{background:rgba(28,140,232,.06);}
+  tbody td[contenteditable="true"]:focus{
+    outline:none; background:rgba(28,140,232,.16);
+    box-shadow:inset 0 0 0 1px var(--steel);
+  }
+
+  .note-list{list-style:none; margin:0; padding:0;}
+  .note-item{
+    background:var(--panel); border:1px solid var(--line); border-left:4px solid var(--teal);
+    border-radius:8px; padding:14px 16px; margin-bottom:10px; font-size:13px; display:flex; gap:12px;
+  }
+  .note-item .num{color:var(--teal); font-weight:700; flex:none;}
+  .note-item .txt{flex:1;}
+  .note-item .txt[contenteditable="true"]{outline:none;}
+  .note-item .txt[contenteditable="true"]:focus{background:rgba(18,191,168,.08); border-radius:4px;}
+
+  .foot-note{font-size:11px; color:var(--muted); margin-top:26px; padding-top:14px; border-top:1px solid var(--line);}
+  .loading{padding:60px; text-align:center; color:var(--muted);}
+</style>
+</head>
+<body>
+
+  <button class="theme-toggle" id="themeToggleBtn" onclick="toggleTheme()">☀️ Modo Diurno</button>
+
+  <div class="sync-banner" id="syncBanner">
+    🔄 <span class="status" id="syncStatus">Carregando dados do Google Sheets…</span>
+  </div>
+
+  <header>
+    <div class="brand">
+      <img src="assets/icone-helice-color.png" alt="" onerror="this.style.display='none'">
+      <div>
+        <h1>📋 Reunião Diária</h1>
+        <div class="sub">Extreme Wind / Logística &amp; Frotas / Reunião Diária</div>
+      </div>
+    </div>
+    <div class="badge-week">5 blocos · Fonte: Google Sheets (RD_*)</div>
+  </header>
+
+  <div class="kpis" id="kpisBox">
+    <div class="kpi"><div class="label">Parques em Pauta</div><div class="n" id="kpiParques">—</div></div>
+    <div class="kpi warn"><div class="label">Ações Pendentes (Temas Diversos)</div><div class="n" id="kpiAcoes">—</div></div>
+    <div class="kpi tech-box">
+      <div class="label">Técnicos Indeterminados</div>
+      <div class="sub-label">Banco de Horas (Casa):</div>
+      <ul class="tech-list" id="tecnicosList"></ul>
+    </div>
+  </div>
+
+  <div class="block-nav" id="blockNav">
+    <button class="block-btn active" data-block="b1"><img class="gif-icon" src="PARQUES ATIVOS.gif" alt="Parques Ativos">Parques Ativos <span class="count" id="countB1"></span></button>
+    <button class="block-btn" data-block="b2"><img class="gif-icon" src="Mobilizações.gif" alt="Mobilização">Mobilização <span class="count" id="countB2"></span></button>
+    <button class="block-btn" data-block="b3"><span class="btn-icons"><img class="gif-icon" src="Data Life.jpeg" alt="Data Life"><img class="gif-icon" src="Tdoc.jpeg" alt="Tdoc"></span>Aprovação de Documentações <span class="count" id="countB3"></span></button>
+    <button class="block-btn" data-block="b4">Novas Demandas <span class="count" id="countB4"></span></button>
+    <button class="block-btn" data-block="b5">Temas Diversos <span class="count" id="countB5"></span></button>
+  </div>
+
+  <div class="block-view active" id="b1"><div class="loading">Carregando…</div></div>
+  <div class="block-view" id="b2"></div>
+  <div class="block-view" id="b3"></div>
+  <div class="block-view" id="b4"></div>
+  <div class="block-view" id="b5"></div>
+
+  <div class="foot-note" id="footNote">
+    Dashboard lê e grava direto na planilha Google Sheets (abas RD_Parques / RD_Equipe / RD_Aprovados / RD_Notas / RD_TecnicosIndeterminados).
+    Edições nos campos são salvas automaticamente ao sair do campo (ou ao mudar um seletor).
+  </div>
+
+<script>
+  /* ============ CONFIG ============
+     Cole aqui a URL do Web App do Apps Script depois de publicar (ver SETUP-GOOGLE-SHEETS.md).
+     Enquanto estiver vazia, o dashboard roda em MODO TESTE, lendo de dados_seed.json local
+     e só simulando as gravações (nada é salvo de verdade). */
+  const API_URL = 'https://script.google.com/macros/s/AKfycbw6S66TJqrBaHsrkgT30ndz0yBUsf3I7O8kYJqcJr5ZuuR_6gzQKh7wEWRH99E-B9g1/exec';
+  const MOCK_JSON_PATH = 'dados_seed.json';
+
+  const LOGOS = {
+    "GE":"GE.jpeg","Vestas":"VESTAS.png","LM":"LM.png","Nordex":"nordex.jpeg",
+    "Siemens":"siemens.jpeg","Eólicas Babilônia":"EÓLICAS BABILÔNIA.png","Eletrobras":"Eletrobras.png"
+  };
+  const STATUS_OPTIONS = [
+    {value:'ativa', label:'Em atividade'},
+    {value:'standby', label:'Em Stand-by'},
+    {value:'desmob', label:'Em Desmobilização'},
+    {value:'stop', label:'Stop Work'}
+  ];
+  const CHIP_LABELS = {Tipo:'Tipo', Card:'Card', Supervisor:'Supervisor', Cliente:'Cliente', Data:'Data', EHS:'EHS', Condicao:'Condição'};
+  const CHIP_ORDER = ['Tipo','Card','Supervisor','Cliente','Data','EHS','Condicao'];
+  const BLOCK_LABELS = {b1:'Parques Ativos', b2:'Mobilização', b3:'Aprovação de Documentações'};
+
+  let DATA = { parques:[], equipe:[], aprovados:[], notas:[], tecnicos:[] };
+  let PARK_SEQ = 0;
+
+  function escapeHtml(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  function el(html){
+    const wrap = document.createElement('div');
+    wrap.innerHTML = html.trim();
+    return wrap.firstElementChild;
+  }
+  /* <tr> só é parseado corretamente com um <tbody> real como contexto (regras de parsing de tabela do HTML) */
+  function elTr(html){
+    const wrap = document.createElement('tbody');
+    wrap.innerHTML = html.trim();
+    return wrap.firstElementChild;
+  }
+
+  async function apiGet(){
+    if (!API_URL){
+      const r = await fetch(MOCK_JSON_PATH);
+      return r.json();
+    }
+    const r = await fetch(API_URL);
+    return r.json();
+  }
+  async function apiPost(payload){
+    if (!API_URL){
+      console.log('[MODO TESTE — não salvo de verdade]', payload);
+      return { ok:true, result:{ newRow: 100000 + (PARK_SEQ++) } };
+    }
+    const r = await fetch(API_URL, { method:'POST', body: JSON.stringify(payload) });
+    return r.json();
+  }
+
+  function setSyncStatus(msg, isErr){
+    const banner = document.getElementById('syncBanner');
+    document.getElementById('syncStatus').textContent = msg;
+    banner.classList.toggle('err', !!isErr);
+  }
+
+  /* ============ Render: chips ============ */
+  function buildChipsHtml(p){
+    let fields = CHIP_ORDER.filter(function(k){
+      if (p.Placeholder) return ['Tipo','Card','Supervisor','Cliente','Data'].indexOf(k) !== -1;
+      return p[k] !== undefined && String(p[k]).trim() !== '';
+    });
+    if (!fields.length && !p.Placeholder) fields = ['Tipo','Card','Supervisor','Cliente','Data'];
+    return fields.map(function(k){
+      return '<span class="chip"><span class="chip-label">' + CHIP_LABELS[k] + '</span>' +
+        '<span class="chip-value" contenteditable="true" data-field="' + k + '">' + escapeHtml(p[k]) + '</span></span>';
+    }).join('');
+  }
+
+  /* ============ Render: painel de parque ============ */
+  function panelHtml(p){
+    const logo = LOGOS[p.Fabricante] || LOGOS.GE;
+    const logoOptions = Object.keys(LOGOS).map(function(k){
+      return '<option value="' + k + '"' + (p.Fabricante === k ? ' selected' : '') + '>' + k + '</option>';
+    }).join('');
+    const statusOptions = STATUS_OPTIONS.map(function(o){
+      return '<option value="' + o.value + '"' + (p.Status === o.value ? ' selected' : '') + '>' + o.label + '</option>';
+    }).join('');
+    const cols = (p.ColunasEquipe || 'Nome — Estado,Certificação').split(',');
+    const theadHtml = cols.map(function(h){ return '<th>' + escapeHtml(h) + '</th>'; }).join('');
+    return '' +
+    '<div class="panel' + (p.Placeholder ? ' blank-panel' : '') + '" data-parkid="' + p.ParkID + '" data-row="' + p._row + '">' +
+      '<div class="panel-head">' +
+        '<span class="logo-picker">' +
+          '<img class="mfr-logo" src="' + logo + '" alt="' + escapeHtml(p.Fabricante || 'GE') + '">' +
+          '<select class="logo-select" data-field="Fabricante">' + logoOptions + '</select>' +
+        '</span>' +
+        '<div class="park-info">' +
+          '<h2 contenteditable="true" class="' + (p.Placeholder ? 'placeholder-title' : '') + '" data-field="NomeParque">' + escapeHtml(p.NomeParque) + '</h2>' +
+          '<div class="info-chips">' + buildChipsHtml(p) + '</div>' +
+        '</div>' +
+        '<select class="status-select st-' + p.Status + '" data-field="Status">' + statusOptions + '</select>' +
+      '</div>' +
+      '<table><thead><tr>' + theadHtml + '</tr></thead><tbody data-equipe-body></tbody></table>' +
+      '<div class="aprovados-box"><div class="ap-title">Aprovados (backup)</div><div class="ap-names" data-aprovados-body></div></div>' +
+    '</div>';
+  }
+
+  function equipeRowHtml(row, colCount){
+    let tds = '';
+    for (let i = 1; i <= colCount; i++){
+      tds += '<td contenteditable="true" data-field="Val' + i + '">' + escapeHtml(row['Val' + i]) + '</td>';
+    }
+    return '<tr data-row="' + row._row + '">' + tds + '</tr>';
+  }
+
+  function aprovadoChipHtml(row){
+    return '<span class="ap-name' + (row.Placeholder ? ' blank-ap' : '') + '" draggable="true" data-row="' + row._row + '">' +
+      '<span class="ap-handle">⠿</span>' +
+      '<span class="ap-text" contenteditable="true" data-field="Nome">' + escapeHtml(row.Nome) + '</span></span>';
+  }
+
+  function renderPark(container, p){
+    const node = el(panelHtml(p));
+    container.appendChild(node);
+    const colCount = (p.ColunasEquipe || 'Nome — Estado,Certificação').split(',').length;
+    const tbody = node.querySelector('[data-equipe-body]');
+    const equipeRows = DATA.equipe.filter(function(r){ return r.ParkID === p.ParkID; }).sort(function(a,b){ return a.Ordem - b.Ordem; });
+    equipeRows.forEach(function(r){ tbody.appendChild(elTr(equipeRowHtml(r, colCount))); });
+
+    const apBody = node.querySelector('[data-aprovados-body]');
+    const apRows = DATA.aprovados.filter(function(r){ return r.ParkID === p.ParkID; }).sort(function(a,b){ return a.Ordem - b.Ordem; });
+    apRows.forEach(function(r){ apBody.appendChild(el(aprovadoChipHtml(r))); });
+
+    wirePanel(node, p);
+    return node;
+  }
+
+  /* ============ Salvar edições ============ */
+  function wireFieldSave(fieldEl, sheet, isSelect){
+    const evt = isSelect ? 'change' : 'blur';
+    fieldEl.addEventListener(evt, function(){
+      const rowHost = fieldEl.closest('[data-row]');
+      if (!rowHost) return;
+      const row = Number(rowHost.dataset.row);
+      const field = fieldEl.dataset.field;
+      const value = isSelect ? fieldEl.value : fieldEl.textContent.trim();
+      const wasPlaceholder = rowHost.classList.contains('blank-panel') || rowHost.classList.contains('blank-ap') ||
+                             rowHost.closest('.note-item.blank-item');
+      apiPost({ action:'updateCell', sheet: sheet, row: row, field: field, value: value, autoUnblank: !!wasPlaceholder });
+      if (field === 'Fabricante'){
+        const img = fieldEl.parentElement.querySelector('.mfr-logo');
+        img.src = LOGOS[value] || LOGOS.GE;
+        img.alt = value;
+      }
+      if (field === 'Status'){
+        fieldEl.className = 'status-select st-' + value;
+      }
+    });
+  }
+
+  function wirePanel(node, p){
+    node.querySelectorAll('.park-info [contenteditable], .info-chips [data-field]').forEach(function(f){ wireFieldSave(f, 'RD_Parques', false); });
+    wireFieldSave(node.querySelector('.logo-select'), 'RD_Parques', true);
+    wireFieldSave(node.querySelector('.status-select'), 'RD_Parques', true);
+    node.querySelectorAll('tbody td[contenteditable]').forEach(function(td){ wireFieldSave(td, 'RD_Equipe', false); });
+    node.querySelectorAll('.ap-text').forEach(function(t){ wireFieldSave(t, 'RD_Aprovados', false); });
+
+    attachBlankPanelWatcher(node, p.Bloco);
+    node.querySelectorAll('.ap-name.blank-ap').forEach(attachBlankAprovadoWatcher.bind(null, p.ParkID));
+    attachDragHandlers(node.querySelector('[data-aprovados-body]'), p.ParkID);
+  }
+
+  /* ============ Reposição automática de vagas em branco ============ */
+  function blankParkTemplate(bloco){
+    PARK_SEQ++;
+    return {
+      ParkID: bloco + '-novo-' + PARK_SEQ, Bloco: bloco, Ordem: 999, Fabricante:'GE', NomeParque:'Novo Parque',
+      Tipo:'', Card:'', Supervisor:'', Cliente:'', Data:'', EHS:'', Condicao:'', Status:'standby',
+      ColunasEquipe:'Nome — Estado,Certificação,Observação', Placeholder:true, _row: null
+    };
+  }
+
+  async function spawnNextPark(bloco, containerEl){
+    const p = blankParkTemplate(bloco);
+    const resp = await apiPost({ action:'addRow', sheet:'RD_Parques', template:{
+      ParkID:p.ParkID, Bloco:p.Bloco, Ordem:p.Ordem, Fabricante:p.Fabricante, NomeParque:'', Status:p.Status,
+      ColunasEquipe:p.ColunasEquipe, Placeholder:true
+    }});
+    p._row = resp.result ? resp.result.newRow : null;
+    for (let i = 1; i <= 3; i++){
+      await apiPost({ action:'addRow', sheet:'RD_Equipe', template:{ ParkID:p.ParkID, Ordem:i, Val1:'', Val2:'', Val3:'' } });
+      await apiPost({ action:'addRow', sheet:'RD_Aprovados', template:{ ParkID:p.ParkID, Ordem:i, Nome:'', Placeholder:true } });
+    }
+    DATA.parques.push(p);
+    renderPark(containerEl, p);
+  }
+
+  function attachBlankPanelWatcher(node, bloco){
+    if (!node.classList.contains('blank-panel')) return;
+    if (node.dataset.watching) return;
+    node.dataset.watching = 'true';
+    node.addEventListener('input', function onFirstInput(){
+      if (node.dataset.used) return;
+      node.dataset.used = 'true';
+      node.classList.remove('blank-panel');
+      const h2 = node.querySelector('h2');
+      if (h2) h2.classList.remove('placeholder-title');
+      spawnNextPark(bloco, node.parentElement);
+    });
+  }
+
+  async function spawnNextAprovado(parkId, containerEl){
+    const resp = await apiPost({ action:'addRow', sheet:'RD_Aprovados', template:{ ParkID: parkId, Ordem: 999, Nome:'', Placeholder:true } });
+    const row = { ParkID: parkId, Ordem: 999, Nome:'', Placeholder:true, _row: resp.result ? resp.result.newRow : null };
+    const chip = el(aprovadoChipHtml(row));
+    containerEl.appendChild(chip);
+    wireFieldSave(chip.querySelector('.ap-text'), 'RD_Aprovados', false);
+    attachBlankAprovadoWatcher(parkId, chip);
+    attachDragHandlers(containerEl, parkId);
+  }
+
+  function attachBlankAprovadoWatcher(parkId, chip){
+    if (chip.dataset.watching) return;
+    chip.dataset.watching = 'true';
+    chip.addEventListener('input', function onFirstInput(){
+      if (chip.dataset.used) return;
+      chip.dataset.used = 'true';
+      chip.classList.remove('blank-ap');
+      spawnNextAprovado(parkId, chip.parentElement);
+    });
+  }
+
+  /* ============ Arrastar e soltar (Aprovados) ============ */
+  let draggedChip = null;
+  function attachDragHandlers(container, parkId){
+    if (!container) return;
+    container.querySelectorAll('.ap-name[draggable="true"]').forEach(function(chip){
+      if (chip.dataset.dragBound) return;
+      chip.dataset.dragBound = 'true';
+      chip.addEventListener('dragstart', function(){ draggedChip = chip; setTimeout(function(){ chip.style.opacity='0.4'; },0); });
+      chip.addEventListener('dragend', function(){
+        chip.style.opacity=''; draggedChip=null;
+        container.querySelectorAll('.ap-name.drag-over').forEach(function(c){ c.classList.remove('drag-over'); });
+      });
+      chip.addEventListener('dragover', function(e){ e.preventDefault(); if (chip!==draggedChip) chip.classList.add('drag-over'); });
+      chip.addEventListener('dragleave', function(){ chip.classList.remove('drag-over'); });
+      chip.addEventListener('drop', function(e){
+        e.preventDefault();
+        chip.classList.remove('drag-over');
+        if (!draggedChip || draggedChip===chip) return;
+        if (chip.parentElement !== draggedChip.parentElement) return;
+        const chips = Array.prototype.slice.call(container.children);
+        const di = chips.indexOf(draggedChip), ti = chips.indexOf(chip);
+        if (di < ti) chip.after(draggedChip); else chip.before(draggedChip);
+        const order = Array.prototype.slice.call(container.children).map(function(c){ return c.querySelector('.ap-text').textContent.trim(); });
+        apiPost({ action:'reorderAprovados', parkId: parkId, order: order });
+      });
+    });
+  }
+
+  /* ============ Notas (Bloco 4 / 5) ============ */
+  function noteHtml(n){
+    return '<li class="note-item' + (n.Placeholder ? ' blank-item' : '') + '" data-row="' + n._row + '">' +
+      '<span class="num">' + n.Ordem + '</span>' +
+      '<span class="txt" contenteditable="true" data-field="Texto">' + escapeHtml(n.Texto) + '</span></li>';
+  }
+  async function spawnNextNote(bloco, listEl){
+    const nextOrdem = listEl.querySelectorAll('.note-item').length + 1;
+    const resp = await apiPost({ action:'addRow', sheet:'RD_Notas', template:{ Bloco: bloco, Ordem: nextOrdem, Texto:'', Placeholder:true } });
+    const n = { Bloco: bloco, Ordem: nextOrdem, Texto:'', Placeholder:true, _row: resp.result ? resp.result.newRow : null };
+    const li = el(noteHtml(n));
+    listEl.appendChild(li);
+    wireFieldSave(li.querySelector('.txt'), 'RD_Notas', false);
+    attachBlankNoteWatcher(bloco, li);
+  }
+  function attachBlankNoteWatcher(bloco, li){
+    if (li.dataset.watching) return;
+    li.dataset.watching = 'true';
+    li.addEventListener('input', function onFirstInput(){
+      if (li.dataset.used) return;
+      li.dataset.used = 'true';
+      li.classList.remove('blank-item');
+      spawnNextNote(bloco, li.parentElement);
+    });
+  }
+  function renderNotes(bloco, containerEl){
+    const rows = DATA.notas.filter(function(n){ return n.Bloco === bloco; }).sort(function(a,b){ return a.Ordem-b.Ordem; });
+    const ul = el('<ul class="note-list"></ul>');
+    rows.forEach(function(n){
+      const li = el(noteHtml(n));
+      ul.appendChild(li);
+      wireFieldSave(li.querySelector('.txt'), 'RD_Notas', false);
+      attachBlankNoteWatcher(bloco, li);
+    });
+    containerEl.innerHTML = '';
+    containerEl.appendChild(ul);
+  }
+
+  /* ============ Técnicos indeterminados ============ */
+  function renderTecnicos(){
+    const ul = document.getElementById('tecnicosList');
+    ul.innerHTML = '';
+    DATA.tecnicos.sort(function(a,b){ return a.Ordem-b.Ordem; }).forEach(function(t){
+      const li = el('<li data-row="' + t._row + '"><span contenteditable="true" data-field="Nome">' + escapeHtml(t.Nome) +
+        '</span> = <span contenteditable="true" data-field="Dias">' + escapeHtml(t.Dias) + '</span></li>');
+      ul.appendChild(li);
+      li.querySelectorAll('[data-field]').forEach(function(f){ wireFieldSave(f, 'RD_TecnicosIndeterminados', false); });
+    });
+  }
+
+  /* ============ KPIs e render geral ============ */
+  function renderKpis(){
+    const parquesReais = DATA.parques.filter(function(p){ return !p.Placeholder && ['b1','b2','b3'].indexOf(p.Bloco) !== -1; });
+    const acoesPendentes = DATA.notas.filter(function(n){ return n.Bloco === 'b5' && !n.Placeholder && String(n.Texto).trim() !== ''; });
+    document.getElementById('kpiParques').textContent = parquesReais.length;
+    document.getElementById('kpiAcoes').textContent = acoesPendentes.length;
+    document.getElementById('countB1').textContent = '(' + DATA.parques.filter(function(p){return p.Bloco==='b1' && !p.Placeholder;}).length + ' parques)';
+    document.getElementById('countB2').textContent = '(' + DATA.parques.filter(function(p){return p.Bloco==='b2' && !p.Placeholder;}).length + ' parque)';
+    document.getElementById('countB3').textContent = '(' + DATA.parques.filter(function(p){return p.Bloco==='b3' && !p.Placeholder;}).length + ' Parques)';
+    document.getElementById('countB4').textContent = '(vazio)';
+    document.getElementById('countB5').textContent = '(ações)';
+  }
+
+  function renderBlock(bloco){
+    const containerEl = document.getElementById(bloco);
+    containerEl.innerHTML = '';
+    const parks = DATA.parques.filter(function(p){ return p.Bloco === bloco; }).sort(function(a,b){ return a.Ordem-b.Ordem; });
+    parks.forEach(function(p){ renderPark(containerEl, p); });
+  }
+
+  function renderAll(){
+    renderKpis();
+    renderTecnicos();
+    ['b1','b2','b3'].forEach(renderBlock);
+    renderNotes('b4', document.getElementById('b4'));
+    renderNotes('b5', document.getElementById('b5'));
+  }
+
+  async function boot(){
+    try{
+      DATA = await apiGet();
+      ['parques','equipe','aprovados','notas','tecnicos'].forEach(function(k){ if (!DATA[k]) DATA[k] = []; });
+      renderAll();
+      setSyncStatus(API_URL ? 'Conectado ao Google Sheets.' : 'MODO TESTE — lendo dados_seed.json local. Edições não são salvas (configure API_URL).', !API_URL);
+    } catch(err){
+      setSyncStatus('Falha ao carregar dados: ' + err.message, true);
+      console.error(err);
+    }
+  }
+
+  document.querySelectorAll('.block-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.block-btn').forEach(function(b){ b.classList.remove('active'); });
+      document.querySelectorAll('.block-view').forEach(function(v){ v.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.block).classList.add('active');
+    });
+  });
+
+  function toggleTheme(){
+    document.body.classList.toggle('light-mode');
+    const isLight = document.body.classList.contains('light-mode');
+    try { localStorage.setItem('reuniaoTheme', isLight ? 'light' : 'dark'); } catch(e){}
+    updateThemeBtn();
+  }
+  function updateThemeBtn(){
+    const btn = document.getElementById('themeToggleBtn');
+    const isLight = document.body.classList.contains('light-mode');
+    btn.textContent = isLight ? '🌙 Modo Noturno' : '☀️ Modo Diurno';
+  }
+  (function(){
+    let saved = null;
+    try { saved = localStorage.getItem('reuniaoTheme'); } catch(e){}
+    if (saved === 'light') document.body.classList.add('light-mode');
+    updateThemeBtn();
+  })();
+
+  boot();
+</script>
+
+</body></html>
