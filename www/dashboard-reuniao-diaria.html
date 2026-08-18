@@ -125,13 +125,39 @@
   .chip-value:focus{outline:none; background:rgba(28,140,232,.18); box-shadow:0 0 0 1px var(--steel);}
   .status-select{
     font-size:11.5px; padding:5px 10px; border-radius:20px; font-weight:700; white-space:nowrap;
-    cursor:pointer; font-family:inherit;
+    cursor:pointer; font-family:inherit; flex:none; width:190px; text-align:center; text-align-last:center;
   }
   .status-select.st-ativa{background:rgba(18,168,116,.18); color:var(--ok); border:1px solid var(--ok);}
   .status-select.st-standby{background:rgba(216,154,42,.18); color:var(--warn); border:1px solid var(--warn);}
   .status-select.st-desmob{background:rgba(232,115,12,.18); color:var(--orange); border:1px solid var(--orange);}
   .status-select.st-stop{background:rgba(224,72,60,.18); color:var(--nok); border:1px solid var(--nok);}
   .status-select option{background:var(--panel); color:var(--text);}
+
+  /* ============ Quadro de Atividades (WTG) — cabeçalho do parque ============ */
+  .activity-box{
+    flex:none; width:210px; background:var(--brand-deep); border:1px solid var(--line);
+    border-radius:8px; padding:8px 10px; font-size:11px;
+  }
+  .activity-box .ab-title{
+    font-size:9.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em;
+    margin-bottom:6px; display:flex; align-items:center; justify-content:space-between; gap:6px;
+  }
+  .activity-box .ab-nav{cursor:pointer; color:var(--muted); font-weight:700; user-select:none; padding:0 3px;}
+  .activity-box .ab-nav:hover{color:var(--text);}
+  .activity-box .ab-empty{color:var(--muted); font-style:italic; font-size:11px;}
+  .activity-box .ab-row{display:flex; justify-content:space-between; gap:6px; padding:2px 0;}
+  .activity-box .ab-label{color:var(--muted);}
+  .activity-box .ab-value{color:var(--text); font-weight:600; text-align:right;}
+  .activity-box .ab-progress-wrap{margin-top:6px;}
+  .activity-box .ab-progress-bar{
+    background:var(--panel2); border-radius:6px; height:6px; overflow:hidden; margin-top:3px;
+  }
+  .activity-box .ab-progress-fill{background:var(--teal); height:100%; border-radius:6px;}
+  .activity-box .ab-dots{display:flex; justify-content:center; gap:4px; margin-top:6px;}
+  .activity-box .ab-dot{width:5px; height:5px; border-radius:50%; background:var(--line);}
+  .activity-box .ab-dot.active{background:var(--teal);}
+  .activity-box.ab-alert{background:rgba(224,72,60,.14); border-color:rgba(224,72,60,.45);}
+  .activity-box .ab-not-sent{color:var(--nok); font-weight:700; font-style:normal; text-align:center; padding:6px 0;}
 
   table{width:100%; border-collapse:collapse; font-size:12px;}
   thead th{
@@ -230,7 +256,7 @@
      Cole aqui a URL do Web App do Apps Script depois de publicar (ver SETUP-GOOGLE-SHEETS.md).
      Enquanto estiver vazia, o dashboard roda em MODO TESTE, lendo de dados_seed.json local
      e só simulando as gravações (nada é salvo de verdade). */
-  const API_URL = 'https://script.google.com/macros/s/AKfycbw6S66TJqrBaHsrkgT30ndz0yBUsf3I7O8kYJqcJr5ZuuR_6gzQKh7wEWRH99E-B9g1/exec';
+  const API_URL = 'https://script.google.com/macros/s/AKfycbwIsF277Wg6QTnUDVU019h5QDzowR3ShJEdBVeNixVmWM8b_Wp-chTO0dNrcV3FVmY/exec';
   const MOCK_JSON_PATH = 'dados_seed.json';
 
   const LOGOS = {
@@ -247,7 +273,7 @@
   const CHIP_ORDER = ['Tipo','Card','Supervisor','Cliente','Data','EHS','Condicao'];
   const BLOCK_LABELS = {b1:'Parques Ativos', b2:'Mobilização', b3:'Aprovação de Documentações'};
 
-  let DATA = { parques:[], equipe:[], aprovados:[], notas:[], tecnicos:[] };
+  let DATA = { parques:[], equipe:[], aprovados:[], notas:[], tecnicos:[], relatorios:[] };
   let PARK_SEQ = 0;
 
   function escapeHtml(s){
@@ -325,6 +351,7 @@
           '<h2 contenteditable="true" class="' + (p.Placeholder ? 'placeholder-title' : '') + '" data-field="NomeParque">' + escapeHtml(p.NomeParque) + '</h2>' +
           '<div class="info-chips">' + buildChipsHtml(p) + '</div>' +
         '</div>' +
+        '<div class="activity-box" data-activity-box data-parkname="' + escapeHtml(p.NomeParque) + '"></div>' +
         '<select class="status-select st-' + p.Status + '" data-field="Status">' + statusOptions + '</select>' +
       '</div>' +
       '<table><thead><tr>' + theadHtml + '</tr></thead><tbody data-equipe-body></tbody></table>' +
@@ -359,7 +386,99 @@
     apRows.forEach(function(r){ apBody.appendChild(el(aprovadoChipHtml(r))); });
 
     wirePanel(node, p);
+    initActivityBox(node);
     return node;
+  }
+
+  /* ============ Quadro de Atividades (WTG) — lê a aba Relatorios (somente leitura) ============ */
+  function normalizeParkName(s){
+    return String(s == null ? '' : s)
+      .normalize('NFD').replace(/[̀-ͯ]/g, '')  // remove acentos
+      .toLowerCase()
+      .replace(/\/.*/g, '')       // corta sufixo "/RN", "/BA" etc.
+      .replace(/[^a-z0-9]+/g, ' ')
+      .trim();
+  }
+  function parkMatchesReport(nomeParque, reportParque){
+    const a = normalizeParkName(nomeParque), b = normalizeParkName(reportParque);
+    if (!a || !b) return false;
+    return a === b || a.indexOf(b) === 0 || b.indexOf(a) === 0;
+  }
+  /* Data_exp pode vir como "2026-08-17" (ISO) ou "17/08/2026" (BR) — normaliza pra "YYYY-MM-DD" */
+  function normalizeDateExp(s){
+    const v = String(s == null ? '' : s).trim();
+    let m = v.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (m) return m[1] + '-' + m[2] + '-' + m[3];
+    m = v.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+    if (m) return m[3] + '-' + m[2] + '-' + m[1];
+    return v;
+  }
+  function yesterdayISO(){
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return yyyy + '-' + mm + '-' + dd;
+  }
+  function activityRowHtml(a){
+    if (!a){
+      return '<div class="ab-empty ab-not-sent">Não Enviado</div>';
+    }
+    const pct = Number(a.Avanco_reparo);
+    const pctStr = isNaN(pct) ? '—' : pct + '%';
+    return '' +
+      '<div class="ab-row"><span class="ab-label">WTG</span><span class="ab-value">' + escapeHtml(a.Turbina || '—') + '</span></div>' +
+      '<div class="ab-row"><span class="ab-label">Blade</span><span class="ab-value">' + escapeHtml(a.Blade || '—') + '</span></div>' +
+      '<div class="ab-row"><span class="ab-label">Tipo de reparo</span><span class="ab-value">' + escapeHtml(a.Tipo_reparo || '—') + '</span></div>' +
+      '<div class="ab-row"><span class="ab-label">Data início</span><span class="ab-value">—</span></div>' +
+      '<div class="ab-row"><span class="ab-label">Data prev. fim</span><span class="ab-value">—</span></div>' +
+      '<div class="ab-progress-wrap">' +
+        '<div class="ab-row"><span class="ab-label">Avanço</span><span class="ab-value">' + pctStr + '</span></div>' +
+        '<div class="ab-progress-bar"><div class="ab-progress-fill" style="width:' + (isNaN(pct) ? 0 : Math.max(0, Math.min(100, pct))) + '%"></div></div>' +
+      '</div>';
+  }
+  function renderActivityBox(box, rows, idx){
+    const title = box.querySelector('[data-ab-title-count]');
+    box.querySelector('[data-ab-body]').innerHTML = activityRowHtml(rows[idx]);
+    if (title) title.textContent = rows.length ? (idx + 1) + '/' + rows.length : '';
+    const dots = box.querySelector('[data-ab-dots]');
+    if (dots){
+      dots.innerHTML = rows.length > 1 ? rows.map(function(_, i){
+        return '<span class="ab-dot' + (i === idx ? ' active' : '') + '"></span>';
+      }).join('') : '';
+    }
+    box.classList.toggle('ab-alert', !rows.length);
+  }
+  function initActivityBox(node){
+    const box = node.querySelector('[data-activity-box]');
+    if (!box) return;
+    const parkName = box.dataset.parkname;
+    const ontem = yesterdayISO();
+    // Considera só o relatório do dia anterior (Data_exp); se houver mais de
+    // um pro mesmo parque nesse dia, mantém todos navegáveis, mas ordenados
+    // do mais recente pro mais antigo (por Registrado_em, quando disponível).
+    const rows = (DATA.relatorios || [])
+      .filter(function(r){ return parkMatchesReport(parkName, r.Parque) && normalizeDateExp(r.Data_exp) === ontem; })
+      .sort(function(a, b){ return String(b.Registrado_em || '').localeCompare(String(a.Registrado_em || '')); });
+    box.innerHTML = '' +
+      '<div class="ab-title"><span class="ab-nav" data-ab-prev>‹</span>' +
+      '<span>Atividades <span data-ab-title-count></span></span>' +
+      '<span class="ab-nav" data-ab-next>›</span></div>' +
+      '<div data-ab-body></div>' +
+      '<div class="ab-dots" data-ab-dots></div>';
+    let idx = 0;
+    renderActivityBox(box, rows, idx);
+    box.querySelector('[data-ab-prev]').addEventListener('click', function(){
+      if (!rows.length) return;
+      idx = (idx - 1 + rows.length) % rows.length;
+      renderActivityBox(box, rows, idx);
+    });
+    box.querySelector('[data-ab-next]').addEventListener('click', function(){
+      if (!rows.length) return;
+      idx = (idx + 1) % rows.length;
+      renderActivityBox(box, rows, idx);
+    });
   }
 
   /* ============ Salvar edições ============ */
@@ -566,7 +685,7 @@
   async function boot(){
     try{
       DATA = await apiGet();
-      ['parques','equipe','aprovados','notas','tecnicos'].forEach(function(k){ if (!DATA[k]) DATA[k] = []; });
+      ['parques','equipe','aprovados','notas','tecnicos','relatorios'].forEach(function(k){ if (!DATA[k]) DATA[k] = []; });
       renderAll();
       setSyncStatus(API_URL ? 'Conectado ao Google Sheets.' : 'MODO TESTE — lendo dados_seed.json local. Edições não são salvas (configure API_URL).', !API_URL);
     } catch(err){
