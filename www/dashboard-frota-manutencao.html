@@ -263,16 +263,16 @@
   <div class="kpi">
     <div class="label">Conformidade Geral &amp; Ações Pendentes</div>
     <div class="value" style="color:var(--ok)">92%</div>
-    <div class="foot">WK 34 · 0 ações pendentes no total</div>
+    <div class="foot">WK 34 · 11 ações pendentes no total</div>
     <div class="locadoras" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
-      <div class="loc-badge" style="background:rgba(224,72,60,.18); color:var(--nok)"><span class="n">0</span><span class="l">Emergenciais</span></div>
-      <div class="loc-badge" style="background:rgba(216,154,43,.24); color:var(--warn)"><span class="n">0</span><span class="l">Programadas</span></div>
+      <div class="loc-badge" style="background:rgba(224,72,60,.18); color:var(--nok)"><span class="n">5</span><span class="l">Emergenciais</span></div>
+      <div class="loc-badge" style="background:rgba(216,154,43,.24); color:var(--warn)"><span class="n">6</span><span class="l">Programadas</span></div>
       <div class="loc-badge" style="background:rgba(92,122,147,.24); color:var(--na)"><span class="n">0</span><span class="l">Administrativas</span></div>
     </div>
   </div>
   <div class="kpi">
     <div class="label">Média de KM</div>
-    <div class="value" id="kmValue" data-km="30795" style="color: var(--nok);">30.795</div>
+    <div class="value" id="kmValue" data-km="30866" style="color: var(--nok);">30.866</div>
     <div class="foot">Limite p/ renovação: ≥ 30.000 km</div>
   </div>
 </div>
@@ -656,8 +656,8 @@
   </div>
   <div class="collapsible" id="acaoBody">
     <div class="locadoras" style="max-width:420px; margin:6px 0 16px">
-      <div class="loc-badge" style="background:rgba(224,72,60,.18); color:var(--nok)"><span class="n">0</span><span class="l">Emergencial</span></div>
-      <div class="loc-badge" style="background:rgba(216,154,43,.24); color:var(--warn)"><span class="n">0</span><span class="l">Programado</span></div>
+      <div class="loc-badge" style="background:rgba(224,72,60,.18); color:var(--nok)"><span class="n">5</span><span class="l">Emergencial</span></div>
+      <div class="loc-badge" style="background:rgba(216,154,43,.24); color:var(--warn)"><span class="n">6</span><span class="l">Programado</span></div>
       <div class="loc-badge" style="background:rgba(92,122,147,.24); color:var(--na)"><span class="n">0</span><span class="l">Administrativa</span></div>
     </div>
     <div class="tablewrap">
@@ -1286,14 +1286,17 @@ toggleHist.addEventListener("click", () => {
 
 // Plano de Ação — WK29 (aba BASE DESHBOARD, colunas V–AD, linhas 1231–1262)
 const acaoData = [
-  { acao:"TYA7G48 - 40K de KM RODADOS/SALDO ESTOURADO/MEDIÇÃO PNEU N/OK", tipo:"ADMINISTRATIVA/CORRETIVA", parque:"SF1", quem:"Gerson/João", status:"", obs:"SALDO EXTRA- EM PROJETO PARA RECUPERAR / AGUARDANDO MEDIÇÃO COM PAQUÍMETRO" },
-  { acao:"TET3C50 - 40K de KM RODADOS/MEDIÇÃO PNEU N/OK", tipo:"ADMINISTRATIVA/CORRETIVA", parque:"BAIXA DO FEIJÃO", quem:"Gerson/João", status:"", obs:"ACOMPANHAR / AGUARDANDO MEDIÇÃO COM PAQUÍMETRO" },
-  { acao:"TYD9E76 - REVISÃO", tipo:"CORRETIVA", parque:"OITIS 1", quem:"Gerson/João", status:"", obs:"Alinhar c/ Locadora" },
-  { acao:"TYW6D70 - SALDO CONTRATO ESTOURADO/MEDIÇÃO PNEU N/OK", tipo:"ADMINISTRATIVA/CORRETIVA", parque:"OITIS 1", quem:"Gerson/João", status:"", obs:"SALDO EXTRA- EM PROJETO PARA RECUPERAR / AGUARDANDO MEDIÇÃO COM PAQUÍMETRO" },
-  { acao:"TWY4C61 - MEDIÇÃO PNEU N/OK - CONFIRMAR COM PAQUÍMETRO", tipo:"CORRETIVA", parque:"TUCANO", quem:"Gerson/João", status:"", obs:"AGUARDANDO MEDIÇÃO COM PAQUÍMETRO" },
-  { acao:"TXZ5J79 - SALDO CONTRATO ESTOURADO", tipo:"ADMINISTRATIVA", parque:"SF1", quem:"Gerson/João", status:"", obs:"AGUARDANDO SALDO REGULARIZAR" },
-  { acao:"TER0D54 - 40K de KM RODADOS", tipo:"ADMINISTRATIVA", parque:"COPEL", quem:"Gerson/João", status:"", obs:"" },
-  { acao:"TXY8H30 - SALDO CONTRATO ESTOURADO", tipo:"ADMINISTRATIVA", parque:"SF2", quem:"Gerson/João", status:"", obs:"AGUARDANDO SALDO REGULARIZAR" }
+  { acao:"TYA7G48 - 40K de KM RODADOS/SALDO ESTOURADO/MEDIÇÃO PNEU N/OK", tipo:"[Emergencial: Medição de Pneu] ADMINISTRATIVA/CORRETIVA", parque:"SF1", quem:"Gerson/João", status:"", obs:"SALDO EXTRA- EM PROJETO PARA RECUPERAR / AGUARDANDO MEDIÇÃO COM PAQUÍMETRO" },
+  { acao:"TYA7G48 - 40K de KM RODADOS/SALDO ESTOURADO/MEDIÇÃO PNEU N/OK", tipo:"[Programada: Saldo de KM/Contrato Estourado, Acima de 40 mil KM, KM Rodados] ADMINISTRATIVA/CORRETIVA", parque:"SF1", quem:"Gerson/João", status:"", obs:"SALDO EXTRA- EM PROJETO PARA RECUPERAR / AGUARDANDO MEDIÇÃO COM PAQUÍMETRO" },
+  { acao:"TET3C50 - 40K de KM RODADOS/MEDIÇÃO PNEU N/OK", tipo:"[Emergencial: Medição de Pneu] ADMINISTRATIVA/CORRETIVA", parque:"BAIXA DO FEIJÃO", quem:"Gerson/João", status:"", obs:"ACOMPANHAR / AGUARDANDO MEDIÇÃO COM PAQUÍMETRO" },
+  { acao:"TET3C50 - 40K de KM RODADOS/MEDIÇÃO PNEU N/OK", tipo:"[Programada: Acima de 40 mil KM, KM Rodados] ADMINISTRATIVA/CORRETIVA", parque:"BAIXA DO FEIJÃO", quem:"Gerson/João", status:"", obs:"ACOMPANHAR / AGUARDANDO MEDIÇÃO COM PAQUÍMETRO" },
+  { acao:"TYD9E76 - REVISÃO", tipo:"[Emergencial: Revisão] CORRETIVA", parque:"OITIS 1", quem:"Gerson/João", status:"", obs:"Alinhar c/ Locadora" },
+  { acao:"TYW6D70 - SALDO CONTRATO ESTOURADO/MEDIÇÃO PNEU N/OK", tipo:"[Emergencial: Medição de Pneu] ADMINISTRATIVA/CORRETIVA", parque:"OITIS 1", quem:"Gerson/João", status:"", obs:"SALDO EXTRA- EM PROJETO PARA RECUPERAR / AGUARDANDO MEDIÇÃO COM PAQUÍMETRO" },
+  { acao:"TYW6D70 - SALDO CONTRATO ESTOURADO/MEDIÇÃO PNEU N/OK", tipo:"[Programada: Saldo de KM/Contrato Estourado] ADMINISTRATIVA/CORRETIVA", parque:"OITIS 1", quem:"Gerson/João", status:"", obs:"SALDO EXTRA- EM PROJETO PARA RECUPERAR / AGUARDANDO MEDIÇÃO COM PAQUÍMETRO" },
+  { acao:"TWY4C61 - MEDIÇÃO PNEU N/OK - CONFIRMAR COM PAQUÍMETRO", tipo:"[Emergencial: Medição de Pneu] CORRETIVA", parque:"TUCANO", quem:"Gerson/João", status:"", obs:"AGUARDANDO MEDIÇÃO COM PAQUÍMETRO" },
+  { acao:"TXZ5J79 - SALDO CONTRATO ESTOURADO", tipo:"[Programada: Saldo de KM/Contrato Estourado] ADMINISTRATIVA", parque:"SF1", quem:"Gerson/João", status:"", obs:"AGUARDANDO SALDO REGULARIZAR" },
+  { acao:"TER0D54 - 40K de KM RODADOS", tipo:"[Programada: Acima de 40 mil KM, KM Rodados] ADMINISTRATIVA", parque:"COPEL", quem:"Gerson/João", status:"", obs:"" },
+  { acao:"TXY8H30 - SALDO CONTRATO ESTOURADO", tipo:"[Programada: Saldo de KM/Contrato Estourado] ADMINISTRATIVA", parque:"SF2", quem:"Gerson/João", status:"", obs:"AGUARDANDO SALDO REGULARIZAR" }
 ];
 
 function acaoStatusTag(s){
