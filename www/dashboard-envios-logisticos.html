@@ -155,7 +155,7 @@
     </div>
   </div>
   <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap">
-    <div class="badge-week" id="badgeAtualizado">Atualizado 17/08/2026</div>
+    <div class="badge-week" id="badgeAtualizado">Atualizado 18/08/2026</div>
     <button class="toggle-btn" id="navAcao" style="background:var(--nok)">Plano de Ação</button>
   </div>
 </header>
@@ -171,7 +171,7 @@
   </div>
   <div class="kpi kpi-fill-green">
     <div class="label">Entregues 2026 (Log.)</div>
-    <div class="n" id="kpiEntregues">526</div>
+    <div class="n" id="kpiEntregues">527</div>
   </div>
   <div class="kpi kpi-fill-red">
     <div class="label">Canceladas 2026 (Almox.)</div>
@@ -185,8 +185,8 @@
   <div class="aberto" id="abertoBadges">
     <div class="aberto-badge"><div class="n" id="abEmSeparacao">0</div><div class="l">Em separação</div></div>
     <div class="aberto-badge"><div class="n" id="abAguardandoColeta">11</div><div class="l">Aguardando coleta</div></div>
-    <div class="aberto-badge warn"><div class="n" id="abEmTrajeto">1</div><div class="l">Em trajeto</div></div>
-    <div class="aberto-badge total"><div class="n" id="abTotal">12</div><div class="l">Total em aberto</div></div>
+    <div class="aberto-badge warn"><div class="n" id="abEmTrajeto">0</div><div class="l">Em trajeto</div></div>
+    <div class="aberto-badge total"><div class="n" id="abTotal">11</div><div class="l">Total em aberto</div></div>
   </div>
 </div>
 
@@ -214,8 +214,8 @@
   <div class="collapsible" id="acaoBody">
   <div class="aberto" style="max-width:620px; margin:6px 0 16px">
     <div class="aberto-badge"><div class="n" id="acaoCountAlmox">11</div><div class="l">Ações Almoxarifado</div></div>
-    <div class="aberto-badge"><div class="n" id="acaoCountLog">1</div><div class="l">Ações Logística</div></div>
-    <div class="aberto-badge warn"><div class="n" id="acaoCountAssinatura">3</div><div class="l">Aguardando Assinatura</div></div>
+    <div class="aberto-badge"><div class="n" id="acaoCountLog">0</div><div class="l">Ações Logística</div></div>
+    <div class="aberto-badge warn"><div class="n" id="acaoCountAssinatura">2</div><div class="l">Aguardando Assinatura</div></div>
   </div>
 
   <h3 style="font-size:12.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:0 0 8px;">Ações Almoxarifado</h3>
@@ -243,7 +243,7 @@
   <table>
     <thead><tr><th>Projeto</th><th>Responsável</th><th>Prazo para Entrega</th><th>Destinatário</th><th>Data de Entrega</th><th>Status</th></tr></thead>
     <tbody id="acoesLog">
-    <tr class="row-warn"><td>OITIS</td><td>JAMILE</td><td>17/08/2026</td><td>SANDRELINO</td><td></td><td>EM TRAJETO</td></tr>
+    <tr><td colspan="6" style="color:var(--muted); text-align:center;">Nenhuma ação pendente</td></tr>
     </tbody>
   </table>
   </div>
@@ -255,7 +255,6 @@
     <thead><tr><th>Projeto</th><th>Responsável</th><th>Prazo para Entrega</th><th>Destinatário</th><th>Data de Entrega</th></tr></thead>
     <tbody id="acoesAssinatura">
     <tr class="row-warn"><td>SANTO AGOSTINHO</td><td>WILDER</td><td>10/08/2026</td><td>LERNITON</td><td>15/08/2026</td></tr>
-    <tr class="row-warn"><td>OITIS</td><td>JAMILE</td><td>17/08/2026</td><td>SANDRELINO</td><td></td></tr>
     <tr class="row-warn"><td>COPEL</td><td>EVAIR</td><td>sem previsão</td><td>JONATO DIAS FEITOSA</td><td>13/08/2026</td></tr>
     </tbody>
   </table>
@@ -268,7 +267,7 @@
 <script>
   var evolucaoMeses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago"];
   var evolucaoReq = [100, 83, 106, 76, 58, 83, 38, 25];
-  var evolucaoEnt = [96, 76, 103, 72, 58, 73, 32, 16];
+  var evolucaoEnt = [96, 76, 103, 72, 58, 73, 32, 17];
   new Chart(document.getElementById("chartEvolucao"), {
     type:"line",
     data:{ labels: evolucaoMeses,
