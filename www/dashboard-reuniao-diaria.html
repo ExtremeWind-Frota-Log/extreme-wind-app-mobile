@@ -46,16 +46,26 @@
 
   .kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin-bottom:24px; align-items:start;}
   .kpi.tech-box{min-width:220px;}
+  .kpi.tech-box-full{grid-column:1 / -1;}
   .tech-box .sub-label{
     font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.03em;
     margin-top:10px; margin-bottom:4px;
   }
   .tech-list{list-style:none; margin:0; padding:0; font-size:12.5px;}
+  .tech-header, .tech-row{
+    display:grid; grid-template-columns:40px 1fr 72px 50px; gap:6px; align-items:start;
+  }
+  .tech-header{
+    font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.03em;
+    padding-bottom:4px; border-bottom:1px solid var(--line);
+  }
   .tech-list li{padding:4px 0; border-top:1px solid var(--line);}
   .tech-list li:first-child{border-top:none;}
   .tech-list [contenteditable="true"]{border-radius:3px; padding:0 3px; cursor:text;}
   .tech-list [contenteditable="true"]:hover{background:rgba(28,140,232,.06);}
   .tech-list [contenteditable="true"]:focus{outline:none; background:rgba(28,140,232,.16);}
+  .tech-mat, .tech-data, .tech-dias{text-align:center; white-space:nowrap;}
+  .tech-nome{font-size:12px; line-height:1.25; word-break:break-word;}
   .kpi{background:var(--panel); border:1px solid var(--line); border-left:4px solid var(--brand); border-radius:10px; padding:16px 18px;}
   .kpi .label{font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.03em;}
   .kpi .n{font-size:26px; font-weight:700; margin-top:4px;}
@@ -63,25 +73,36 @@
   .kpi.ok{border-left-color:var(--ok);}
 
   .block-nav{
-    display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap;
+    display:flex; gap:6px; margin-bottom:16px; flex-wrap:wrap;
     position:sticky; top:0; z-index:50; background:var(--bg);
-    padding:14px 0; margin-top:-14px; box-shadow:0 8px 12px -8px rgba(0,0,0,.4);
+    padding:8px 0; margin-top:-8px; box-shadow:0 8px 12px -8px rgba(0,0,0,.4);
   }
   .block-btn{
     background:var(--panel); border:1px solid var(--line); color:var(--muted);
-    padding:22px 18px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer;
+    padding:10px 12px; border-radius:8px; font-size:11.5px; font-weight:600; cursor:pointer;
     transition:background .15s, color .15s, border-color .15s;
     display:inline-block; vertical-align:top;
-    width:230px; white-space:normal; text-align:center; line-height:1.3;
+    width:150px; white-space:normal; text-align:center; line-height:1.25;
   }
   .block-btn:hover{background:var(--panel2); color:var(--text);}
   .block-btn.active{background:var(--brand); color:#fff; border-color:var(--brand);}
   .block-btn img.gif-icon{
-    height:56px; width:auto; border-radius:6px; vertical-align:middle; margin-right:6px;
+    height:28px; width:auto; border-radius:5px; vertical-align:middle; margin-right:5px;
     display:inline-block; border:1px solid rgba(255,255,255,.25);
   }
   .btn-icons{display:inline-flex; margin-right:4px;}
   .block-btn .count{font-weight:400; opacity:.8; margin-left:4px;}
+
+  /* No celular, blocos fixos (sticky) tomam espaço da tela e atrapalham ver
+     as informações do parque ao rolar — vira barra normal (rola junto). */
+  @media (max-width: 640px){
+    .block-nav{
+      position:static; box-shadow:none; padding:0; margin-top:0; margin-bottom:14px;
+      overflow-x:auto; flex-wrap:nowrap; -webkit-overflow-scrolling:touch;
+    }
+    .block-btn{width:118px; flex:none; padding:8px 10px; font-size:10.5px;}
+    .block-btn img.gif-icon{height:22px;}
+  }
 
   .block-view{display:none;}
   .block-view.active{display:block;}
@@ -223,11 +244,10 @@
   </header>
 
   <div class="kpis" id="kpisBox">
-    <div class="kpi"><div class="label">Parques em Pauta</div><div class="n" id="kpiParques">—</div></div>
-    <div class="kpi warn"><div class="label">Ações Pendentes (Temas Diversos)</div><div class="n" id="kpiAcoes">—</div></div>
-    <div class="kpi tech-box">
+    <div class="kpi tech-box tech-box-full">
       <div class="label">Técnicos Indeterminados</div>
       <div class="sub-label">Banco de Horas (Casa):</div>
+      <div class="tech-header"><span>Mat.</span><span>Nome</span><span>Início</span><span>Dias</span></div>
       <ul class="tech-list" id="tecnicosList"></ul>
     </div>
   </div>
@@ -298,7 +318,10 @@
       const r = await fetch(MOCK_JSON_PATH);
       return r.json();
     }
-    const r = await fetch(API_URL);
+    // cache-buster: o Web App do Apps Script (e/ou o navegador) pode servir
+    // uma resposta antiga em cache para essa mesma URL; o parâmetro "_"
+    // garante que cada carregamento busque os dados realmente atuais da planilha.
+    const r = await fetch(API_URL + '?_=' + Date.now(), { cache: 'no-store' });
     return r.json();
   }
   async function apiPost(payload){
@@ -643,23 +666,61 @@
   }
 
   /* ============ Técnicos indeterminados ============ */
+  // Converte o valor de DataInicio (pode vir como "dd/mm/aaaa" digitado à mão,
+  // ou como string ISO com hora — é assim que o Apps Script serializa uma
+  // célula de data de verdade) num objeto Date à meia-noite local.
+  function parseDataInicio(s){
+    const v = String(s == null ? '' : s).trim();
+    if (!v) return null;
+    let m = v.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (m) return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+    m = v.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+    if (m) return new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1]));
+    return null;
+  }
+  // Dias corridos entre a Data Início e hoje (contador ao vivo — some 1 dia
+  // automaticamente sempre que a data virar, sem precisar editar a planilha).
+  function diasContador(dataInicioStr){
+    const ini = parseDataInicio(dataInicioStr);
+    if (!ini) return '—';
+    const hoje = new Date();
+    const hojeSemHora = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+    const diffMs = hojeSemHora - ini;
+    const dias = Math.floor(diffMs / 86400000);
+    if (dias < 0) return '—';
+    return dias + (dias === 1 ? ' dia' : ' dias');
+  }
+  // Exibe a Data Início sempre como dd/mm/aaaa, mesmo quando a planilha
+  // guarda a célula como data de verdade (o Apps Script serializa isso como
+  // "2026-08-07T03:00:00.000Z" — sem isso o texto cru aparecia na tela).
+  function formatDataInicio(s){
+    const d = parseDataInicio(s);
+    if (!d) return escapeHtml(String(s == null ? '' : s));
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    return dd + '/' + mm + '/' + d.getFullYear();
+  }
   function renderTecnicos(){
     const ul = document.getElementById('tecnicosList');
     ul.innerHTML = '';
     DATA.tecnicos.sort(function(a,b){ return a.Ordem-b.Ordem; }).forEach(function(t){
-      const li = el('<li data-row="' + t._row + '"><span contenteditable="true" data-field="Nome">' + escapeHtml(t.Nome) +
-        '</span> = <span contenteditable="true" data-field="Dias">' + escapeHtml(t.Dias) + '</span></li>');
+      const li = el(
+        '<li data-row="' + t._row + '" class="tech-row">' +
+          '<span class="tech-mat" contenteditable="true" data-field="Matricula">' + escapeHtml(t.Matricula) + '</span>' +
+          '<span class="tech-nome" contenteditable="true" data-field="Nome">' + escapeHtml(t.Nome) + '</span>' +
+          '<span class="tech-data" contenteditable="true" data-field="DataInicio">' + formatDataInicio(t.DataInicio) + '</span>' +
+          '<span class="tech-dias" title="Calculado automaticamente a partir da Data Início">' + diasContador(t.DataInicio) + '</span>' +
+        '</li>'
+      );
       ul.appendChild(li);
+      // Só Matrícula/Nome/DataInicio são editáveis e salvam na planilha —
+      // "Dias" agora é sempre calculado ao vivo, não é mais um campo salvo.
       li.querySelectorAll('[data-field]').forEach(function(f){ wireFieldSave(f, 'RD_TecnicosIndeterminados', false); });
     });
   }
 
   /* ============ KPIs e render geral ============ */
   function renderKpis(){
-    const parquesReais = DATA.parques.filter(function(p){ return !p.Placeholder && ['b1','b2','b3'].indexOf(p.Bloco) !== -1; });
-    const acoesPendentes = DATA.notas.filter(function(n){ return n.Bloco === 'b5' && !n.Placeholder && String(n.Texto).trim() !== ''; });
-    document.getElementById('kpiParques').textContent = parquesReais.length;
-    document.getElementById('kpiAcoes').textContent = acoesPendentes.length;
     document.getElementById('countB1').textContent = '(' + DATA.parques.filter(function(p){return p.Bloco==='b1' && !p.Placeholder;}).length + ' parques)';
     document.getElementById('countB2').textContent = '(' + DATA.parques.filter(function(p){return p.Bloco==='b2' && !p.Placeholder;}).length + ' parque)';
     document.getElementById('countB3').textContent = '(' + DATA.parques.filter(function(p){return p.Bloco==='b3' && !p.Placeholder;}).length + ' Parques)';
