@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Extreme Wind — Logística &amp; Frotas</title>
+<title>Extreme Wind — Painel Geral</title>
 <link rel="icon" type="image/png" href="assets/icone-helice-color.png">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
@@ -141,7 +141,7 @@
     <div class="sidebar-brand">
       <img src="assets/logo-extreme-wind-white.png" alt="Extreme Wind" style="height:44px; width:auto; display:block;">
       <div>
-        <div class="sub" style="margin-top:6px;">Logística &amp; Frotas</div>
+        <div class="sub" style="margin-top:6px;">Painel Geral</div>
       </div>
     </div>
 
@@ -165,7 +165,7 @@
     </nav>
 
     <div class="sidebar-footer">
-      Uso interno · Setor de Logística e Frotas.<br>Não repassar fora da equipe.
+      Uso interno · Extreme Wind.<br>Não repassar fora da equipe.
     </div>
   </aside>
 
@@ -176,7 +176,7 @@
         <img src="assets/icone-helice-color.png" alt="" class="topbar-logo" style="height:22px; width:auto; display:none;">
         <div>
           <h2 id="topTitle">Início</h2>
-          <div class="path" id="topPath">Extreme Wind / Logística &amp; Frotas</div>
+          <div class="path" id="topPath">Extreme Wind / Painel Geral</div>
         </div>
       </div>
       <div class="badge" id="topBadge">Atualizado 22/08/2026</div>
@@ -190,8 +190,8 @@
           </div>
           <div>
             <img src="assets/logo-extreme-wind-white.png" alt="Extreme Wind" style="height:34px; width:auto; display:block; margin-bottom:12px;">
-            <h3>Painel de Logística &amp; Frotas</h3>
-            <p>Ponto único de acesso aos dashboards de controle de equipes (mobilização/desmobilização) e de frota/manutenção de veículos da Extreme Wind. Selecione um item no menu ao lado ou em um dos cartões abaixo.</p>
+            <h3>Painel Geral — Extreme Wind</h3>
+            <p>Ponto único de acesso aos dashboards da Extreme Wind: controle de equipes (mobilização/desmobilização), frota/manutenção de veículos, boletos, envios logísticos e reembolso. Selecione um item no menu ao lado ou em um dos cartões abaixo.</p>
           </div>
         </div>
 
@@ -269,7 +269,7 @@
             <div class="kpirow">
               <div><div class="n">10</div><div class="l">Veículos</div></div>
               <div><div class="n" style="color:var(--ok)">92%</div><div class="l">Conformidade</div></div>
-              <div><div class="n" style="color:var(--nok)">11</div><div class="l">Ações pendentes</div></div>
+              <div><div class="n" style="color:var(--nok)">12</div><div class="l">Ações pendentes</div></div>
             </div>
             <div class="go">Ver detalhamento por veículo e plano de ação →</div>
           </div>
@@ -306,15 +306,15 @@
   console.log("EW-APP-SCRIPT-BOOT-OK");
 
   const TITLES = {
-    home: { title: "Início", path: "Extreme Wind / Logística & Frotas" },
-    "reuniao-diaria": { title: "Reunião Diária", path: "Extreme Wind / Logística & Frotas / Reunião Diária" },
-    demandas: { title: "Nossas Demandas", path: "Extreme Wind / Logística & Frotas / Nossas Demandas" },
-    "busca-tecnico": { title: "Buscar Técnico", path: "Extreme Wind / Logística & Frotas / Buscar Técnico" },
-    equipes: { title: "Controle de Equipes", path: "Extreme Wind / Logística & Frotas / Controle de Equipes" },
-    frota: { title: "Frota — Manutenção", path: "Extreme Wind / Logística & Frotas / Frota - Manutenção" },
-    boletos: { title: "Controle de Boletos", path: "Extreme Wind / Logística & Frotas / Controle de Boletos" },
-    envios: { title: "Envios Logísticos", path: "Extreme Wind / Logística & Frotas / Envios Logísticos" },
-    reembolso: { title: "Reembolso", path: "Extreme Wind / Logística & Frotas / Reembolso" }
+    home: { title: "Início", path: "Extreme Wind / Painel Geral" },
+    "reuniao-diaria": { title: "Reunião Diária", path: "Extreme Wind / Painel Geral / Reunião Diária" },
+    demandas: { title: "Nossas Demandas", path: "Extreme Wind / Painel Geral / Nossas Demandas" },
+    "busca-tecnico": { title: "Buscar Técnico", path: "Extreme Wind / Painel Geral / Buscar Técnico" },
+    equipes: { title: "Controle de Equipes", path: "Extreme Wind / Painel Geral / Controle de Equipes" },
+    frota: { title: "Frota — Manutenção", path: "Extreme Wind / Painel Geral / Frota - Manutenção" },
+    boletos: { title: "Controle de Boletos", path: "Extreme Wind / Painel Geral / Controle de Boletos" },
+    envios: { title: "Envios Logísticos", path: "Extreme Wind / Painel Geral / Envios Logísticos" },
+    reembolso: { title: "Reembolso", path: "Extreme Wind / Painel Geral / Reembolso" }
   };
 
   function showView(view){
