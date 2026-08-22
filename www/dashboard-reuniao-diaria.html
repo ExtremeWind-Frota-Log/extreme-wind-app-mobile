@@ -22,18 +22,30 @@
     border-radius:20px; padding:9px 18px; font-size:12.5px; font-weight:700;
     cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,.25);
   }
+  .fullscreen-toggle{
+    position:fixed; top:16px; right:158px; z-index:200;
+    background:var(--panel); border:1px solid var(--line); color:var(--text);
+    border-radius:20px; padding:9px 18px; font-size:12.5px; font-weight:700;
+    cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,.25);
+  }
+  /* Modo apresentação: some só com o cabeçalho (logo/título/breadcrumb) pra
+     sobrar mais espaço vertical na tela. Edição continua funcionando normal
+     — nada é bloqueado, só o header some visualmente. */
+  body.focus-mode header{display:none;}
+  body.focus-mode{padding-top:14px;}
+  @media (max-width: 640px){
+    .fullscreen-toggle{top:auto; bottom:16px; right:16px;}
+  }
   *{box-sizing:border-box;}
   body{
     margin:0; font-family:Segoe UI,Arial,sans-serif; background:var(--bg); color:var(--text);
     padding:24px; line-height:1.4;
   }
-  .sync-banner{
-    background:#0A2A3A; border:1px solid var(--brand); color:#9FD3EA;
-    padding:10px 16px; border-radius:8px; font-size:12.5px; margin-bottom:18px;
-    display:flex; align-items:center; gap:8px; justify-content:space-between; flex-wrap:wrap;
-  }
-  .sync-banner.err{ border-color:var(--nok); background:#3A0A0A; color:#F2A08C; }
-  .sync-banner .status{ font-weight:700; }
+  /* margin-top pra não ficar embaixo dos botões fixos (Tela Cheia/Modo Diurno)
+     no canto superior direito, que sobrepõem essa área no topo da página. */
+  .header-right{display:flex; flex-direction:column; align-items:flex-end; gap:6px; margin-top:40px;}
+  .sync-inline{font-size:10.5px; color:var(--muted); text-align:right;}
+  .sync-inline.err{ color:var(--nok); font-weight:700; }
   header{
     display:flex; align-items:center; justify-content:space-between; gap:16px;
     padding-bottom:18px; border-bottom:1px solid var(--line); margin-bottom:20px;
@@ -258,10 +270,7 @@
 <body>
 
   <button class="theme-toggle" id="themeToggleBtn" onclick="toggleTheme()">☀️ Modo Diurno</button>
-
-  <div class="sync-banner" id="syncBanner">
-    🔄 <span class="status" id="syncStatus">Carregando dados do Google Sheets…</span>
-  </div>
+  <button class="fullscreen-toggle" id="fullscreenToggleBtn" onclick="toggleFullscreen()">⛶ Tela Cheia</button>
 
   <header>
     <div class="brand">
@@ -271,7 +280,10 @@
         <div class="sub">Extreme Wind / Logística &amp; Frotas / Reunião Diária</div>
       </div>
     </div>
-    <div class="badge-week">5 blocos · Fonte: Google Sheets (RD_*)</div>
+    <div class="header-right">
+      <div class="badge-week">5 blocos · Fonte: Google Sheets (RD_*)</div>
+      <div class="sync-inline" id="syncBanner">🔄 <span id="syncStatus">Carregando dados do Google Sheets…</span></div>
+    </div>
   </header>
 
   <div class="kpis" id="kpisBox">
@@ -949,6 +961,44 @@
     if (saved === 'light') document.body.classList.add('light-mode');
     updateThemeBtn();
   })();
+
+  /* Modo Tela Cheia / Apresentação: pede fullscreen real do navegador (some
+     com abas/barra de endereço) e some com o cabeçalho "Reunião Diária" pra
+     sobrar o máximo de espaço pro conteúdo dos parques. Nada fica travado —
+     continua tudo editável normalmente, é só uma questão de espaço na tela. */
+  function isFocusModeOn(){
+    return document.body.classList.contains('focus-mode');
+  }
+  function updateFullscreenBtn(){
+    const btn = document.getElementById('fullscreenToggleBtn');
+    btn.textContent = isFocusModeOn() ? '↩️ Sair da Tela Cheia' : '⛶ Tela Cheia';
+  }
+  function toggleFullscreen(){
+    if (!isFocusModeOn()){
+      document.body.classList.add('focus-mode');
+      const el = document.documentElement;
+      const req = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+      if (req) { try { req.call(el); } catch(e){} }
+    } else {
+      document.body.classList.remove('focus-mode');
+      const exit = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
+      if (exit && (document.fullscreenElement || document.webkitFullscreenElement)) {
+        try { exit.call(document); } catch(e){}
+      }
+    }
+    updateFullscreenBtn();
+  }
+  // Se o usuário sair do fullscreen pelo Esc/F11 (sem clicar no botão), some
+  // o cabeçalho de novo pra não ficar com o texto "Sair da Tela Cheia" preso.
+  ['fullscreenchange','webkitfullscreenchange'].forEach(function(evt){
+    document.addEventListener(evt, function(){
+      const stillFs = document.fullscreenElement || document.webkitFullscreenElement;
+      if (!stillFs && isFocusModeOn()){
+        document.body.classList.remove('focus-mode');
+        updateFullscreenBtn();
+      }
+    });
+  });
 
   boot();
 </script>
