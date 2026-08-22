@@ -155,7 +155,20 @@
   .status-select.st-stop{background:rgba(224,72,60,.18); color:var(--nok); border:1px solid var(--nok);}
   .status-select option{background:var(--panel); color:var(--text);}
 
-  /* ============ Quadro de Atividades (WTG) — cabeçalho do parque ============ */
+  /* Coluna à direita do painel: status "Em atividade" em cima, RDO Enviado embaixo */
+  .status-col{display:flex; flex-direction:column; gap:8px; flex:none; width:190px;}
+  .status-col .status-select{width:100%;}
+  .status-col .rdo-box{width:100%;}
+
+  /* ============ Quadro de Atividades (WTG) — cabeçalho do parque ============
+     Mostra sempre 2 dias lado a lado (anteontem à esquerda, ontem à direita);
+     a janela avança sozinha dia a dia conforme a data do sistema. */
+  .activity-boxes{display:flex; gap:8px; flex:none;}
+  .ab-daycol{display:flex; flex-direction:column; gap:4px;}
+  .ab-daycol-label{
+    font-size:9.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em;
+    text-align:center;
+  }
   .activity-box{
     flex:none; width:210px; background:var(--brand-deep); border:1px solid var(--line);
     border-radius:8px; padding:8px 10px; font-size:11px;
@@ -164,6 +177,7 @@
     font-size:9.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em;
     margin-bottom:6px; display:flex; align-items:center; justify-content:space-between; gap:6px;
   }
+  .activity-box .ab-rdo-tag{color:var(--teal); font-weight:700; margin-right:3px;}
   .activity-box .ab-nav{cursor:pointer; color:var(--muted); font-weight:700; user-select:none; padding:0 3px;}
   .activity-box .ab-nav:hover{color:var(--text);}
   .activity-box .ab-empty{color:var(--muted); font-style:italic; font-size:11px;}
@@ -180,6 +194,22 @@
   .activity-box .ab-dot.active{background:var(--teal);}
   .activity-box.ab-alert{background:rgba(224,72,60,.14); border-color:rgba(224,72,60,.45);}
   .activity-box .ab-not-sent{color:var(--nok); font-weight:700; font-style:normal; text-align:center; padding:6px 0;}
+
+  /* ============ Quadro RDO Enviado (data + % Stand by/Produtivo/Setup/Garantia) ============ */
+  .rdo-box{
+    flex:none; width:170px; background:var(--brand-deep); border:1px solid var(--line);
+    border-radius:8px; padding:8px 10px; font-size:11px;
+  }
+  .rdo-box .ab-title{
+    font-size:9.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em;
+    margin-bottom:6px;
+  }
+  .rdo-box .rdo-date{font-size:12px; font-weight:700; color:var(--text); margin-bottom:6px;}
+  .rdo-box .ab-row{display:flex; justify-content:space-between; gap:6px; padding:1px 0;}
+  .rdo-box .ab-label{color:var(--muted);}
+  .rdo-box .ab-value{color:var(--text); font-weight:600; text-align:right;}
+  .rdo-box.ab-alert{background:rgba(224,72,60,.14); border-color:rgba(224,72,60,.45);}
+  .rdo-box .ab-not-sent{color:var(--nok); font-weight:700; font-style:normal; text-align:center; padding:6px 0;}
 
   table{width:100%; border-collapse:collapse; font-size:12px;}
   thead th{
@@ -246,8 +276,7 @@
 
   <div class="kpis" id="kpisBox">
     <div class="kpi tech-box tech-box-full">
-      <div class="label">Técnicos Indeterminados</div>
-      <div class="sub-label">Banco de Horas (Casa):</div>
+      <div class="label">Técnicos em Banco de Horas (Casa)</div>
       <div class="tech-header"><span>Mat.</span><span>Nome</span><span>Início</span><span>Dias</span></div>
       <ul class="tech-list" id="tecnicosList"></ul>
     </div>
@@ -294,7 +323,7 @@
   const CHIP_ORDER = ['Tipo','Card','Supervisor','Cliente','Data','EHS','Condicao'];
   const BLOCK_LABELS = {b1:'Parques Ativos', b2:'Mobilização', b3:'Aprovação de Documentações'};
 
-  let DATA = { parques:[], equipe:[], aprovados:[], notas:[], tecnicos:[], relatorios:[] };
+  let DATA = { parques:[], equipe:[], aprovados:[], notas:[], tecnicos:[], relatorios:[], atividades:[], classificacao:[] };
   let PARK_SEQ = 0;
 
   function escapeHtml(s){
@@ -375,8 +404,16 @@
           '<h2 contenteditable="true" class="' + (p.Placeholder ? 'placeholder-title' : '') + '" data-field="NomeParque">' + escapeHtml(p.NomeParque) + '</h2>' +
           '<div class="info-chips">' + buildChipsHtml(p) + '</div>' +
         '</div>' +
-        '<div class="activity-box" data-activity-box data-parkname="' + escapeHtml(p.NomeParque) + '"></div>' +
-        '<select class="status-select st-' + p.Status + '" data-field="Status">' + statusOptions + '</select>' +
+        '<div class="activity-boxes">' +
+          '<div class="ab-daycol"><div class="ab-daycol-label">Anteontem</div>' +
+            '<div class="activity-box" data-activity-box data-dayoffset="2" data-parkname="' + escapeHtml(p.NomeParque) + '"></div></div>' +
+          '<div class="ab-daycol"><div class="ab-daycol-label">Ontem</div>' +
+            '<div class="activity-box" data-activity-box data-dayoffset="1" data-parkname="' + escapeHtml(p.NomeParque) + '"></div></div>' +
+        '</div>' +
+        '<div class="status-col">' +
+          '<select class="status-select st-' + p.Status + '" data-field="Status">' + statusOptions + '</select>' +
+          '<div class="rdo-box" data-rdo-box data-parkname="' + escapeHtml(p.NomeParque) + '"></div>' +
+        '</div>' +
       '</div>' +
       '<table><thead><tr>' + theadHtml + '</tr></thead><tbody data-equipe-body></tbody></table>' +
       '<div class="aprovados-box"><div class="ap-title">Aprovados (backup)</div><div class="ap-names" data-aprovados-body></div></div>' +
@@ -411,6 +448,7 @@
 
     wirePanel(node, p);
     initActivityBox(node);
+    initRdoBox(node);
     return node;
   }
 
@@ -437,14 +475,17 @@
     if (m) return m[3] + '-' + m[2] + '-' + m[1];
     return v;
   }
-  function yesterdayISO(){
+  /* offsetDays=1 -> ontem, offsetDays=2 -> anteontem, etc. Base sempre a data
+     atual do sistema, então a janela "avança" sozinha dia a dia. */
+  function dateOffsetISO(offsetDays){
     const d = new Date();
-    d.setDate(d.getDate() - 1);
+    d.setDate(d.getDate() - offsetDays);
     const yyyy = d.getFullYear();
     const mm = String(d.getMonth() + 1).padStart(2, '0');
     const dd = String(d.getDate()).padStart(2, '0');
     return yyyy + '-' + mm + '-' + dd;
   }
+  function yesterdayISO(){ return dateOffsetISO(1); }
   function activityRowHtml(a){
     if (!a){
       return '<div class="ab-empty ab-not-sent">Não Enviado</div>';
@@ -462,10 +503,21 @@
         '<div class="ab-progress-bar"><div class="ab-progress-fill" style="width:' + (isNaN(pct) ? 0 : Math.max(0, Math.min(100, pct))) + '%"></div></div>' +
       '</div>';
   }
+  /* "dd/mm" a partir do Registrado_em (data de envio do RDO) — vazio se não houver. */
+  function formatDataCurta(registradoEm){
+    const full = formatDataHoraEnvio(registradoEm);
+    const m = full.match(/^(\d{2}\/\d{2})/);
+    return m ? m[1] : '';
+  }
   function renderActivityBox(box, rows, idx){
     const title = box.querySelector('[data-ab-title-count]');
+    const rdoTag = box.querySelector('[data-ab-rdo-date]');
     box.querySelector('[data-ab-body]').innerHTML = activityRowHtml(rows[idx]);
     if (title) title.textContent = rows.length ? (idx + 1) + '/' + rows.length : '';
+    if (rdoTag){
+      const curta = rows.length ? formatDataCurta(rows[idx].Registrado_em) : '';
+      rdoTag.textContent = curta ? ('RDO ' + curta + ' · ') : '';
+    }
     const dots = box.querySelector('[data-ab-dots]');
     if (dots){
       dots.innerHTML = rows.length > 1 ? rows.map(function(_, i){
@@ -474,35 +526,150 @@
     }
     box.classList.toggle('ab-alert', !rows.length);
   }
+  /* Cada painel tem 2 quadros (data-dayoffset="2" = anteontem, "1" = ontem),
+     cada um navegável de forma independente entre os relatórios daquele dia. */
   function initActivityBox(node){
-    const box = node.querySelector('[data-activity-box]');
+    node.querySelectorAll('[data-activity-box]').forEach(function(box){
+      const parkName = box.dataset.parkname;
+      const offset = Number(box.dataset.dayoffset) || 1;
+      const diaIso = dateOffsetISO(offset);
+      // Considera só o relatório daquele dia (Data_exp); se houver mais de um
+      // pro mesmo parque nesse dia, mantém todos navegáveis, mas ordenados do
+      // mais recente pro mais antigo (por Registrado_em, quando disponível).
+      const rows = (DATA.relatorios || [])
+        .filter(function(r){ return parkMatchesReport(parkName, r.Parque) && normalizeDateExp(r.Data_exp) === diaIso; })
+        .sort(function(a, b){ return String(b.Registrado_em || '').localeCompare(String(a.Registrado_em || '')); });
+      box.innerHTML = '' +
+        '<div class="ab-title"><span class="ab-nav" data-ab-prev>‹</span>' +
+        '<span><span class="ab-rdo-tag" data-ab-rdo-date></span>Atividades <span data-ab-title-count></span></span>' +
+        '<span class="ab-nav" data-ab-next>›</span></div>' +
+        '<div data-ab-body></div>' +
+        '<div class="ab-dots" data-ab-dots></div>';
+      let idx = 0;
+      renderActivityBox(box, rows, idx);
+      box.querySelector('[data-ab-prev]').addEventListener('click', function(){
+        if (!rows.length) return;
+        idx = (idx - 1 + rows.length) % rows.length;
+        renderActivityBox(box, rows, idx);
+      });
+      box.querySelector('[data-ab-next]').addEventListener('click', function(){
+        if (!rows.length) return;
+        idx = (idx + 1) % rows.length;
+        renderActivityBox(box, rows, idx);
+      });
+    });
+  }
+
+  /* ============ Quadro RDO Enviado — % Stand by / Produtivo / Setup / Garantia ============
+     Lê SOMENTE LEITURA as abas Atividades e "Classificação de atv" (fora do
+     prefixo RD_). A % de cada RDO (relatório) do dia anterior é calculada a
+     partir da duração (Hora_ini/Hora_fim) de cada atividade lançada, cujo
+     "Tipo de reparo" (catálogo da aba Classificação de atv) é enquadrado em
+     um dos 3 grupos abaixo. Garantia é um caso à parte: só existe quando a
+     própria equipe sinalizar retrabalho por erro nosso no RDO — hoje isso
+     ainda não é um campo na planilha, então o valor fica zerado até que
+     esse rastreio exista. */
+  const TIPO_TO_BUCKET = {
+    // Setup (preparação/fechamento do acesso por corda, integração, pesagem)
+    'integracao':'setup', 'setup inicio':'setup', 'setup final':'setup', 'pesagem dos quimicos':'setup',
+    // Stand by (parado/aguardando — inclui intervalo e atividades não classificadas)
+    'stand by clima':'standby', 'stand by':'standby', 'intervalo':'standby', 'outro':'standby', 'atividade a definir':'standby'
+    // Tudo que não estiver mapeado acima (instalação/reparo/inspeção) cai em "produtivo" — ver classificaBucket().
+  };
+  function normalizeTxt(s){
+    return String(s == null ? '' : s)
+      .normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .toLowerCase().replace(/\s+/g, ' ').trim();
+  }
+  let _classifLookup = null;
+  function classifLookup(){
+    if (_classifLookup) return _classifLookup;
+    _classifLookup = {};
+    (DATA.classificacao || []).forEach(function(c){
+      const nome = normalizeTxt(c.Atividade);
+      if (nome) _classifLookup[nome] = c['Tipo de reparo'];
+    });
+    return _classifLookup;
+  }
+  function classificaBucket(atividadeTexto){
+    const tipo = classifLookup()[normalizeTxt(atividadeTexto)];
+    if (!tipo) return null;
+    const key = normalizeTxt(tipo);
+    if (TIPO_TO_BUCKET[key]) return TIPO_TO_BUCKET[key];
+    return 'produtivo';
+  }
+  /* Aceita "7:00" / "17:30" (texto) ou string ISO com hora ("...T17:30:00.000Z") vinda de célula
+     que a planilha guardou como horário — devolve minutos desde a meia-noite, ou null se ilegível. */
+  function parseHoraMinutos(v){
+    const s = String(v == null ? '' : v).trim();
+    if (!s) return null;
+    let m = s.match(/(\d{1,2}):(\d{2})(?::(\d{2}))?/);
+    if (!m) return null;
+    return Number(m[1]) * 60 + Number(m[2]);
+  }
+  function computeRdoStats(parkName, relatorioIds){
+    const idSet = {};
+    relatorioIds.forEach(function(id){ idSet[String(id)] = true; });
+    const minutos = { setup:0, standby:0, produtivo:0 };
+    let total = 0;
+    (DATA.atividades || []).forEach(function(a){
+      if (!idSet[String(a.Relatorio_ID)]) return;
+      const ini = parseHoraMinutos(a.Hora_ini), fim = parseHoraMinutos(a.Hora_fim);
+      if (ini == null || fim == null) return;
+      let dur = fim - ini;
+      if (dur < 0) dur += 24 * 60; // atravessou a meia-noite
+      if (dur <= 0) return;
+      const bucket = classificaBucket(a.Atividade);
+      if (!bucket) return;
+      minutos[bucket] += dur;
+      total += dur;
+    });
+    if (!total) return null;
+    return {
+      standby: Math.round(minutos.standby / total * 100),
+      produtivo: Math.round(minutos.produtivo / total * 100),
+      setup: Math.round(minutos.setup / total * 100),
+      garantia: 0 // sem rastreio na planilha ainda — ver comentário acima
+    };
+  }
+  function formatDataHoraEnvio(registradoEm){
+    const s = String(registradoEm == null ? '' : registradoEm).trim();
+    if (!s) return '—';
+    // "17/08/2026 18:23" (BR) ou ISO — mantém só dd/mm hh:mm pra caber na caixa.
+    let m = s.match(/^(\d{2})\/(\d{2})\/\d{4}\s+(\d{1,2}):(\d{2})/);
+    if (m) return m[1] + '/' + m[2] + ' ' + m[3].padStart(2, '0') + ':' + m[4];
+    m = s.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})/);
+    if (m) return m[3] + '/' + m[2] + ' ' + m[4] + ':' + m[5];
+    return s;
+  }
+  function rdoBoxHtml(rows, stats){
+    if (!rows.length){
+      return '<div class="ab-title">RDO Enviado</div><div class="ab-not-sent">Não Enviado</div>';
+    }
+    const dataStr = formatDataHoraEnvio(rows[0].Registrado_em);
+    if (!stats){
+      return '<div class="ab-title">RDO Enviado</div><div class="rdo-date">' + escapeHtml(dataStr) + '</div>' +
+        '<div class="ab-empty">Sem atividades lançadas</div>';
+    }
+    return '' +
+      '<div class="ab-title">RDO Enviado</div>' +
+      '<div class="rdo-date">' + escapeHtml(dataStr) + '</div>' +
+      '<div class="ab-row"><span class="ab-label">Stand by</span><span class="ab-value">' + stats.standby + '%</span></div>' +
+      '<div class="ab-row"><span class="ab-label">Produtivo</span><span class="ab-value">' + stats.produtivo + '%</span></div>' +
+      '<div class="ab-row"><span class="ab-label">Setup</span><span class="ab-value">' + stats.setup + '%</span></div>' +
+      '<div class="ab-row"><span class="ab-label">Garantia</span><span class="ab-value">' + stats.garantia + '%</span></div>';
+  }
+  function initRdoBox(node){
+    const box = node.querySelector('[data-rdo-box]');
     if (!box) return;
     const parkName = box.dataset.parkname;
     const ontem = yesterdayISO();
-    // Considera só o relatório do dia anterior (Data_exp); se houver mais de
-    // um pro mesmo parque nesse dia, mantém todos navegáveis, mas ordenados
-    // do mais recente pro mais antigo (por Registrado_em, quando disponível).
     const rows = (DATA.relatorios || [])
       .filter(function(r){ return parkMatchesReport(parkName, r.Parque) && normalizeDateExp(r.Data_exp) === ontem; })
       .sort(function(a, b){ return String(b.Registrado_em || '').localeCompare(String(a.Registrado_em || '')); });
-    box.innerHTML = '' +
-      '<div class="ab-title"><span class="ab-nav" data-ab-prev>‹</span>' +
-      '<span>Atividades <span data-ab-title-count></span></span>' +
-      '<span class="ab-nav" data-ab-next>›</span></div>' +
-      '<div data-ab-body></div>' +
-      '<div class="ab-dots" data-ab-dots></div>';
-    let idx = 0;
-    renderActivityBox(box, rows, idx);
-    box.querySelector('[data-ab-prev]').addEventListener('click', function(){
-      if (!rows.length) return;
-      idx = (idx - 1 + rows.length) % rows.length;
-      renderActivityBox(box, rows, idx);
-    });
-    box.querySelector('[data-ab-next]').addEventListener('click', function(){
-      if (!rows.length) return;
-      idx = (idx + 1) % rows.length;
-      renderActivityBox(box, rows, idx);
-    });
+    const stats = computeRdoStats(parkName, rows.map(function(r){ return r.ID; }));
+    box.innerHTML = rdoBoxHtml(rows, stats);
+    box.classList.toggle('ab-alert', !rows.length);
   }
 
   /* ============ Salvar edições ============ */
@@ -747,7 +914,7 @@
   async function boot(){
     try{
       DATA = await apiGet();
-      ['parques','equipe','aprovados','notas','tecnicos','relatorios'].forEach(function(k){ if (!DATA[k]) DATA[k] = []; });
+      ['parques','equipe','aprovados','notas','tecnicos','relatorios','atividades','classificacao'].forEach(function(k){ if (!DATA[k]) DATA[k] = []; });
       renderAll();
       setSyncStatus(API_URL ? 'Conectado ao Google Sheets.' : 'MODO TESTE — lendo dados_seed.json local. Edições não são salvas (configure API_URL).', !API_URL);
     } catch(err){
