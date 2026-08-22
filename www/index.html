@@ -72,9 +72,15 @@
   .home{position:absolute; inset:0; overflow-y:auto; padding:32px; display:none;}
   .home.active{display:block;}
   .home .hero{
-    background:linear-gradient(135deg,var(--brand),var(--brand-dark)); border-radius:14px; padding:36px 40px;
+    position:relative; background:linear-gradient(135deg,var(--brand),var(--brand-dark));
+    border-radius:14px; padding:18px 32px; overflow:hidden;
     display:flex; align-items:center; gap:22px; margin-bottom:28px;
   }
+  .home .hero .hero-photo{
+    position:absolute; top:0; right:0; height:100%; width:55%; min-width:340px;
+    object-fit:cover; object-position:right center; z-index:0; pointer-events:none;
+  }
+  .home .hero > *{position:relative; z-index:1;}
   .home .hero svg{flex:none;}
   .home .hero h3{margin:0 0 6px; font-size:22px;}
   .home .hero p{margin:0; color:rgba(255,255,255,.8); font-size:13.5px; max-width:520px;}
@@ -185,13 +191,13 @@
     <div class="view">
       <div class="home active" id="view-home">
         <div class="hero">
+          <img src="assets/hero-tecnico.png" alt="" class="hero-photo">
           <div style="background:rgba(255,255,255,.15); border-radius:20px; padding:16px; flex:none; display:flex; align-items:center; justify-content:center;">
-            <img src="assets/icone-helice-white.png" alt="" style="height:96px; width:auto; display:block;">
+            <img src="assets/icone-helice-white.png" alt="" style="height:72px; width:auto; display:block;">
           </div>
           <div>
-            <img src="assets/logo-extreme-wind-white.png" alt="Extreme Wind" style="height:34px; width:auto; display:block; margin-bottom:12px;">
-            <h3>Painel Geral — Extreme Wind</h3>
-            <p>Ponto único de acesso aos dashboards da Extreme Wind: controle de equipes (mobilização/desmobilização), frota/manutenção de veículos, boletos, envios logísticos e reembolso. Selecione um item no menu ao lado ou em um dos cartões abaixo.</p>
+            <img src="assets/logo-extreme-wind-white.png" alt="Extreme Wind" style="height:56px; width:auto; display:block; margin-bottom:10px;">
+            <h3 style="margin:0;">Painel Geral — Extreme Wind</h3>
           </div>
         </div>
 
