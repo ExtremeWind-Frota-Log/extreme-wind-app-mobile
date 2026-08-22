@@ -23,7 +23,7 @@
     cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,.25);
   }
   .fullscreen-toggle{
-    position:fixed; top:16px; right:158px; z-index:200;
+    position:fixed; top:60px; right:16px; z-index:200;
     background:var(--panel); border:1px solid var(--line); color:var(--text);
     border-radius:20px; padding:9px 18px; font-size:12.5px; font-weight:700;
     cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,.25);
@@ -36,14 +36,18 @@
   @media (max-width: 640px){
     .fullscreen-toggle{top:auto; bottom:16px; right:16px;}
   }
+  @media (min-width: 641px){
+    .fullscreen-toggle{width:150px; text-align:center; white-space:nowrap; top:64px;}
+    .theme-toggle{width:150px; text-align:center; white-space:nowrap;}
+  }
   *{box-sizing:border-box;}
   body{
     margin:0; font-family:Segoe UI,Arial,sans-serif; background:var(--bg); color:var(--text);
     padding:24px; line-height:1.4;
   }
-  /* margin-top pra não ficar embaixo dos botões fixos (Tela Cheia/Modo Diurno)
-     no canto superior direito, que sobrepõem essa área no topo da página. */
-  .header-right{display:flex; flex-direction:column; align-items:flex-end; gap:6px; margin-top:40px;}
+  /* margin-top pra não ficar embaixo dos botões fixos (Modo Diurno em cima,
+     Tela Cheia embaixo, empilhados) no canto superior direito. */
+  .header-right{display:flex; flex-direction:column; align-items:flex-end; gap:6px; margin-top:84px;}
   .sync-inline{font-size:10.5px; color:var(--muted); text-align:right;}
   .sync-inline.err{ color:var(--nok); font-weight:700; }
   header{
