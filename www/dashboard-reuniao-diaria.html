@@ -209,6 +209,8 @@
   .activity-box .ab-dot{width:5px; height:5px; border-radius:50%; background:var(--line);}
   .activity-box .ab-dot.active{background:var(--teal);}
   .activity-box.ab-alert{background:rgba(224,72,60,.14); border-color:rgba(224,72,60,.45);}
+  .activity-box.ab-fallback{border-color:rgba(217,178,52,.55);}
+  .ab-daycol-label[data-fallback-active]{color:#d9b234;}
   .activity-box .ab-not-sent{color:var(--nok); font-weight:700; font-style:normal; text-align:center; padding:6px 0;}
 
   /* ============ Quadro RDO Enviado (data + % Stand by/Produtivo/Setup/Garantia) ============ */
@@ -421,7 +423,7 @@
           '<div class="info-chips">' + buildChipsHtml(p) + '</div>' +
         '</div>' +
         '<div class="activity-boxes">' +
-          '<div class="ab-daycol"><div class="ab-daycol-label">Anteontem</div>' +
+          '<div class="ab-daycol"><div class="ab-daycol-label" data-ab-daylabel>Anteontem</div>' +
             '<div class="activity-box" data-activity-box data-dayoffset="2" data-parkname="' + escapeHtml(p.NomeParque) + '"></div></div>' +
           '<div class="ab-daycol"><div class="ab-daycol-label">Ontem</div>' +
             '<div class="activity-box" data-activity-box data-dayoffset="1" data-parkname="' + escapeHtml(p.NomeParque) + '"></div></div>' +
@@ -519,20 +521,20 @@
         '<div class="ab-progress-bar"><div class="ab-progress-fill" style="width:' + (isNaN(pct) ? 0 : Math.max(0, Math.min(100, pct))) + '%"></div></div>' +
       '</div>';
   }
-  /* "dd/mm" a partir do Registrado_em (data de envio do RDO) — vazio se não houver. */
-  function formatDataCurta(registradoEm){
-    const full = formatDataHoraEnvio(registradoEm);
-    const m = full.match(/^(\d{2}\/\d{2})/);
-    return m ? m[1] : '';
+  /* "dd/mm" a partir de uma data ISO "YYYY-MM-DD" (o dia de expediente do
+     quadro — Data_exp — não a data em que o RDO foi de fato digitado/enviado,
+     que pode ser um dia depois se a equipe atrasar o envio). */
+  function isoToDDMM(iso){
+    const m = String(iso || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
+    return m ? (m[3] + '/' + m[2]) : '';
   }
-  function renderActivityBox(box, rows, idx){
+  function renderActivityBox(box, rows, idx, diaTag){
     const title = box.querySelector('[data-ab-title-count]');
     const rdoTag = box.querySelector('[data-ab-rdo-date]');
     box.querySelector('[data-ab-body]').innerHTML = activityRowHtml(rows[idx]);
     if (title) title.textContent = rows.length ? (idx + 1) + '/' + rows.length : '';
     if (rdoTag){
-      const curta = rows.length ? formatDataCurta(rows[idx].Registrado_em) : '';
-      rdoTag.textContent = curta ? ('RDO ' + curta + ' · ') : '';
+      rdoTag.textContent = (rows.length && diaTag) ? ('RDO ' + diaTag + ' · ') : '';
     }
     const dots = box.querySelector('[data-ab-dots]');
     if (dots){
@@ -543,35 +545,71 @@
     box.classList.toggle('ab-alert', !rows.length);
   }
   /* Cada painel tem 2 quadros (data-dayoffset="2" = anteontem, "1" = ontem),
-     cada um navegável de forma independente entre os relatórios daquele dia. */
+     cada um navegável de forma independente entre os relatórios daquele dia.
+     Regra especial: se não houver RDO nem de ontem nem de anteontem, o
+     quadro de Anteontem passa a mostrar o último RDO já enviado (qualquer
+     data), escolhido/rotulado pelo dia de expediente — Data_exp — mais
+     recente (não pela data/hora real de envio). O quadro de Ontem continua
+     mostrando "Não Enviado" normalmente nesse cenário. */
   function initActivityBox(node){
+    const byPark = {};
     node.querySelectorAll('[data-activity-box]').forEach(function(box){
       const parkName = box.dataset.parkname;
-      const offset = Number(box.dataset.dayoffset) || 1;
-      const diaIso = dateOffsetISO(offset);
-      // Considera só o relatório daquele dia (Data_exp); se houver mais de um
-      // pro mesmo parque nesse dia, mantém todos navegáveis, mas ordenados do
-      // mais recente pro mais antigo (por Registrado_em, quando disponível).
-      const rows = (DATA.relatorios || [])
-        .filter(function(r){ return parkMatchesReport(parkName, r.Parque) && normalizeDateExp(r.Data_exp) === diaIso; })
-        .sort(function(a, b){ return String(b.Registrado_em || '').localeCompare(String(a.Registrado_em || '')); });
-      box.innerHTML = '' +
-        '<div class="ab-title"><span class="ab-nav" data-ab-prev>‹</span>' +
-        '<span><span class="ab-rdo-tag" data-ab-rdo-date></span>Atividades <span data-ab-title-count></span></span>' +
-        '<span class="ab-nav" data-ab-next>›</span></div>' +
-        '<div data-ab-body></div>' +
-        '<div class="ab-dots" data-ab-dots></div>';
-      let idx = 0;
-      renderActivityBox(box, rows, idx);
-      box.querySelector('[data-ab-prev]').addEventListener('click', function(){
-        if (!rows.length) return;
-        idx = (idx - 1 + rows.length) % rows.length;
-        renderActivityBox(box, rows, idx);
+      (byPark[parkName] = byPark[parkName] || []).push(box);
+    });
+    Object.keys(byPark).forEach(function(parkName){
+      const entries = {}; // offset -> { box, diaTag, rows, fallback }
+      byPark[parkName].forEach(function(box){
+        const offset = Number(box.dataset.dayoffset) || 1;
+        const diaIso = dateOffsetISO(offset);
+        // Considera só o relatório daquele dia (Data_exp); se houver mais de um
+        // pro mesmo parque nesse dia, mantém todos navegáveis, mas ordenados do
+        // mais recente pro mais antigo (por Registrado_em, quando disponível).
+        const rows = (DATA.relatorios || [])
+          .filter(function(r){ return parkMatchesReport(parkName, r.Parque) && normalizeDateExp(r.Data_exp) === diaIso; })
+          .sort(function(a, b){ return String(b.Registrado_em || '').localeCompare(String(a.Registrado_em || '')); });
+        entries[offset] = { box: box, diaTag: isoToDDMM(diaIso), rows: rows, fallback: false };
       });
-      box.querySelector('[data-ab-next]').addEventListener('click', function(){
-        if (!rows.length) return;
-        idx = (idx + 1) % rows.length;
-        renderActivityBox(box, rows, idx);
+      const semOntem = !entries[1] || !entries[1].rows.length;
+      const semAnteontem = !entries[2] || !entries[2].rows.length;
+      if (entries[2] && semOntem && semAnteontem){
+        const todos = (DATA.relatorios || [])
+          .filter(function(r){ return parkMatchesReport(parkName, r.Parque); })
+          .sort(function(a, b){ return normalizeDateExp(b.Data_exp).localeCompare(normalizeDateExp(a.Data_exp)); });
+        if (todos.length){
+          const ultimoDiaIso = normalizeDateExp(todos[0].Data_exp);
+          const rowsUltimoDia = todos
+            .filter(function(r){ return normalizeDateExp(r.Data_exp) === ultimoDiaIso; })
+            .sort(function(a, b){ return String(b.Registrado_em || '').localeCompare(String(a.Registrado_em || '')); });
+          entries[2].rows = rowsUltimoDia;
+          entries[2].diaTag = isoToDDMM(ultimoDiaIso);
+          entries[2].fallback = true;
+        }
+      }
+      Object.keys(entries).forEach(function(offset){
+        const entry = entries[offset];
+        const box = entry.box, rows = entry.rows, diaTag = entry.diaTag;
+        box.classList.toggle('ab-fallback', entry.fallback);
+        const label = box.parentElement && box.parentElement.querySelector('[data-ab-daylabel]');
+        if (label) label.toggleAttribute('data-fallback-active', entry.fallback);
+        box.innerHTML = '' +
+          '<div class="ab-title"><span class="ab-nav" data-ab-prev>‹</span>' +
+          '<span><span class="ab-rdo-tag" data-ab-rdo-date></span>Atividades <span data-ab-title-count></span></span>' +
+          '<span class="ab-nav" data-ab-next>›</span></div>' +
+          '<div data-ab-body></div>' +
+          '<div class="ab-dots" data-ab-dots></div>';
+        let idx = 0;
+        renderActivityBox(box, rows, idx, diaTag);
+        box.querySelector('[data-ab-prev]').addEventListener('click', function(){
+          if (!rows.length) return;
+          idx = (idx - 1 + rows.length) % rows.length;
+          renderActivityBox(box, rows, idx, diaTag);
+        });
+        box.querySelector('[data-ab-next]').addEventListener('click', function(){
+          if (!rows.length) return;
+          idx = (idx + 1) % rows.length;
+          renderActivityBox(box, rows, idx, diaTag);
+        });
       });
     });
   }
