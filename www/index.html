@@ -134,6 +134,11 @@
 
     .home{padding:18px;}
     .home .hero{flex-direction:column; align-items:flex-start; padding:22px;}
+    .home .hero .hero-photo{
+      width:60%; min-width:0; height:100%; opacity:.35;
+      -webkit-mask-image:linear-gradient(to left, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%);
+      mask-image:linear-gradient(to left, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%);
+    }
     .cards{grid-template-columns:1fr;}
   }
 </style>
@@ -185,7 +190,7 @@
           <div class="path" id="topPath">Extreme Wind / Painel Geral</div>
         </div>
       </div>
-      <div class="badge" id="topBadge">Atualizado 22/08/2026</div>
+      <div class="badge" id="topBadge">Atualizado 24/08/2026</div>
     </div>
 
     <div class="view">
@@ -274,7 +279,7 @@
             <div class="card-title">&#128663; Frota — Manutenção</div>
             <div class="kpirow">
               <div><div class="n">10</div><div class="l">Veículos</div></div>
-              <div><div class="n" style="color:var(--ok)">92%</div><div class="l">Conformidade</div></div>
+              <div><div class="n" style="color:var(--ok)">88%</div><div class="l">Conformidade</div></div>
               <div><div class="n" style="color:var(--nok)">12</div><div class="l">Ações pendentes</div></div>
             </div>
             <div class="go">Ver detalhamento por veículo e plano de ação →</div>
