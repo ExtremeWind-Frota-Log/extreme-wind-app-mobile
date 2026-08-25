@@ -262,17 +262,17 @@
   </div>
   <div class="kpi">
     <div class="label">Conformidade Geral &amp; Ações Pendentes</div>
-    <div class="value" style="color:var(--warn)">88%</div>
-    <div class="foot">WK 35 · 12 ações pendentes no total</div>
+    <div class="value" style="color:var(--warn)">87%</div>
+    <div class="foot">WK 35 · 15 ações pendentes no total</div>
     <div class="locadoras" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
       <div class="loc-badge" style="background:rgba(224,72,60,.18); color:var(--nok)"><span class="n">0</span><span class="l">Emergenciais</span></div>
-      <div class="loc-badge" style="background:rgba(216,154,43,.24); color:var(--warn)"><span class="n">12</span><span class="l">Programadas</span></div>
+      <div class="loc-badge" style="background:rgba(216,154,43,.24); color:var(--warn)"><span class="n">15</span><span class="l">Programadas</span></div>
       <div class="loc-badge" style="background:rgba(92,122,147,.24); color:var(--na)"><span class="n">0</span><span class="l">Administrativas</span></div>
     </div>
   </div>
   <div class="kpi">
     <div class="label">Média de KM</div>
-    <div class="value" id="kmValue" data-km="31257" style="color: var(--nok);">31.257</div>
+    <div class="value" id="kmValue" data-km="31433" style="color: var(--nok);">31.433</div>
     <div class="foot">Limite p/ renovação: ≥ 30.000 km</div>
   </div>
 </div>
@@ -657,7 +657,7 @@
   <div class="collapsible" id="acaoBody">
     <div class="locadoras" style="max-width:420px; margin:6px 0 16px">
       <div class="loc-badge" style="background:rgba(224,72,60,.18); color:var(--nok)"><span class="n">0</span><span class="l">Emergencial</span></div>
-      <div class="loc-badge" style="background:rgba(216,154,43,.24); color:var(--warn)"><span class="n">12</span><span class="l">Programado</span></div>
+      <div class="loc-badge" style="background:rgba(216,154,43,.24); color:var(--warn)"><span class="n">15</span><span class="l">Programado</span></div>
       <div class="loc-badge" style="background:rgba(92,122,147,.24); color:var(--na)"><span class="n">0</span><span class="l">Administrativa</span></div>
     </div>
     <div class="tablewrap">
@@ -1094,14 +1094,14 @@
 
 <script>
 const rows = [
-["TYA7G48","LOCALIZA","1","SÃO FERNANDO 1/RN","NORDEX","19/02/2026","6,20","N/OK","N/OK","OK","OK","OK","N/OK","OK","None","OK","N/A"],
-["TXZ5J79","LOCALIZA","1","ADM 2","EXTREME","21/02/2026","6,13","OK","N/OK","OK","OK","OK","OK","OK","None","OK","N/A"],
+["TYA7G48","LOCALIZA","1","SÃO FERNANDO 1/RN","NORDEX","19/02/2026","6,20","N/OK","N/OK","-","OK","OK","N/OK","OK","None","OK","N/A"],
+["TXZ5J79","LOCALIZA","1","ADM 2","EXTREME","21/02/2026","6,13","OK","N/OK","-","OK","OK","OK","OK","None","OK","N/A"],
 ["TER0D54","LOCALIZA","1","COPEL/RN","GE","06/12/2025","8,70","N/OK","OK","OK","OK","OK","N/OK","OK","None","OK","N/A"],
 ["TET3C50","UNIDAS","1","BAIXA DO FEIJÃO/RN","SIEMENS","06/02/2026","6,63","N/OK","OK","OK","OK","OK","N/OK","OK","None","OK","N/A"],
 ["TYG1E23","LOCALIZA","2","ST.AGOSTINHO/RN","SIEMENS","23/01/2026","7,10","OK","OK","OK","OK","OK","N/OK","OK","None","OK","N/A"],
 ["TXY8H30","LOCALIZA","1","SÃO FERNANDO 2/RN","NORDEX","20/02/2026","6,17","OK","N/OK","OK","OK","OK","OK","OK","None","OK","N/A"],
-["TYD9F24","LOCALIZA","2","SÃO VITOR/BA","SIEMENS","13/02/2026","6,40","OK","OK","OK","OK","OK","OK","OK","None","OK","N/A"],
-["TYD9E76","LOCALIZA","","APOIO ADMIN","EXTREME","17/07/2026","1,27","OK","OK","OK","OK","OK","OK","OK","None","OK","N/A"],
+["TYD9F24","LOCALIZA","2","SÃO VITOR/BA","SIEMENS","13/02/2026","6,40","OK","OK","-","OK","OK","OK","OK","None","OK","N/A"],
+["TYD9E76","LOCALIZA","","APOIO ADMIN","EXTREME","17/07/2026","1,27","OK","OK","-","OK","OK","OK","OK","None","OK","N/A"],
 ["TYW6D70","LOCALIZA","2","Oitis 1/PI","GE","13/05/2026","3,43","OK","N/OK","OK","OK","OK","N/OK","OK","None","OK","N/A"],
 ["TWY4C61","UNIDAS","1","TUCANO/BA","SIEMENS","18/08/2025","12,37","OK","OK","OK","OK","OK","N/OK","OK","None","OK","N/A"],
 ];
@@ -1346,18 +1346,21 @@ toggleHist.addEventListener("click", () => {
 
 // Plano de Ação — WK29 (aba BASE DESHBOARD, colunas V–AD, linhas 1231–1262)
 const acaoData = [
-  { acao:"TYA7G48 - KM RODADOS ESTOURADO/SALDO CONTRATO ESTOURADO/MEDIÇÃO PNEU N/OK", tipo:"[Emergencial: PNEU] ADMINISTRATIVA/CORRETIVA", parque:"SF1", quem:"Gerson/João", status:"24/08/2026", obs:"", categoria:"Emergencial" },
-  { acao:"TYA7G48 - KM RODADOS ESTOURADO/SALDO CONTRATO ESTOURADO/MEDIÇÃO PNEU N/OK", tipo:"[Programada: KM, SALDO] ADMINISTRATIVA/CORRETIVA", parque:"SF1", quem:"Gerson/João", status:"24/08/2026", obs:"", categoria:"Programada" },
+  { acao:"TYA7G48 - 40K de KM RODADOS", tipo:"ADMINISTRATIVA", parque:"SF1", quem:"Gerson/João", status:"24/08/2026", obs:"", categoria:"Programada" },
+  { acao:"TYA7G48 - SALDO CONTRATO ESTOURADO", tipo:"ADMINISTRATIVA", parque:"SF1", quem:"Gerson/João", status:"24/08/2026", obs:"", categoria:"Programada" },
+  { acao:"TYA7G48 - MEDIÇÃO PNEU N/OK", tipo:"CORRETIVA", parque:"SF1", quem:"Gerson/João", status:"24/08/2026", obs:"", categoria:"Emergencial" },
+  { acao:"TXZ5J79 - SALDO CONTRATO ESTOURADO", tipo:"ADMINISTRATIVA", parque:"ADM APOIO", quem:"Gerson/João", status:"24/08/2026", obs:"", categoria:"Programada" },
+  { acao:"TER0D54 - 40K de KM RODADOS", tipo:"ADMINISTRATIVA", parque:"COPEL", quem:"Gerson/João", status:"24/08/2026", obs:"", categoria:"Programada" },
   { acao:"TER0D54 - MEDIÇÃO PNEU ESTEPE EXTRA N/OK (FAIXA AMBÍGUA 3,7-2,7mm, RELATO DE FURO NO TEXTO)", tipo:"CORRETIVA", parque:"COPEL", quem:"Gerson/João", status:"24/08/2026", obs:"", categoria:"Emergencial" },
-  { acao:"TET3C50 - KM RODADOS ESTOURADO/MEDIÇÃO PNEU N/OK", tipo:"[Emergencial: PNEU] ADMINISTRATIVA/CORRETIVA", parque:"BAIXA DO FEIJÃO", quem:"Gerson/João", status:"24/08/2026", obs:"", categoria:"Emergencial" },
-  { acao:"TET3C50 - KM RODADOS ESTOURADO/MEDIÇÃO PNEU N/OK", tipo:"[Programada: KM] ADMINISTRATIVA/CORRETIVA", parque:"BAIXA DO FEIJÃO", quem:"Gerson/João", status:"24/08/2026", obs:"", categoria:"Programada" },
+  { acao:"TET3C50 - 40K de KM RODADOS", tipo:"ADMINISTRATIVA", parque:"BAIXA DO FEIJÃO", quem:"Gerson/João", status:"24/08/2026", obs:"", categoria:"Programada" },
+  { acao:"TET3C50 - MEDIÇÃO PNEU N/OK", tipo:"CORRETIVA", parque:"BAIXA DO FEIJÃO", quem:"Gerson/João", status:"24/08/2026", obs:"", categoria:"Emergencial" },
   { acao:"TYG1E23 - MEDIÇÃO PNEU ESTEPE/ESTEPE EXTRA N/OK (JÁ ABAIXO DE 2,7mm HÁ 2 SEMANAS, NÃO CORRIGIDO)", tipo:"CORRETIVA", parque:"ST.AGOSTINHO/RN", quem:"Gerson/João", status:"24/08/2026", obs:"", categoria:"Emergencial" },
   { acao:"TYG1E23 - AVARIA NA LATARIA (CALOTA TRASEIRA ESQ. TRINCADA, AMASSADO LATERAL ESQ., TRINCO NO PARA-CHOQUE TRASEIRO) RELATADA NO TEXTO LIVRE MAS MARCADA CONFORME NO CHECKLIST E AVARIA=NÃO - CONFIRMAR COM MOTORISTA E REGISTRAR FOTOS", tipo:"CORRETIVA", parque:"ST.AGOSTINHO/RN", quem:"Gerson/João", status:"24/08/2026", obs:"", categoria:"Emergencial" },
-  { acao:"TYW6D70 - SALDO CONTRATO ESTOURADO/MEDIÇÃO PNEU N/OK", tipo:"[Emergencial: PNEU] ADMINISTRATIVA/CORRETIVA", parque:"OITIS 1", quem:"Gerson/João", status:"24/08/2026", obs:"", categoria:"Emergencial" },
-  { acao:"TYW6D70 - SALDO CONTRATO ESTOURADO/MEDIÇÃO PNEU N/OK", tipo:"[Programada: SALDO] ADMINISTRATIVA/CORRETIVA", parque:"OITIS 1", quem:"Gerson/João", status:"24/08/2026", obs:"", categoria:"Programada" },
+  { acao:"TXY8H30 - SALDO CONTRATO ESTOURADO", tipo:"ADMINISTRATIVA", parque:"SF2", quem:"Gerson/João", status:"24/08/2026", obs:"", categoria:"Programada" },
+  { acao:"TYW6D70 - SALDO CONTRATO ESTOURADO", tipo:"ADMINISTRATIVA", parque:"OITIS 1", quem:"Gerson/João", status:"24/08/2026", obs:"", categoria:"Programada" },
+  { acao:"TYW6D70 - MEDIÇÃO PNEU N/OK", tipo:"CORRETIVA", parque:"OITIS 1", quem:"Gerson/João", status:"24/08/2026", obs:"", categoria:"Emergencial" },
   { acao:"TWY4C61 - MEDIÇÃO PNEU N/OK", tipo:"CORRETIVA", parque:"TUCANO", quem:"Gerson/João", status:"24/08/2026", obs:"", categoria:"Emergencial" },
-  { acao:"TXZ5J79 - SALDO CONTRATO ESTOURADO", tipo:"ADMINISTRATIVA", parque:"ADM APOIO", quem:"Gerson/João", status:"24/08/2026", obs:"", categoria:"Programada" },
-  { acao:"TXY8H30 - SALDO CONTRATO ESTOURADO", tipo:"ADMINISTRATIVA", parque:"SF2", quem:"Gerson/João", status:"24/08/2026", obs:"", categoria:"Programada" }
+  { acao:"TYW6D70 - AVARIA NO CUBO/CALOTA DO PNEU E CAPOTA QUEBRADA", tipo:"CORRETIVA", parque:"OITIS 1", quem:"Gerson/João", status:"24/08/2026", obs:"AGUARDANDO REPARO DA CAPOTA", categoria:"Emergencial" }
 ];
 
 function categoriaTag(categoria){
