@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Controle de Calibração</title>
+<link rel="icon" type="image/png" href="assets/icone-helice-color.png">
+<style>
+  :root{
+    --brand:#00679A; --brand-dark:#055384; --brand-deep:#021C2C;
+    --steel:#1C8CE8; --teal:#12BFA8;
+    --bg:#081C2C; --panel:#0F2A40; --panel2:#123350; --line:#1E4363;
+    --text:#EAF1F7; --muted:#8FA9C0;
+    --ok:#12A874; --nok:#E0483C; --warn:#D89A2B; --na:#5C7A93;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; font-family:Segoe UI,Arial,sans-serif; background:var(--bg); color:var(--text); padding:24px; line-height:1.4;}
+  header{display:flex; align-items:center; justify-content:space-between; gap:16px; padding-bottom:18px; border-bottom:1px solid var(--line); margin-bottom:20px;}
+  header h1{font-size:19px; margin:0;}
+  header .sub{font-size:11.5px; color:var(--muted); margin-top:2px;}
+  .badge-week{background:var(--panel2); border:1px solid var(--line); color:var(--muted); font-size:11.5px; padding:6px 14px; border-radius:20px;}
+  .kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin-bottom:24px;}
+  .kpi{background:var(--panel); border:1px solid var(--line); border-left:4px solid var(--brand); border-radius:10px; padding:16px 18px;}
+  .kpi .label{font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.03em;}
+  .kpi .n{font-size:26px; font-weight:700; margin-top:4px;}
+  .kpi.warn{border-left-color:var(--warn);}
+  .kpi.nok{border-left-color:var(--nok);}
+  .panel{background:var(--panel); border:1px solid var(--line); border-radius:10px; overflow:hidden;}
+  .panel-head{background:var(--panel2); padding:14px 18px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;}
+  .panel-head h2{font-size:14px; margin:0;}
+  input#busca{background:var(--panel2); border:1px solid var(--line); color:var(--text); border-radius:6px; padding:8px 12px; font-size:13px; width:220px;}
+  table{width:100%; border-collapse:collapse; font-size:12.5px;}
+  thead th{text-align:left; padding:9px 14px; background:var(--brand-deep); color:var(--muted); font-size:10.5px; text-transform:uppercase; letter-spacing:.03em; white-space:nowrap;}
+  tbody td{padding:9px 14px; border-top:1px solid var(--line); vertical-align:top;}
+  tbody tr:hover{background:rgba(255,255,255,.02);}
+  .status-tag{font-size:11px; padding:3px 10px; border-radius:20px; font-weight:600; white-space:nowrap;}
+  .status-tag.ok{background:rgba(18,168,116,.15); color:var(--ok); border:1px solid var(--ok);}
+  .status-tag.warn{background:rgba(216,154,42,.15); color:var(--warn); border:1px solid var(--warn);}
+  .status-tag.nok{background:rgba(224,72,60,.15); color:var(--nok); border:1px solid var(--nok);}
+  .status-tag.na{background:rgba(92,122,147,.15); color:var(--na); border:1px solid var(--na);}
+  .foot-note{font-size:11px; color:var(--muted); margin-top:22px; padding-top:14px; border-top:1px solid var(--line);}
+</style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>🔧 Controle de Calibração</h1>
+      <div class="sub">Extreme Wind / Painel Geral / Almoxarifado / Calibração — 148 instrumentos</div>
+    </div>
+    <div class="badge-week">Atualizado 26/08/2026</div>
+  </header>
+
+  <div class="kpis">
+    <div class="kpi"><div class="label">Total de Instrumentos</div><div class="n">148</div></div>
+    <div class="kpi warn"><div class="label">Vence em 0–90 dias</div><div class="n">15</div></div>
+    <div class="kpi nok"><div class="label">Vencido</div><div class="n">10</div></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2>📋 Instrumentos — Datas de Calibração</h2>
+      <input type="text" id="busca" placeholder="Buscar código...">
+    </div>
+    <table>
+      <thead><tr><th>Código</th><th>Status</th><th>Data Calibração</th><th>Próxima Calibração</th><th>Dias p/ Vencer</th></tr></thead>
+      <tbody id="corpo">
+      <tr data-status="VENCIDO"><td>DEG-002</td><td><span class="status-tag nok">VENCIDO</span></td><td>19/02/2025</td><td>19/02/2026</td><td>188d atrás</td></tr>
+      <tr data-status="VENCIDO"><td>DEG-017</td><td><span class="status-tag nok">VENCIDO</span></td><td>07/03/2025</td><td>07/03/2026</td><td>172d atrás</td></tr>
+      <tr data-status="VENCIDO"><td>TORQ-005</td><td><span class="status-tag nok">VENCIDO</span></td><td>04/08/2025</td><td>08/04/2026</td><td>140d atrás</td></tr>
+      <tr data-status="VENCIDO"><td>TIV-004</td><td><span class="status-tag nok">VENCIDO</span></td><td>04/12/2025</td><td>12/04/2026</td><td>136d atrás</td></tr>
+      <tr data-status="VENCIDO"><td>ANE-014</td><td><span class="status-tag nok">VENCIDO</span></td><td>05/09/2025</td><td>09/05/2026</td><td>109d atrás</td></tr>
+      <tr data-status="VENCIDO"><td>MOM-001</td><td><span class="status-tag nok">VENCIDO</span></td><td>05/11/2025</td><td>11/05/2026</td><td>107d atrás</td></tr>
+      <tr data-status="VENCIDO"><td>DEG-008</td><td><span class="status-tag nok">VENCIDO</span></td><td>27/05/2025</td><td>27/05/2026</td><td>91d atrás</td></tr>
+      <tr data-status="VENCIDO"><td>DEG-011</td><td><span class="status-tag nok">VENCIDO</span></td><td>27/05/2025</td><td>27/05/2026</td><td>91d atrás</td></tr>
+      <tr data-status="VENCIDO"><td>DEG-014</td><td><span class="status-tag nok">VENCIDO</span></td><td>27/05/2025</td><td>27/05/2026</td><td>91d atrás</td></tr>
+      <tr data-status="VENCIDO"><td>DEG-015</td><td><span class="status-tag nok">VENCIDO</span></td><td>27/05/2025</td><td>27/05/2026</td><td>91d atrás</td></tr>
+      <tr data-status="VENCE EM 90 DIAS"><td>ANE-005</td><td><span class="status-tag warn">VENCE EM 90 DIAS</span></td><td>10/09/2025</td><td>09/10/2026</td><td>44d</td></tr>
+      <tr data-status="VENCE EM 90 DIAS"><td>MIL-001</td><td><span class="status-tag warn">VENCE EM 90 DIAS</span></td><td>10/11/2025</td><td>11/10/2026</td><td>46d</td></tr>
+      <tr data-status="VENCE EM 90 DIAS"><td>TRE-038</td><td><span class="status-tag warn">VENCE EM 90 DIAS</span></td><td>10/12/2025</td><td>12/10/2026</td><td>47d</td></tr>
+      <tr data-status="VENCE EM 90 DIAS"><td>MCP-002</td><td><span class="status-tag warn">VENCE EM 90 DIAS</span></td><td>22/10/2025</td><td>22/10/2026</td><td>57d</td></tr>
+      <tr data-status="VENCE EM 90 DIAS"><td>MCP-003</td><td><span class="status-tag warn">VENCE EM 90 DIAS</span></td><td>22/10/2025</td><td>22/10/2026</td><td>57d</td></tr>
+      <tr data-status="VENCE EM 90 DIAS"><td>4001863</td><td><span class="status-tag warn">VENCE EM 90 DIAS</span></td><td>28/10/2025</td><td>28/10/2026</td><td>63d</td></tr>
+      <tr data-status="VENCE EM 90 DIAS"><td>DEG-003</td><td><span class="status-tag warn">VENCE EM 90 DIAS</span></td><td>29/10/2025</td><td>29/10/2026</td><td>64d</td></tr>
+      <tr data-status="VENCE EM 90 DIAS"><td>DEG-012</td><td><span class="status-tag warn">VENCE EM 90 DIAS</span></td><td>29/10/2025</td><td>29/10/2026</td><td>64d</td></tr>
+      <tr data-status="VENCE EM 90 DIAS"><td>DEG-006</td><td><span class="status-tag warn">VENCE EM 90 DIAS</span></td><td>02/11/2025</td><td>02/11/2026</td><td>68d</td></tr>
+      <tr data-status="VENCE EM 90 DIAS"><td>DEG-007</td><td><span class="status-tag warn">VENCE EM 90 DIAS</span></td><td>02/11/2025</td><td>02/11/2026</td><td>68d</td></tr>
+      <tr data-status="VENCE EM 90 DIAS"><td>MIL-005</td><td><span class="status-tag warn">VENCE EM 90 DIAS</span></td><td>11/11/2025</td><td>11/11/2026</td><td>77d</td></tr>
+      <tr data-status="VENCE EM 90 DIAS"><td>MUL-0023</td><td><span class="status-tag warn">VENCE EM 90 DIAS</span></td><td>11/11/2025</td><td>11/11/2026</td><td>77d</td></tr>
+      <tr data-status="VENCE EM 90 DIAS"><td>MULT-001</td><td><span class="status-tag warn">VENCE EM 90 DIAS</span></td><td>11/11/2025</td><td>11/11/2026</td><td>77d</td></tr>
+      <tr data-status="VENCE EM 90 DIAS"><td>MOM-011</td><td><span class="status-tag warn">VENCE EM 90 DIAS</span></td><td>14/11/2025</td><td>14/11/2026</td><td>80d</td></tr>
+      <tr data-status="VENCE EM 90 DIAS"><td>MOM-012</td><td><span class="status-tag warn">VENCE EM 90 DIAS</span></td><td>14/11/2025</td><td>14/11/2026</td><td>80d</td></tr>
+      <tr data-status="OK"><td>TORQ-001</td><td><span class="status-tag ok">OK</span></td><td>27/11/2025</td><td>27/11/2026</td><td>93d</td></tr>
+      <tr data-status="OK"><td>ESC-021</td><td><span class="status-tag ok">OK</span></td><td>27/11/2025</td><td>27/11/2026</td><td>93d</td></tr>
+      <tr data-status="OK"><td>MCP-005</td><td><span class="status-tag ok">OK</span></td><td>27/11/2025</td><td>27/11/2026</td><td>93d</td></tr>
+      <tr data-status="OK"><td>MCP-006</td><td><span class="status-tag ok">OK</span></td><td>27/11/2025</td><td>27/11/2026</td><td>93d</td></tr>
+      <tr data-status="OK"><td>MCP-007</td><td><span class="status-tag ok">OK</span></td><td>27/11/2025</td><td>27/11/2026</td><td>93d</td></tr>
+      <tr data-status="OK"><td>MCP-008</td><td><span class="status-tag ok">OK</span></td><td>27/11/2025</td><td>27/11/2026</td><td>93d</td></tr>
+      <tr data-status="OK"><td>MCP-009</td><td><span class="status-tag ok">OK</span></td><td>27/11/2025</td><td>27/11/2026</td><td>93d</td></tr>
+      <tr data-status="OK"><td>DEG-001</td><td><span class="status-tag ok">OK</span></td><td>02/12/2025</td><td>02/12/2026</td><td>98d</td></tr>
+      <tr data-status="OK"><td>MCP-011</td><td><span class="status-tag ok">OK</span></td><td>12/12/2025</td><td>12/12/2026</td><td>108d</td></tr>
+      <tr data-status="OK"><td>MMD-009</td><td><span class="status-tag ok">OK</span></td><td>12/12/2025</td><td>12/12/2026</td><td>108d</td></tr>
+      <tr data-status="OK"><td>ANE-002</td><td><span class="status-tag ok">OK</span></td><td>12/12/2025</td><td>12/12/2026</td><td>108d</td></tr>
+      <tr data-status="OK"><td>ANE-003</td><td><span class="status-tag ok">OK</span></td><td>12/12/2025</td><td>12/12/2026</td><td>108d</td></tr>
+      <tr data-status="OK"><td>ANE-004</td><td><span class="status-tag ok">OK</span></td><td>12/12/2025</td><td>12/12/2026</td><td>108d</td></tr>
+      <tr data-status="OK"><td>MMD-006</td><td><span class="status-tag ok">OK</span></td><td>12/12/2025</td><td>12/12/2026</td><td>108d</td></tr>
+      <tr data-status="OK"><td>MMD-007</td><td><span class="status-tag ok">OK</span></td><td>12/12/2025</td><td>12/12/2026</td><td>108d</td></tr>
+      <tr data-status="OK"><td>MMD-008</td><td><span class="status-tag ok">OK</span></td><td>12/12/2025</td><td>12/12/2026</td><td>108d</td></tr>
+      <tr data-status="OK"><td>MMD-010</td><td><span class="status-tag ok">OK</span></td><td>12/12/2025</td><td>12/12/2026</td><td>108d</td></tr>
+      <tr data-status="OK"><td>PAD-005</td><td><span class="status-tag ok">OK</span></td><td>12/12/2025</td><td>12/12/2026</td><td>108d</td></tr>
+      <tr data-status="OK"><td>PAD-006 (calibracao anterior)</td><td><span class="status-tag ok">OK</span></td><td>12/12/2025</td><td>12/12/2026</td><td>108d</td></tr>
+      <tr data-status="OK"><td>TRE-004</td><td><span class="status-tag ok">OK</span></td><td>12/12/2025</td><td>12/12/2026</td><td>108d</td></tr>
+      <tr data-status="OK"><td>TRE-006</td><td><span class="status-tag ok">OK</span></td><td>12/12/2025</td><td>12/12/2026</td><td>108d</td></tr>
+      <tr data-status="OK"><td>TRE-007</td><td><span class="status-tag ok">OK</span></td><td>12/12/2025</td><td>12/12/2026</td><td>108d</td></tr>
+      <tr data-status="OK"><td>TRE-008</td><td><span class="status-tag ok">OK</span></td><td>12/12/2025</td><td>12/12/2026</td><td>108d</td></tr>
+      <tr data-status="OK"><td>TRE-009</td><td><span class="status-tag ok">OK</span></td><td>12/12/2025</td><td>12/12/2026</td><td>108d</td></tr>
+      <tr data-status="OK"><td>TRE-039</td><td><span class="status-tag ok">OK</span></td><td>12/12/2025</td><td>12/12/2026</td><td>108d</td></tr>
+      <tr data-status="OK"><td>TRE-040</td><td><span class="status-tag ok">OK</span></td><td>12/12/2025</td><td>12/12/2026</td><td>108d</td></tr>
+      <tr data-status="OK"><td>TRE-041</td><td><span class="status-tag ok">OK</span></td><td>12/12/2025</td><td>12/12/2026</td><td>108d</td></tr>
+      <tr data-status="OK"><td>VAC-024</td><td><span class="status-tag ok">OK</span></td><td>12/12/2025</td><td>12/12/2026</td><td>108d</td></tr>
+      <tr data-status="OK"><td>ESC-023</td><td><span class="status-tag ok">OK</span></td><td>17/12/2025</td><td>17/12/2026</td><td>113d</td></tr>
+      <tr data-status="OK"><td>MOM-023</td><td><span class="status-tag ok">OK</span></td><td>17/12/2025</td><td>17/12/2026</td><td>113d</td></tr>
+      <tr data-status="OK"><td>PAD-010</td><td><span class="status-tag ok">OK</span></td><td>17/12/2025</td><td>17/12/2026</td><td>113d</td></tr>
+      <tr data-status="OK"><td>PAD-001</td><td><span class="status-tag ok">OK</span></td><td>01/04/2026</td><td>04/01/2027</td><td>131d</td></tr>
+      <tr data-status="OK"><td>BAL-016</td><td><span class="status-tag ok">OK</span></td><td>17/01/2026</td><td>17/01/2027</td><td>144d</td></tr>
+      <tr data-status="OK"><td>BAL-026</td><td><span class="status-tag ok">OK</span></td><td>23/01/2026</td><td>23/01/2027</td><td>150d</td></tr>
+      <tr data-status="OK"><td>ESC-029</td><td><span class="status-tag ok">OK</span></td><td>23/01/2026</td><td>23/01/2027</td><td>150d</td></tr>
+      <tr data-status="OK"><td>MOM-007</td><td><span class="status-tag ok">OK</span></td><td>23/01/2026</td><td>23/01/2027</td><td>150d</td></tr>
+      <tr data-status="OK"><td>KA424-6049682</td><td><span class="status-tag ok">OK</span></td><td>23/01/2026</td><td>23/01/2027</td><td>150d</td></tr>
+      <tr data-status="OK"><td>MA218-600611</td><td><span class="status-tag ok">OK</span></td><td>28/01/2026</td><td>28/01/2027</td><td>155d</td></tr>
+      <tr data-status="OK"><td>BAL-027</td><td><span class="status-tag ok">OK</span></td><td>29/01/2026</td><td>29/01/2027</td><td>156d</td></tr>
+      <tr data-status="OK"><td>DUR-012</td><td><span class="status-tag ok">OK</span></td><td>29/01/2026</td><td>29/01/2027</td><td>156d</td></tr>
+      <tr data-status="OK"><td>ESC-030</td><td><span class="status-tag ok">OK</span></td><td>29/01/2026</td><td>29/01/2027</td><td>156d</td></tr>
+      <tr data-status="OK"><td>ESC-031</td><td><span class="status-tag ok">OK</span></td><td>29/01/2026</td><td>29/01/2027</td><td>156d</td></tr>
+      <tr data-status="OK"><td>VAC-015</td><td><span class="status-tag ok">OK</span></td><td>29/01/2026</td><td>29/01/2027</td><td>156d</td></tr>
+      <tr data-status="OK"><td>VAC-025</td><td><span class="status-tag ok">OK</span></td><td>29/01/2026</td><td>29/01/2027</td><td>156d</td></tr>
+      <tr data-status="OK"><td>VAC-026</td><td><span class="status-tag ok">OK</span></td><td>29/01/2026</td><td>29/01/2027</td><td>156d</td></tr>
+      <tr data-status="OK"><td>ANE-020</td><td><span class="status-tag ok">OK</span></td><td>02/01/2026</td><td>01/02/2027</td><td>159d</td></tr>
+      <tr data-status="OK"><td>BAL-004</td><td><span class="status-tag ok">OK</span></td><td>02/01/2026</td><td>01/02/2027</td><td>159d</td></tr>
+      <tr data-status="OK"><td>ESC-024</td><td><span class="status-tag ok">OK</span></td><td>02/01/2026</td><td>01/02/2027</td><td>159d</td></tr>
+      <tr data-status="OK"><td>TERM-026</td><td><span class="status-tag ok">OK</span></td><td>02/01/2026</td><td>01/02/2027</td><td>159d</td></tr>
+      <tr data-status="OK"><td>TERM-027</td><td><span class="status-tag ok">OK</span></td><td>02/01/2026</td><td>01/02/2027</td><td>159d</td></tr>
+      <tr data-status="OK"><td>TERM-028</td><td><span class="status-tag ok">OK</span></td><td>02/01/2026</td><td>01/02/2027</td><td>159d</td></tr>
+      <tr data-status="OK"><td>TERM-029</td><td><span class="status-tag ok">OK</span></td><td>02/01/2026</td><td>01/02/2027</td><td>159d</td></tr>
+      <tr data-status="OK"><td>TERM-030</td><td><span class="status-tag ok">OK</span></td><td>02/01/2026</td><td>01/02/2027</td><td>159d</td></tr>
+      <tr data-status="OK"><td>BAL-019</td><td><span class="status-tag ok">OK</span></td><td>02/04/2026</td><td>04/02/2027</td><td>162d</td></tr>
+      <tr data-status="OK"><td>TRE-043</td><td><span class="status-tag ok">OK</span></td><td>14/02/2026</td><td>14/02/2027</td><td>172d</td></tr>
+      <tr data-status="OK"><td>TRE-044</td><td><span class="status-tag ok">OK</span></td><td>14/02/2026</td><td>14/02/2027</td><td>172d</td></tr>
+      <tr data-status="OK"><td>ESC-032</td><td><span class="status-tag ok">OK</span></td><td>19/02/2026</td><td>19/02/2027</td><td>177d</td></tr>
+      <tr data-status="OK"><td>ESC-033</td><td><span class="status-tag ok">OK</span></td><td>19/02/2026</td><td>19/02/2027</td><td>177d</td></tr>
+      <tr data-status="OK"><td>ESC-034</td><td><span class="status-tag ok">OK</span></td><td>19/02/2026</td><td>19/02/2027</td><td>177d</td></tr>
+      <tr data-status="OK"><td>BAL-028</td><td><span class="status-tag ok">OK</span></td><td>21/02/2026</td><td>21/02/2027</td><td>179d</td></tr>
+      <tr data-status="OK"><td>BAL-029</td><td><span class="status-tag ok">OK</span></td><td>21/02/2026</td><td>21/02/2027</td><td>179d</td></tr>
+      <tr data-status="OK"><td>TERM-031</td><td><span class="status-tag ok">OK</span></td><td>21/02/2026</td><td>21/02/2027</td><td>179d</td></tr>
+      <tr data-status="OK"><td>TERM-032</td><td><span class="status-tag ok">OK</span></td><td>21/02/2026</td><td>21/02/2027</td><td>179d</td></tr>
+      <tr data-status="OK"><td>TERM-033</td><td><span class="status-tag ok">OK</span></td><td>21/02/2026</td><td>21/02/2027</td><td>179d</td></tr>
+      <tr data-status="OK"><td>TRE-045</td><td><span class="status-tag ok">OK</span></td><td>21/02/2026</td><td>21/02/2027</td><td>179d</td></tr>
+      <tr data-status="OK"><td>TRE-046</td><td><span class="status-tag ok">OK</span></td><td>21/02/2026</td><td>21/02/2027</td><td>179d</td></tr>
+      <tr data-status="OK"><td>TRE-047</td><td><span class="status-tag ok">OK</span></td><td>21/02/2026</td><td>21/02/2027</td><td>179d</td></tr>
+      <tr data-status="OK"><td>ESC-008</td><td><span class="status-tag ok">OK</span></td><td>03/06/2026</td><td>06/03/2027</td><td>192d</td></tr>
+      <tr data-status="OK"><td>DUR-019</td><td><span class="status-tag ok">OK</span></td><td>24/03/2026</td><td>24/03/2027</td><td>210d</td></tr>
+      <tr data-status="OK"><td>TRE-016</td><td><span class="status-tag ok">OK</span></td><td>24/03/2026</td><td>24/03/2027</td><td>210d</td></tr>
+      <tr data-status="OK"><td>DUR-018</td><td><span class="status-tag ok">OK</span></td><td>31/03/2026</td><td>31/03/2027</td><td>217d</td></tr>
+      <tr data-status="OK"><td>TERM-025</td><td><span class="status-tag ok">OK</span></td><td>31/03/2026</td><td>31/03/2027</td><td>217d</td></tr>
+      <tr data-status="OK"><td>MOM-005</td><td><span class="status-tag ok">OK</span></td><td>04/05/2026</td><td>05/04/2027</td><td>222d</td></tr>
+      <tr data-status="OK"><td>PAD-006</td><td><span class="status-tag ok">OK</span></td><td>04/05/2026</td><td>05/04/2027</td><td>222d</td></tr>
+      <tr data-status="OK"><td>TORQ-010</td><td><span class="status-tag ok">OK</span></td><td>04/05/2026</td><td>05/04/2027</td><td>222d</td></tr>
+      <tr data-status="OK"><td>TERM-024 (etiqueta mostra TERM-027)</td><td><span class="status-tag ok">OK</span></td><td>15/04/2026</td><td>15/04/2027</td><td>232d</td></tr>
+      <tr data-status="OK"><td>DTLG-011</td><td><span class="status-tag ok">OK</span></td><td>16/04/2026</td><td>16/04/2027</td><td>233d</td></tr>
+      <tr data-status="OK"><td>DTLG-017</td><td><span class="status-tag ok">OK</span></td><td>16/04/2026</td><td>16/04/2027</td><td>233d</td></tr>
+      <tr data-status="OK"><td>DEG-009</td><td><span class="status-tag ok">OK</span></td><td>23/04/2026</td><td>23/04/2027</td><td>240d</td></tr>
+      <tr data-status="OK"><td>BAL-020</td><td><span class="status-tag ok">OK</span></td><td>27/04/2026</td><td>27/04/2027</td><td>244d</td></tr>
+      <tr data-status="OK"><td>DTLG-015</td><td><span class="status-tag ok">OK</span></td><td>27/04/2026</td><td>27/04/2027</td><td>244d</td></tr>
+      <tr data-status="OK"><td>BAL-030</td><td><span class="status-tag ok">OK</span></td><td>05/03/2026</td><td>03/05/2027</td><td>250d</td></tr>
+      <tr data-status="OK"><td>DTLG-018</td><td><span class="status-tag ok">OK</span></td><td>05/03/2026</td><td>03/05/2027</td><td>250d</td></tr>
+      <tr data-status="OK"><td>DTLG-019</td><td><span class="status-tag ok">OK</span></td><td>05/03/2026</td><td>03/05/2027</td><td>250d</td></tr>
+      <tr data-status="OK"><td>DUR-020</td><td><span class="status-tag ok">OK</span></td><td>13/05/2026</td><td>13/05/2027</td><td>260d</td></tr>
+      <tr data-status="OK"><td>PAD-011</td><td><span class="status-tag ok">OK</span></td><td>13/05/2026</td><td>13/05/2027</td><td>260d</td></tr>
+      <tr data-status="OK"><td>VAC-010</td><td><span class="status-tag ok">OK</span></td><td>13/05/2026</td><td>13/05/2027</td><td>260d</td></tr>
+      <tr data-status="OK"><td>ANE-015</td><td><span class="status-tag ok">OK</span></td><td>19/05/2026</td><td>19/05/2027</td><td>266d</td></tr>
+      <tr data-status="OK"><td>TRE-020</td><td><span class="status-tag ok">OK</span></td><td>19/05/2026</td><td>19/05/2027</td><td>266d</td></tr>
+      <tr data-status="OK"><td>TORQ-012</td><td><span class="status-tag ok">OK</span></td><td>27/05/2026</td><td>27/05/2027</td><td>274d</td></tr>
+      <tr data-status="OK"><td>DTLG-012</td><td><span class="status-tag ok">OK</span></td><td>06/04/2026</td><td>04/06/2027</td><td>282d</td></tr>
+      <tr data-status="OK"><td>PAD-009</td><td><span class="status-tag ok">OK</span></td><td>06/04/2026</td><td>04/06/2027</td><td>282d</td></tr>
+      <tr data-status="OK"><td>TERM-012</td><td><span class="status-tag ok">OK</span></td><td>06/04/2026</td><td>04/06/2027</td><td>282d</td></tr>
+      <tr data-status="OK"><td>DTLG-016</td><td><span class="status-tag ok">OK</span></td><td>06/06/2026</td><td>06/06/2027</td><td>284d</td></tr>
+      <tr data-status="OK"><td>TORQ-008</td><td><span class="status-tag ok">OK</span></td><td>06/06/2026</td><td>06/06/2027</td><td>284d</td></tr>
+      <tr data-status="OK"><td>BAL-018</td><td><span class="status-tag ok">OK</span></td><td>17/06/2026</td><td>17/06/2027</td><td>295d</td></tr>
+      <tr data-status="OK"><td>TRE-036</td><td><span class="status-tag ok">OK</span></td><td>17/06/2026</td><td>17/06/2027</td><td>295d</td></tr>
+      <tr data-status="OK"><td>TRE-022</td><td><span class="status-tag ok">OK</span></td><td>25/06/2026</td><td>25/06/2027</td><td>303d</td></tr>
+      <tr data-status="OK"><td>AN-01</td><td><span class="status-tag ok">OK</span></td><td>07/01/2026</td><td>01/07/2027</td><td>309d</td></tr>
+      <tr data-status="OK"><td>ANE-019</td><td><span class="status-tag ok">OK</span></td><td>07/01/2026</td><td>01/07/2027</td><td>309d</td></tr>
+      <tr data-status="OK"><td>MCP-004</td><td><span class="status-tag ok">OK</span></td><td>07/01/2026</td><td>01/07/2027</td><td>309d</td></tr>
+      <tr data-status="OK"><td>MOM-002</td><td><span class="status-tag ok">OK</span></td><td>07/01/2026</td><td>01/07/2027</td><td>309d</td></tr>
+      <tr data-status="OK"><td>MOM-003</td><td><span class="status-tag ok">OK</span></td><td>07/01/2026</td><td>01/07/2027</td><td>309d</td></tr>
+      <tr data-status="OK"><td>PAD-008</td><td><span class="status-tag ok">OK</span></td><td>07/01/2026</td><td>01/07/2027</td><td>309d</td></tr>
+      <tr data-status="OK"><td>TERM-019</td><td><span class="status-tag ok">OK</span></td><td>07/01/2026</td><td>01/07/2027</td><td>309d</td></tr>
+      <tr data-status="OK"><td>TERM-021</td><td><span class="status-tag ok">OK</span></td><td>07/01/2026</td><td>01/07/2027</td><td>309d</td></tr>
+      <tr data-status="OK"><td>TIV-006</td><td><span class="status-tag ok">OK</span></td><td>07/01/2026</td><td>01/07/2027</td><td>309d</td></tr>
+      <tr data-status="OK"><td>TRE-012</td><td><span class="status-tag ok">OK</span></td><td>07/01/2026</td><td>01/07/2027</td><td>309d</td></tr>
+      <tr data-status="OK"><td>TRE-029</td><td><span class="status-tag ok">OK</span></td><td>07/01/2026</td><td>01/07/2027</td><td>309d</td></tr>
+      <tr data-status="OK"><td>TRE-031</td><td><span class="status-tag ok">OK</span></td><td>07/01/2026</td><td>01/07/2027</td><td>309d</td></tr>
+      <tr data-status="OK"><td>VAC-022</td><td><span class="status-tag ok">OK</span></td><td>07/01/2026</td><td>01/07/2027</td><td>309d</td></tr>
+      <tr data-status="OK"><td>MMD-005</td><td><span class="status-tag ok">OK</span></td><td>20/07/2026</td><td>20/07/2027</td><td>328d</td></tr>
+      <tr data-status="OK"><td>DEG-004</td><td><span class="status-tag ok">OK</span></td><td>05/08/2026</td><td>05/08/2027</td><td>344d</td></tr>
+      <tr data-status="OK"><td>DTLG-006</td><td><span class="status-tag ok">OK</span></td><td>09/07/2026</td><td>07/09/2027</td><td>377d</td></tr>
+      <tr data-status="OK"><td>DEG-005</td><td><span class="status-tag ok">OK</span></td><td>02/10/2026</td><td>02/10/2027</td><td>402d</td></tr>
+      <tr data-status="OK"><td>KA418-6000671</td><td><span class="status-tag ok">OK</span></td><td>02/10/2026</td><td>02/10/2027</td><td>402d</td></tr>
+      <tr data-status="OK"><td>KA418-6000736</td><td><span class="status-tag ok">OK</span></td><td>02/10/2026</td><td>02/10/2027</td><td>402d</td></tr>
+      <tr data-status="OK"><td>PAD-012</td><td><span class="status-tag ok">OK</span></td><td>10/06/2026</td><td>06/10/2027</td><td>406d</td></tr>
+      <tr data-status="OK"><td>TORQ-009</td><td><span class="status-tag ok">OK</span></td><td>10/06/2026</td><td>06/10/2027</td><td>406d</td></tr>
+      <tr data-status="OK"><td>VAC-012</td><td><span class="status-tag ok">OK</span></td><td>10/06/2026</td><td>06/10/2027</td><td>406d</td></tr>
+      <tr data-status="OK"><td>DUR-008</td><td><span class="status-tag ok">OK</span></td><td>11/04/2026</td><td>04/11/2027</td><td>435d</td></tr>
+      <tr data-status="OK"><td>TRE-010</td><td><span class="status-tag ok">OK</span></td><td>12/12/2026</td><td>12/12/2027</td><td>473d</td></tr>
+      <tr data-status="SEM DADOS"><td>TRE-048</td><td><span class="status-tag na">SEM DADOS</span></td><td>23/05/2026</td><td>—</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="foot-note">
+    Fonte: planilha "Controle_Calibracao_Extreme_Wind_2026_FINAL.xlsx" (Dropbox → 3 - SUPRIMENTOS / 01 - ALMOXARIFADO / 04 - ETIQUETAS / ETIQUETAS CALIBRAÇÃO). Status recalculado com base na data de hoje. Gerado manualmente em 26/08/2026 — ainda sem automação recorrente configurada.
+  </div>
+
+<script>
+  document.getElementById('busca').addEventListener('input', function(){
+    var t = this.value.trim().toUpperCase();
+    document.querySelectorAll('#corpo tr').forEach(function(tr){
+      tr.style.display = tr.children[0].textContent.toUpperCase().indexOf(t) !== -1 ? '' : 'none';
+    });
+  });
+</script>
+</body></html>
