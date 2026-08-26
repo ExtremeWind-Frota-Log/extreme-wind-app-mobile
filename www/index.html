@@ -173,6 +173,8 @@
       <div class="menu-item" data-view="boletos"><span class="ic">&#129534;</span> Controle de Boletos</div>
       <div class="menu-item" data-view="envios"><span class="ic">&#128230;</span> Envios Logísticos</div>
       <div class="menu-item" data-view="reembolso"><span class="ic">&#128176;</span> Reembolso</div>
+      <div class="menu-label">Almoxarifado</div>
+      <div class="menu-item" data-view="calibracao"><span class="ic">&#128295;</span> Calibração</div>
     </nav>
 
     <div class="sidebar-footer">
@@ -309,6 +311,7 @@
       <iframe id="view-boletos" src="dashboard-boletos.html" title="Controle de Boletos"></iframe>
       <iframe id="view-envios" src="dashboard-envios-logisticos.html" title="Envios Logísticos"></iframe>
       <iframe id="view-reembolso" src="dashboard-reembolso.html" title="Reembolso"></iframe>
+      <iframe id="view-calibracao" src="dashboard-calibracao.html" title="Calibração"></iframe>
     </div>
   </main>
 </div>
@@ -325,7 +328,8 @@
     frota: { title: "Frota — Manutenção", path: "Extreme Wind / Painel Geral / Frota - Manutenção" },
     boletos: { title: "Controle de Boletos", path: "Extreme Wind / Painel Geral / Controle de Boletos" },
     envios: { title: "Envios Logísticos", path: "Extreme Wind / Painel Geral / Envios Logísticos" },
-    reembolso: { title: "Reembolso", path: "Extreme Wind / Painel Geral / Reembolso" }
+    reembolso: { title: "Reembolso", path: "Extreme Wind / Painel Geral / Reembolso" },
+    calibracao: { title: "Calibração", path: "Extreme Wind / Painel Geral / Almoxarifado / Calibração" }
   };
 
   function showView(view){
@@ -339,6 +343,7 @@
     document.getElementById("view-boletos").classList.toggle("active", view === "boletos");
     document.getElementById("view-envios").classList.toggle("active", view === "envios");
     document.getElementById("view-reembolso").classList.toggle("active", view === "reembolso");
+    document.getElementById("view-calibracao").classList.toggle("active", view === "calibracao");
     document.getElementById("topTitle").textContent = TITLES[view].title;
     document.getElementById("topPath").textContent = TITLES[view].path;
   }
