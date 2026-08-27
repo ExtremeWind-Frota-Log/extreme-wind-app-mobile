@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controle de Efetivo</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .breadcrumb { font-size: 0.9em; color: #666; margin-bottom: 20px; }
+    .header { background: #fff; padding: 20px; border-radius: 6px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .header h1 { font-size: 1.8em; margin-bottom: 5px; }
+    .header-timestamp { font-size: 0.85em; color: #999; }
+    .tabs { display: flex; gap: 5px; margin-bottom: 20px; border-bottom: 2px solid #e0e0e0; }
+    .tab-btn { padding: 10px 15px; background: transparent; border: none; cursor: pointer; font-size: 0.95em; color: #666; border-bottom: 2px solid transparent; transition: all 0.2s; }
+    .tab-btn:hover { color: #333; }
+    .tab-btn.active { color: #0066cc; border-bottom-color: #0066cc; }
+    .content { background: #fff; padding: 20px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="breadcrumb">Extreme Wind / Painel Geral / Controle de Efetivo</div>
+
+    <div class="header">
+      <h1>Controle de Efetivo</h1>
+      <div class="header-timestamp">Atualizado <span id="timestamp">--/--/----</span></div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab-btn="resumo">Resumo</button>
+      <button class="tab-btn" data-tab-btn="disponibilidade">Disponibilidade</button>
+      <button class="tab-btn" data-tab-btn="bdh">BDH</button>
+      <button class="tab-btn" data-tab-btn="aguardando">Aguardando Convocação</button>
+      <button class="tab-btn" data-tab-btn="necessidade">Necessidade de Efetivo</button>
+      <button class="tab-btn" data-tab-btn="historico">Histórico</button>
+    </div>
+
+    <div class="content">
+      <div data-tab="resumo"></div>
+      <div data-tab="disponibilidade" style="display:none;"></div>
+      <div data-tab="bdh" style="display:none;"></div>
+      <div data-tab="aguardando" style="display:none;"></div>
+      <div data-tab="necessidade" style="display:none;"></div>
+      <div data-tab="historico" style="display:none;"></div>
+    </div>
+  </div>
+
+  <script>
+    var EFETIVO_DATA = {"pessoas": [{"mat": "001", "nome": "João Silva", "status": "RESERVAS", "funcao": "Eletricista", "qualificacao": "N1", "local": {"valor": "Trairi/CE"}, "contrato": "PJ", "bdh_data": null}, {"mat": "002", "nome": "Maria Santos", "status": "BDH", "funcao": "Técnica", "qualificacao": "N2", "local": {"valor": "Tamandaré/PE"}, "contrato": "CLT", "bdh_data": "01/08"}, {"mat": "003", "nome": "Pedro Costa", "status": "AGUARDANDO CONVOCAÇÃO", "funcao": "Supervisor", "qualificacao": "N3", "local": {"valor": "Niterói/RJ"}, "contrato": "PJ", "bdh_data": null}, {"mat": "004", "nome": "Ana Oliveira", "status": "ATIVO PARQUE", "funcao": "Eletricista", "qualificacao": "N1", "local": {"valor": "Gravatá/PE"}, "contrato": "CLT", "bdh_data": null}, {"mat": "005", "nome": "Carlos Mendes", "status": "INDISPONÍVEL", "funcao": "Técnica", "qualificacao": "N2", "local": {"valor": "-"}, "contrato": "PJ", "bdh_data": null}, {"mat": "006", "nome": "Fernanda Lima", "status": "BDH", "funcao": "Operador", "qualificacao": "N1", "local": {"valor": "Beberibe/CE"}, "contrato": "CLT", "bdh_data": "15/07"}], "status_count": {"RESERVAS": 1, "BDH": 2, "AGUARDANDO CONVOCAÇÃO": 1, "ATIVO PARQUE": 1, "INDISPONÍVEL": 1}, "total_disponivel": 4, "bdh": 2, "aguardando_convocacao": 1, "bdh_list": [{"mat": "002", "nome": "Maria Santos", "bdh_data_sem_ano": "01/08", "local": {"valor": "Tamandaré/PE"}, "contrato": "CLT", "qualificacao": "N2"}, {"mat": "006", "nome": "Fernanda Lima", "bdh_data_sem_ano": "15/07", "local": {"valor": "Beberibe/CE"}, "contrato": "CLT", "qualificacao": "N1"}], "aguardando_list": [{"mat": "003", "nome": "Pedro Costa", "local": {"valor": "Niterói/RJ"}, "contrato": "PJ", "qualificacao": "N3"}], "parques_efetivo": [{"parque": "Trairi/CE", "efetivo_ativo": 1, "necessidade_informada": 5, "saldo": 4}, {"parque": "Tamandaré/PE", "efetivo_ativo": 2, "necessidade_informada": 4, "saldo": 2}, {"parque": "Niterói/RJ", "efetivo_ativo": 0, "necessidade_informada": 3, "saldo": 3}, {"parque": "Gravatá/PE", "efetivo_ativo": 1, "necessidade_informada": 2, "saldo": 1}], "historico_por_mat": {"001": [{"data": "20/08/2026", "tipo": "MOBILIZAÇÃO", "parque": "Trairi/CE"}], "002": [{"data": "15/07/2026", "tipo": "DESMOBILIZAÇÃO", "parque": "Tamandaré/PE"}, {"data": "15/07/2026", "tipo": "MOBILIZAÇÃO", "parque": "BDH"}], "003": [{"data": "25/07/2026", "tipo": "DESMOBILIZAÇÃO", "parque": "Niterói/RJ"}]}, "gerado_em": "27/08/2026"};
+  </script>
+
+  <script>
+  (function(){
+    'use strict';
+
+    // ============================================================
+    // INICIALIZAÇÃO E VALIDAÇÃO
+    // ============================================================
+    if (typeof EFETIVO_DATA === 'undefined' || !EFETIVO_DATA.pessoas) {
+      console.error("EFETIVO_DATA não carregado ou estrutura incorreta");
+      document.body.innerHTML = '<p style="color:red;padding:20px;">Erro ao carregar dados de efetivo. Contate o administrador.</p>';
+      return;
+    }
+
+    var data = EFETIVO_DATA;
+    var currentTab = 'resumo';
+
+    // ============================================================
+    // ABA 1: RESUMO (KPIs)
+    // ============================================================
+    function renderResumo() {
+      var container = document.querySelector('[data-tab="resumo"]');
+      if (!container) return;
+
+      var html = '<div class="kpi-grid">';
+      html += '<div class="kpi-box"><div class="kpi-label">Total Disponível</div><div class="kpi-value">' + (data.total_disponivel || 0) + '</div></div>';
+      html += '<div class="kpi-box"><div class="kpi-label">Disponível Livre</div><div class="kpi-value">' + ((data.status_count["RESERVAS"] || 0) + (data.status_count["ATIVO PARQUE"] || 0)) + '</div></div>';
+      html += '<div class="kpi-box"><div class="kpi-label">Em BDH</div><div class="kpi-value">' + (data.bdh || 0) + '</div></div>';
+      html += '<div class="kpi-box"><div class="kpi-label">Aguardando Convocação</div><div class="kpi-value">' + (data.aguardando_convocacao || 0) + '</div></div>';
+      html += '<div class="kpi-box"><div class="kpi-label">Indisponível</div><div class="kpi-value">' + (data.status_count["INDISPONÍVEL"] || 0) + '</div></div>';
+      html += '<div class="kpi-box"><div class="kpi-label">Total de Pessoas</div><div class="kpi-value">' + (data.pessoas.length || 0) + '</div></div>';
+      html += '</div>';
+
+      html += '<div class="info-box">';
+      html += '<p><strong>Status Atual — Efetivo Total</strong></p>';
+      html += '<p style="font-size:0.9em;color:#666;">Total Disponível = Reservas + Aguardando Convocação + BDH (regra: colaborador em BDH continua disponível para convocação).</p>';
+      html += '</div>';
+
+      container.innerHTML = html;
+    }
+
+    // ============================================================
+    // ABA 2: DISPONIBILIDADE
+    // ============================================================
+    function renderDisponibilidade() {
+      var container = document.querySelector('[data-tab="disponibilidade"]');
+      if (!container) return;
+
+      var html = '<table class="data-table">';
+      html += '<thead><tr><th>Mat.</th><th>Nome</th><th>Status</th><th>Função</th><th>Qualificação</th><th>Local</th></tr></thead>';
+      html += '<tbody>';
+
+      (data.pessoas || []).forEach(function(p) {
+        var status = p.status || 'SEM STATUS';
+        if (['RESERVAS', 'BDH', 'AGUARDANDO CONVOCAÇÃO'].indexOf(status) !== -1) {
+          html += '<tr>';
+          html += '<td>' + (p.mat || '—') + '</td>';
+          html += '<td>' + (p.nome || '?') + '</td>';
+          html += '<td><span class="status-badge">' + status + '</span></td>';
+          html += '<td>' + (p.funcao || '—') + '</td>';
+          html += '<td>' + (p.qualificacao || '—') + '</td>';
+          html += '<td>' + ((p.local && p.local.valor) || '—') + '</td>';
+          html += '</tr>';
+        }
+      });
+
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+
+    // ============================================================
+    // ABA 3: BDH
+    // ============================================================
+    function renderBDH() {
+      var container = document.querySelector('[data-tab="bdh"]');
+      if (!container) return;
+
+      var html = '<div class="info-box">';
+      html += '<p><strong>Colaboradores em Banco de Horas</strong></p>';
+      html += '<p style="font-size:0.9em;color:#666;">Total: <strong>' + (data.bdh || 0) + '</strong></p>';
+      html += '</div>';
+
+      html += '<table class="data-table">';
+      html += '<thead><tr><th>Mat.</th><th>Nome</th><th>Data BDH</th><th>Local</th><th>Contrato</th><th>Qualificação</th></tr></thead>';
+      html += '<tbody>';
+
+      (data.bdh_list || []).forEach(function(p) {
+        html += '<tr>';
+        html += '<td>' + (p.mat || '—') + '</td>';
+        html += '<td>' + (p.nome || '?') + '</td>';
+        html += '<td>' + (p.bdh_data_sem_ano || '—') + '</td>';
+        html += '<td>' + ((p.local && p.local.valor) || '—') + '</td>';
+        html += '<td>' + (p.contrato || '—') + '</td>';
+        html += '<td>' + (p.qualificacao || '—') + '</td>';
+        html += '</tr>';
+      });
+
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+
+    // ============================================================
+    // ABA 4: AGUARDANDO CONVOCAÇÃO
+    // ============================================================
+    function renderAguardando() {
+      var container = document.querySelector('[data-tab="aguardando"]');
+      if (!container) return;
+
+      var html = '<div class="info-box">';
+      html += '<p><strong>Colaboradores Aguardando Convocação</strong></p>';
+      html += '<p style="font-size:0.9em;color:#666;">Total: <strong>' + (data.aguardando_convocacao || 0) + '</strong></p>';
+      html += '</div>';
+
+      html += '<table class="data-table">';
+      html += '<thead><tr><th>Mat.</th><th>Nome</th><th>Parque/Destino</th><th>Contrato</th><th>Qualificação</th></tr></thead>';
+      html += '<tbody>';
+
+      (data.aguardando_list || []).forEach(function(p) {
+        html += '<tr>';
+        html += '<td>' + (p.mat || '—') + '</td>';
+        html += '<td>' + (p.nome || '?') + '</td>';
+        html += '<td>' + ((p.local && p.local.valor) || '—') + '</td>';
+        html += '<td>' + (p.contrato || '—') + '</td>';
+        html += '<td>' + (p.qualificacao || '—') + '</td>';
+        html += '</tr>';
+      });
+
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+
+    // ============================================================
+    // ABA 5: NECESSIDADE DE EFETIVO
+    // ============================================================
+    function renderNecessidade() {
+      var container = document.querySelector('[data-tab="necessidade"]');
+      if (!container) return;
+
+      var html = '<table class="data-table">';
+      html += '<thead><tr><th>Parque</th><th>Efetivo Ativo</th><th>Necessidade Informada</th><th>Saldo</th></tr></thead>';
+      html += '<tbody>';
+
+      (data.parques_efetivo || []).forEach(function(p) {
+        var efetivo = p.efetivo_ativo || 0;
+        var necessidade = p.necessidade_informada || '—';
+        var saldo = (p.saldo !== null && p.saldo !== undefined) ? p.saldo : '—';
+
+        html += '<tr>';
+        html += '<td><strong>' + (p.parque || '?') + '</strong></td>';
+        html += '<td>' + efetivo + '</td>';
+        html += '<td>' + necessidade + '</td>';
+        html += '<td>' + saldo + '</td>';
+        html += '</tr>';
+      });
+
+      html += '</tbody></table>';
+
+      html += '<div class="info-box" style="margin-top:20px;">';
+      html += '<p style="font-size:0.9em;color:#666;">Necessidade Informada: dados preenchidos pelo Comercial/RH. Saldo = Necessidade − Efetivo Ativo.</p>';
+      html += '</div>';
+
+      container.innerHTML = html;
+    }
+
+    // ============================================================
+    // ABA 6: HISTÓRICO
+    // ============================================================
+    function renderHistorico() {
+      var container = document.querySelector('[data-tab="historico"]');
+      if (!container) return;
+
+      var eventos = [];
+
+      if (data.historico_por_mat) {
+        for (var mat in data.historico_por_mat) {
+          var pessoa = (data.pessoas || []).find(function(p) { return p.mat === mat; });
+          var nome = (pessoa && pessoa.nome) || '?';
+
+          (data.historico_por_mat[mat] || []).forEach(function(ev) {
+            eventos.push({
+              data: ev.data || '—',
+              mat: mat,
+              nome: nome,
+              tipo: ev.tipo || 'EVENTO',
+              parque: ev.parque || '—'
+            });
+          });
+        }
+      }
+
+      eventos.sort(function(a, b) {
+        return (b.data || '').localeCompare(a.data || '');
+      });
+
+      var html = '<div class="timeline">';
+
+      if (eventos.length === 0) {
+        html += '<p style="color:#999;">Nenhum evento de mobilização/desmobilização registrado.</p>';
+      } else {
+        eventos.forEach(function(ev) {
+          var icon = ev.tipo === 'MOBILIZAÇÃO' ? '→' : (ev.tipo === 'DESMOBILIZAÇÃO' ? '←' : '◦');
+          var typeColor = ev.tipo === 'MOBILIZAÇÃO' ? '#28a745' : (ev.tipo === 'DESMOBILIZAÇÃO' ? '#dc3545' : '#6c757d');
+
+          html += '<div class="evento">';
+          html += '<div class="evento-data">' + ev.data + '</div>';
+          html += '<div class="evento-tipo" style="color:' + typeColor + ';"><strong>' + icon + ' ' + ev.tipo + '</strong></div>';
+          html += '<div class="evento-pessoa"><strong>' + ev.nome + '</strong> (' + ev.mat + ')</div>';
+          html += '<div class="evento-parque">' + ev.parque + '</div>';
+          html += '</div>';
+        });
+      }
+
+      html += '</div>';
+      container.innerHTML = html;
+    }
+
+    // ============================================================
+    // CONTROLE DE ABAS
+    // ============================================================
+    function selectTab(tabName) {
+      currentTab = tabName;
+
+      var tabs = document.querySelectorAll('[data-tab]');
+      tabs.forEach(function(tab) {
+        tab.style.display = tab.dataset.tab === tabName ? 'block' : 'none';
+      });
+
+      var btns = document.querySelectorAll('[data-tab-btn]');
+      btns.forEach(function(btn) {
+        if (btn.dataset.tabBtn === tabName) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      switch(tabName) {
+        case 'resumo': renderResumo(); break;
+        case 'disponibilidade': renderDisponibilidade(); break;
+        case 'bdh': renderBDH(); break;
+        case 'aguardando': renderAguardando(); break;
+        case 'necessidade': renderNecessidade(); break;
+        case 'historico': renderHistorico(); break;
+      }
+    }
+
+    // ============================================================
+    // INICIALIZAÇÃO
+    // ============================================================
+    function init() {
+      var tabBtns = document.querySelectorAll('[data-tab-btn]');
+      tabBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          selectTab(btn.dataset.tabBtn);
+        });
+      });
+
+      var requiredTabs = ['resumo', 'disponibilidade', 'bdh', 'aguardando', 'necessidade', 'historico'];
+      requiredTabs.forEach(function(tabName) {
+        if (!document.querySelector('[data-tab="' + tabName + '"]')) {
+          console.warn("Aba '" + tabName + "' não encontrada no HTML");
+        }
+      });
+
+      selectTab('resumo');
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  })();
+</script>
+
+<style>
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+
+  .kpi-box {
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 15px;
+    text-align: center;
+  }
+
+  .kpi-label {
+    font-size: 0.85em;
+    color: #666;
+    margin-bottom: 8px;
+  }
+
+  .kpi-value {
+    font-size: 1.8em;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .info-box {
+    background: #e7f3ff;
+    border-left: 4px solid #0066cc;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+  }
+
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9em;
+  }
+
+  .data-table thead {
+    background: #f0f0f0;
+  }
+
+  .data-table th, .data-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .data-table th {
+    font-weight: 600;
+    color: #333;
+  }
+
+  .data-table tr:hover {
+    background: #f9f9f9;
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: 600;
+    background: #d4edda;
+    color: #155724;
+  }
+
+  .timeline {
+    margin-top: 15px;
+  }
+
+  .evento {
+    padding: 12px;
+    margin-bottom: 8px;
+    border-left: 3px solid #0066cc;
+    background: #f8f9fa;
+    border-radius: 4px;
+  }
+
+  .evento-data {
+    font-weight: 600;
+    font-size: 0.9em;
+    color: #666;
+  }
+
+  .evento-tipo {
+    margin: 4px 0;
+  }
+
+  .evento-pessoa {
+    margin: 4px 0;
+  }
+
+  .evento-parque {
+    font-size: 0.85em;
+    color: #999;
+  }
+
+  [data-tab] {
+    display: none;
+  }
+
+  [data-tab].active {
+    display: block;
+  }
+
+  [data-tab-btn] {
+    cursor: pointer;
+  }
+
+  [data-tab-btn].active {
+    background: #0066cc;
+    color: #fff;
+    border-color: #0066cc;
+  }
+</style>
+
+</body>
+</html>
