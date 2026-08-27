@@ -169,6 +169,7 @@
 
       <div class="menu-label">Dashboards</div>
       <div class="menu-item" data-view="equipes"><span class="ic">&#128101;</span> Controle de Equipes</div>
+            <div class="menu-item" data-view="efetivo"><span class="ic">🚩</span> Controle de Efetivo</div>
       <div class="menu-item" data-view="frota"><span class="ic">&#128663;</span> Frota — Manutenção</div>
       <div class="menu-item" data-view="boletos"><span class="ic">&#129534;</span> Controle de Boletos</div>
       <div class="menu-item" data-view="envios"><span class="ic">&#128230;</span> Envios Logísticos</div>
@@ -307,6 +308,7 @@
       <iframe id="view-demandas" src="dashboard-nossas-demandas.html" title="Nossas Demandas"></iframe>
       <iframe id="view-busca-tecnico" src="dashboard-resumo-equipes.html#busca" title="Buscar Técnico"></iframe>
       <iframe id="view-equipes" src="dashboard-resumo-equipes.html" title="Controle de Equipes"></iframe>
+            <iframe id="view-efetivo" src="dashboard-resumo-equipes.html" title="Controle de Efetivo"></iframe>
       <iframe id="view-frota" src="dashboard-frota-manutencao.html" title="Frota - Manutenção"></iframe>
       <iframe id="view-boletos" src="dashboard-boletos.html" title="Controle de Boletos"></iframe>
       <iframe id="view-envios" src="dashboard-envios-logisticos.html" title="Envios Logísticos"></iframe>
@@ -325,6 +327,7 @@
     demandas: { title: "Nossas Demandas", path: "Extreme Wind / Painel Geral / Nossas Demandas" },
     "busca-tecnico": { title: "Buscar Técnico", path: "Extreme Wind / Painel Geral / Buscar Técnico" },
     equipes: { title: "Controle de Equipes", path: "Extreme Wind / Painel Geral / Controle de Equipes" },
+    efetivo: { title: "Controle de Efetivo", path: "dashboard-resumo-equipes.html" },
     frota: { title: "Frota — Manutenção", path: "Extreme Wind / Painel Geral / Frota - Manutenção" },
     boletos: { title: "Controle de Boletos", path: "Extreme Wind / Painel Geral / Controle de Boletos" },
     envios: { title: "Envios Logísticos", path: "Extreme Wind / Painel Geral / Envios Logísticos" },
@@ -339,6 +342,7 @@
     document.getElementById("view-demandas").classList.toggle("active", view === "demandas");
     document.getElementById("view-busca-tecnico").classList.toggle("active", view === "busca-tecnico");
     document.getElementById("view-equipes").classList.toggle("active", view === "equipes");
+    document.getElementById("view-efetivo").classList.toggle("active", view === "efetivo");
     document.getElementById("view-frota").classList.toggle("active", view === "frota");
     document.getElementById("view-boletos").classList.toggle("active", view === "boletos");
     document.getElementById("view-envios").classList.toggle("active", view === "envios");
