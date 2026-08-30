@@ -40,6 +40,32 @@
     .fullscreen-toggle{width:150px; text-align:center; white-space:nowrap; top:64px;}
     .theme-toggle{width:150px; text-align:center; white-space:nowrap;}
   }
+
+  /* ============ Caixinha de desfazer exclusão (Bloco 1) ============ */
+  .undo-toast{
+    position:fixed; right:16px; bottom:16px; z-index:250;
+    display:flex; align-items:center; gap:10px; max-width:360px;
+    background:var(--panel); border:1px solid var(--line); color:var(--text);
+    border-radius:10px; padding:10px 10px 10px 16px; font-size:12.5px;
+    box-shadow:0 4px 14px rgba(0,0,0,.3);
+  }
+  /* No celular o botão de tela cheia desce pro canto inferior direito
+     (bottom:16px; right:16px) — sobe a caixinha de desfazer pra não ficar
+     uma em cima da outra nessa faixa de tela. */
+  @media (max-width: 640px){
+    .undo-toast{bottom:70px;}
+  }
+  .undo-toast[hidden]{display:none;}
+  .undo-toast .undo-msg{flex:1;}
+  .undo-toast .undo-btn{
+    background:rgba(18,191,168,.15); border:1px solid var(--teal); color:var(--teal);
+    font-weight:700; font-size:12px; padding:6px 12px; border-radius:6px; cursor:pointer; white-space:nowrap;
+  }
+  .undo-toast .undo-btn:hover{background:rgba(18,191,168,.28);}
+  .undo-toast .undo-close{
+    background:none; border:none; color:var(--muted); cursor:pointer; font-size:14px; padding:0 4px; line-height:1;
+  }
+  .undo-toast .undo-close:hover{color:var(--text);}
   *{box-sizing:border-box;}
   body{
     margin:0; font-family:Segoe UI,Arial,sans-serif; background:var(--bg); color:var(--text);
@@ -239,6 +265,16 @@
   .obs{color:var(--muted); font-size:11.5px;}
   .aprovados-box{padding:12px 18px; border-top:1px solid var(--line); background:rgba(255,255,255,.015);}
   .aprovados-box .ap-title{font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.03em; margin-bottom:8px;}
+
+  /* ============ Rodapé do painel — excluir (bloco 1) / avançar (blocos 2 e 3) ============ */
+  .panel-footer{padding:8px 18px 12px; display:flex; justify-content:flex-end; border-top:1px solid var(--line);}
+  .btn-delete-park, .btn-advance-block{
+    font-size:11px; font-weight:600; padding:5px 11px; border-radius:6px; cursor:pointer;
+  }
+  .btn-delete-park{background:rgba(224,72,60,.12); border:1px solid rgba(224,72,60,.45); color:#e0483c;}
+  .btn-delete-park:hover{background:rgba(224,72,60,.22);}
+  .btn-advance-block{background:rgba(46,196,161,.12); border:1px solid rgba(46,196,161,.5); color:var(--teal);}
+  .btn-advance-block:hover{background:rgba(46,196,161,.22);}
   .ap-names{display:flex; flex-wrap:wrap; gap:6px;}
   .ap-name{
     display:inline-flex; align-items:center; gap:4px;
@@ -277,6 +313,12 @@
 
   <button class="theme-toggle" id="themeToggleBtn" onclick="toggleTheme()">☀️ Modo Diurno</button>
   <button class="fullscreen-toggle" id="fullscreenToggleBtn" onclick="toggleFullscreen()">⛶ Tela Cheia</button>
+
+  <div class="undo-toast" id="undoToast" hidden>
+    <span class="undo-msg" id="undoToastMsg"></span>
+    <button type="button" class="undo-btn" onclick="undoLastDelete()">Desfazer</button>
+    <button type="button" class="undo-close" onclick="dismissUndoToast()" aria-label="Fechar">✕</button>
+  </div>
 
   <header>
     <div class="brand">
@@ -401,7 +443,7 @@
   }
 
   /* ============ Render: painel de parque ============ */
-  function panelHtml(p){
+  function panelHtml(p, extraDeletableBlank){
     const logo = LOGOS[p.Fabricante] || LOGOS.GE;
     const logoOptions = Object.keys(LOGOS).map(function(k){
       return '<option value="' + k + '"' + (p.Fabricante === k ? ' selected' : '') + '>' + k + '</option>';
@@ -435,7 +477,29 @@
       '</div>' +
       '<table><thead><tr>' + theadHtml + '</tr></thead><tbody data-equipe-body></tbody></table>' +
       '<div class="aprovados-box"><div class="ap-title">Aprovados (backup)</div><div class="ap-names" data-aprovados-body></div></div>' +
+      panelFooterHtml(p, extraDeletableBlank) +
     '</div>';
+  }
+
+  /* Bloco 1 (Parques Ativos): botão de excluir o projeto por inteiro.
+     Blocos 2 (Mobilização) e 3 (Aprovação de Documentações): botão de
+     avançar o projeto pro bloco anterior na esteira (3→2, 2→1). Painéis em
+     branco (placeholder, ainda sem nome) normalmente não recebem nenhum dos
+     dois — exceto quando há mais de 1 vaga em branco sobrando no Bloco 1
+     (extraDeletableBlank), caso em que a vaga extra também ganha um botão
+     de excluir, pra dar um jeito de reduzir a sempre 1 vaga só. */
+  function panelFooterHtml(p, extraDeletableBlank){
+    if (p.Placeholder){
+      if (!extraDeletableBlank) return '';
+      return '<div class="panel-footer"><button type="button" class="btn-delete-park" data-action="delete-park">🗑 Excluir vaga em branco</button></div>';
+    }
+    if (p.Bloco === 'b1'){
+      return '<div class="panel-footer"><button type="button" class="btn-delete-park" data-action="delete-park">🗑 Excluir projeto</button></div>';
+    }
+    if (p.Bloco === 'b2' || p.Bloco === 'b3'){
+      return '<div class="panel-footer"><button type="button" class="btn-advance-block" data-action="advance-block">Avançar ▸</button></div>';
+    }
+    return '';
   }
 
   function equipeRowHtml(row, colCount){
@@ -452,8 +516,8 @@
       '<span class="ap-text" contenteditable="true" data-field="Nome">' + escapeHtml(row.Nome) + '</span></span>';
   }
 
-  function renderPark(container, p){
-    const node = el(panelHtml(p));
+  function renderPark(container, p, extraDeletableBlank){
+    const node = el(panelHtml(p, extraDeletableBlank));
     container.appendChild(node);
     const colCount = (p.ColunasEquipe || 'Nome — Estado,Certificação').split(',').length;
     const tbody = node.querySelector('[data-equipe-body]');
@@ -759,13 +823,126 @@
     attachBlankPanelWatcher(node, p.Bloco);
     node.querySelectorAll('.ap-name.blank-ap').forEach(attachBlankAprovadoWatcher.bind(null, p.ParkID));
     attachDragHandlers(node.querySelector('[data-aprovados-body]'), p.ParkID);
+
+    const delBtn = node.querySelector('[data-action="delete-park"]');
+    if (delBtn) delBtn.addEventListener('click', function(){ deletePark(p); });
+    const advBtn = node.querySelector('[data-action="advance-block"]');
+    if (advBtn) advBtn.addEventListener('click', function(){ advancePark(p); });
+  }
+
+  /* ============ Excluir projeto (Bloco 1) / Avançar bloco (Blocos 2 e 3) ============ */
+  const BLOCO_LABEL = { b1:'Parques Ativos', b2:'Mobilização', b3:'Aprovação de Documentações' };
+  function blocoAnterior(bloco){
+    if (bloco === 'b3') return 'b2';
+    if (bloco === 'b2') return 'b1';
+    return null;
+  }
+  async function deletePark(p){
+    const isBlank = !!p.Placeholder;
+    const nome = (p.NomeParque || '').trim() || 'este projeto';
+    const msg = isBlank
+      ? 'Remover esta vaga em branco de "Novo Projeto"? Isso ajuda a manter só 1 vaga aberta no Bloco 1.'
+      : 'Excluir "' + nome + '" por completo dos Parques Ativos?\n\nEssa ação remove o painel, a equipe e a lista de aprovados desse projeto. Se for engano, dá pra desfazer logo em seguida.';
+    if (!confirm(msg)) return;
+    // Guarda uma cópia completa (parque + equipe + aprovados) antes de excluir,
+    // pra permitir desfazer via a caixinha que aparece no canto inferior esquerdo.
+    const snapshot = {
+      park: Object.assign({}, p),
+      equipe: DATA.equipe.filter(function(r){ return r.ParkID === p.ParkID; }).map(function(r){ return Object.assign({}, r); }),
+      aprovados: DATA.aprovados.filter(function(r){ return r.ParkID === p.ParkID; }).map(function(r){ return Object.assign({}, r); })
+    };
+    let resp;
+    try {
+      resp = await apiPost({ action:'deletePark', parkId: p.ParkID });
+    } catch (err){
+      alert('Falha ao excluir (erro de conexão): ' + err.message);
+      return;
+    }
+    if (!resp || resp.ok === false){
+      alert('Falha ao excluir: ' + (resp && resp.error ? resp.error : 'erro desconhecido'));
+      return;
+    }
+    DATA.parques = DATA.parques.filter(function(r){ return r.ParkID !== p.ParkID; });
+    DATA.equipe = DATA.equipe.filter(function(r){ return r.ParkID !== p.ParkID; });
+    DATA.aprovados = DATA.aprovados.filter(function(r){ return r.ParkID !== p.ParkID; });
+    // Mostra a caixinha de desfazer ANTES de re-renderizar: assim, mesmo que
+    // algo dê errado ao redesenhar a tela, a exclusão já foi confirmada pelo
+    // servidor e o "Desfazer" continua disponível pra reverter.
+    showUndoToast(snapshot, isBlank ? 'Vaga em branco removida.' : 'Projeto "' + nome + '" excluído.');
+    try {
+      renderBlock('b1');
+      renderKpis();
+    } catch (err){
+      console.error('Erro ao atualizar a tela após excluir:', err);
+      alert('O projeto foi excluído, mas houve um erro ao atualizar a tela (recarregue a página pra ver certinho). Detalhe técnico: ' + err.message);
+    }
+  }
+
+  /* ============ Caixinha de desfazer (canto inferior esquerdo) ============ */
+  let lastDeleted = null;
+  function showUndoToast(snapshot, msg){
+    if (lastDeleted && lastDeleted.timeoutId) clearTimeout(lastDeleted.timeoutId);
+    const timeoutId = setTimeout(dismissUndoToast, 20000);
+    lastDeleted = { snapshot: snapshot, timeoutId: timeoutId };
+    document.getElementById('undoToastMsg').textContent = msg;
+    document.getElementById('undoToast').hidden = false;
+  }
+  function dismissUndoToast(){
+    if (lastDeleted && lastDeleted.timeoutId) clearTimeout(lastDeleted.timeoutId);
+    lastDeleted = null;
+    document.getElementById('undoToast').hidden = true;
+  }
+  async function undoLastDelete(){
+    if (!lastDeleted) return;
+    const snapshot = lastDeleted.snapshot;
+    dismissUndoToast();
+    try {
+      // Recria o parque e tudo que estava vinculado a ele (mesmo ParkID, mesma
+      // Ordem), pra reaparecer no mesmo lugar de antes dentro do Bloco 1.
+      const parkResp = await apiPost({ action:'addRow', sheet:'RD_Parques', template: snapshot.park });
+      const restoredPark = Object.assign({}, snapshot.park, { _row: parkResp && parkResp.result ? parkResp.result.newRow : null });
+      DATA.parques.push(restoredPark);
+      for (const eq of snapshot.equipe){
+        const r = await apiPost({ action:'addRow', sheet:'RD_Equipe', template: eq });
+        DATA.equipe.push(Object.assign({}, eq, { _row: r && r.result ? r.result.newRow : null }));
+      }
+      for (const ap of snapshot.aprovados){
+        const r = await apiPost({ action:'addRow', sheet:'RD_Aprovados', template: ap });
+        DATA.aprovados.push(Object.assign({}, ap, { _row: r && r.result ? r.result.newRow : null }));
+      }
+      renderBlock('b1');
+      renderKpis();
+    } catch (err){
+      console.error('Erro ao desfazer exclusão:', err);
+      alert('Não consegui desfazer a exclusão (erro de conexão ou ao atualizar a tela). Detalhe técnico: ' + err.message);
+    }
+  }
+  async function advancePark(p){
+    const destino = blocoAnterior(p.Bloco);
+    if (!destino) return;
+    const nome = (p.NomeParque || '').trim() || 'este projeto';
+    if (!confirm('Avançar "' + nome + '" para o bloco "' + BLOCO_LABEL[destino] + '"?')) return;
+    const origem = p.Bloco;
+    const resp = await apiPost({ action:'updateCell', sheet:'RD_Parques', row: p._row, field:'Bloco', value: destino });
+    if (!resp || resp.ok === false){
+      alert('Falha ao mover: ' + (resp && resp.error ? resp.error : 'erro desconhecido'));
+      return;
+    }
+    p.Bloco = destino;
+    renderBlock(origem);
+    renderBlock(destino);
+    renderKpis();
   }
 
   /* ============ Reposição automática de vagas em branco ============ */
   function blankParkTemplate(bloco){
     PARK_SEQ++;
+    // ID único mesmo com várias pessoas usando o dashboard ao mesmo tempo em
+    // abas/sessões diferentes (cada aba tem seu próprio contador PARK_SEQ, que
+    // sozinho já colidiu no passado). Combina timestamp + contador + sorteio.
+    const uniqueSuffix = Date.now().toString(36) + '-' + PARK_SEQ + '-' + Math.random().toString(36).slice(2, 6);
     return {
-      ParkID: bloco + '-novo-' + PARK_SEQ, Bloco: bloco, Ordem: 999, Fabricante:'GE', NomeParque:'Novo Parque',
+      ParkID: bloco + '-novo-' + uniqueSuffix, Bloco: bloco, Ordem: 999, Fabricante:'GE', NomeParque:'Novo Parque',
       Tipo:'', Card:'', Supervisor:'', Cliente:'', Data:'', EHS:'', Condicao:'', Status:'standby',
       ColunasEquipe:'Nome — Estado,Certificação,Observação', Placeholder:true, _row: null
     };
@@ -954,6 +1131,24 @@
     const containerEl = document.getElementById(bloco);
     containerEl.innerHTML = '';
     const parks = DATA.parques.filter(function(p){ return p.Bloco === bloco; }).sort(function(a,b){ return a.Ordem-b.Ordem; });
+    if (bloco === 'b1'){
+      // O Bloco 1 deve manter sempre só 1 vaga em branco de "novo projeto"
+      // aberta. Se sobrar mais de uma (uso antigo, antes dessa regra), as
+      // vagas extras também ganham botão de excluir pra dar um jeito de
+      // reduzir a 1 só; a primeira vaga em branco nunca perde o botão de
+      // criar, pra sempre existir um lugar pra cadastrar um projeto novo.
+      const totalBlanks = parks.filter(function(p){ return p.Placeholder; }).length;
+      let blanksSeen = 0;
+      parks.forEach(function(p){
+        let extraDeletableBlank = false;
+        if (p.Placeholder){
+          blanksSeen++;
+          extraDeletableBlank = totalBlanks > 1 && blanksSeen > 1;
+        }
+        renderPark(containerEl, p, extraDeletableBlank);
+      });
+      return;
+    }
     parks.forEach(function(p){ renderPark(containerEl, p); });
   }
 
