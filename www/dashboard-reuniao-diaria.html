@@ -379,8 +379,19 @@
     {value:'desmob', label:'Em Desmobilização'},
     {value:'stop', label:'Stop Work'}
   ];
-  const CHIP_LABELS = {Tipo:'Tipo', Card:'Card', Supervisor:'Supervisor', Cliente:'Cliente', Data:'Data', EHS:'EHS', Condicao:'Condição'};
-  const CHIP_ORDER = ['Tipo','Card','Supervisor','Cliente','Data','EHS','Condicao'];
+  // Os 6 campos finais (Tramitacao...OcorrenciaQualidade) são específicos do
+  // Bloco 2 (Mobilização) — só aparecem como chip quando o parque de fato
+  // tiver algum desses campos preenchido (buildChipsHtml já filtra vazios),
+  // então não afetam a exibição dos parques dos Blocos 1 e 3.
+  const CHIP_LABELS = {
+    Tipo:'Tipo', Card:'Card', Supervisor:'Supervisor', Cliente:'Cliente', Data:'Data', EHS:'EHS', Condicao:'Condição',
+    Tramitacao:'Tramitação', OcorrenciaRH:'Ocorrência RH', OcorrenciaEHS:'Ocorrência EHS',
+    MaterialCompras:'Material e Compras', Veiculo:'Veículo', OcorrenciaQualidade:'Ocorrência Qualidade/PO'
+  };
+  const CHIP_ORDER = [
+    'Tipo','Card','Supervisor','Cliente','Data','EHS','Condicao',
+    'Tramitacao','OcorrenciaRH','OcorrenciaEHS','MaterialCompras','Veiculo','OcorrenciaQualidade'
+  ];
   const BLOCK_LABELS = {b1:'Parques Ativos', b2:'Mobilização', b3:'Aprovação de Documentações'};
 
   let DATA = { parques:[], equipe:[], aprovados:[], notas:[], tecnicos:[], relatorios:[], atividades:[], classificacao:[] };
@@ -1127,48 +1138,51 @@
     document.getElementById('countB5').textContent = '(ações)';
   }
 
-  // Ordem de apresentação dos supervisores no Bloco 1 (Parques Ativos).
-  // Projetos são agrupados por supervisor nessa sequência; dentro de cada
-  // supervisor, mantém a ordem original (campo Ordem). Supervisor fora
-  // dessa lista (ou vazio) cai no final, antes da vaga em branco.
-  const SUPERVISOR_ORDER_B1 = ['Evair', 'Magalhães', 'Wildner Joseph'];
+  // Ordem de apresentação dos supervisores, aplicada nos 3 blocos de parques
+  // (Parques Ativos, Mobilização, Aprovação de Documentações). Projetos são
+  // agrupados por supervisor nessa sequência; dentro de cada supervisor,
+  // mantém a ordem original (campo Ordem). Supervisor fora dessa lista (ou
+  // vazio) cai no final, antes da vaga em branco. Compara só o primeiro
+  // nome pra não quebrar quando o campo Supervisor está gravado de forma
+  // inconsistente entre parques (ex.: "Wildner" vs "Wildner Joseph").
+  const SUPERVISOR_ORDER = ['Evair', 'Magalhães', 'Wildner'];
+  function primeiroNome(nome){
+    return (nome || '').trim().split(/\s+/)[0] || '';
+  }
   function supervisorRank(nome){
-    const idx = SUPERVISOR_ORDER_B1.indexOf((nome || '').trim());
-    return idx === -1 ? SUPERVISOR_ORDER_B1.length : idx;
+    const primeiro = primeiroNome(nome);
+    const idx = SUPERVISOR_ORDER.indexOf(primeiro);
+    return idx === -1 ? SUPERVISOR_ORDER.length : idx;
   }
 
   function renderBlock(bloco){
     const containerEl = document.getElementById(bloco);
     containerEl.innerHTML = '';
     const parks = DATA.parques.filter(function(p){ return p.Bloco === bloco; }).sort(function(a,b){ return a.Ordem-b.Ordem; });
-    if (bloco === 'b1'){
-      // O Bloco 1 é ordenado por supervisor (Evair, depois Magalhães, depois
-      // Wildner Joseph), preservando a ordem original dentro de cada grupo.
-      // Vagas em branco (Placeholder) sempre vão pro final, independente de
-      // supervisor. Mantém também a regra de só 1 vaga em branco sempre
-      // aberta pra criar projeto novo; vagas extras (uso antigo) ganham
-      // botão de excluir pra dar um jeito de reduzir a 1 só.
-      const naoPlaceholder = parks.filter(function(p){ return !p.Placeholder; });
-      const placeholders = parks.filter(function(p){ return p.Placeholder; });
-      naoPlaceholder.sort(function(a,b){
-        const ra = supervisorRank(a.Supervisor), rb = supervisorRank(b.Supervisor);
-        if (ra !== rb) return ra - rb;
-        return a.Ordem - b.Ordem;
-      });
-      const ordered = naoPlaceholder.concat(placeholders);
-      const totalBlanks = placeholders.length;
-      let blanksSeen = 0;
-      ordered.forEach(function(p){
-        let extraDeletableBlank = false;
-        if (p.Placeholder){
-          blanksSeen++;
-          extraDeletableBlank = totalBlanks > 1 && blanksSeen > 1;
-        }
-        renderPark(containerEl, p, extraDeletableBlank);
-      });
-      return;
-    }
-    parks.forEach(function(p){ renderPark(containerEl, p); });
+    // Todo bloco de parques (b1/b2/b3) é ordenado por supervisor (Evair,
+    // depois Magalhães, depois Wildner), preservando a ordem original dentro
+    // de cada grupo. Vagas em branco (Placeholder) sempre vão pro final,
+    // independente de supervisor. No Bloco 1 mantém também a regra de só 1
+    // vaga em branco sempre aberta pra criar projeto novo; vagas extras (uso
+    // antigo) ganham botão de excluir pra dar um jeito de reduzir a 1 só.
+    const naoPlaceholder = parks.filter(function(p){ return !p.Placeholder; });
+    const placeholders = parks.filter(function(p){ return p.Placeholder; });
+    naoPlaceholder.sort(function(a,b){
+      const ra = supervisorRank(a.Supervisor), rb = supervisorRank(b.Supervisor);
+      if (ra !== rb) return ra - rb;
+      return a.Ordem - b.Ordem;
+    });
+    const ordered = naoPlaceholder.concat(placeholders);
+    const totalBlanks = placeholders.length;
+    let blanksSeen = 0;
+    ordered.forEach(function(p){
+      let extraDeletableBlank = false;
+      if (p.Placeholder && bloco === 'b1'){
+        blanksSeen++;
+        extraDeletableBlank = totalBlanks > 1 && blanksSeen > 1;
+      }
+      renderPark(containerEl, p, extraDeletableBlank);
+    });
   }
 
   function renderAll(){
