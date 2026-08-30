@@ -155,7 +155,7 @@
     </div>
   </div>
   <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap">
-    <div class="badge-week" id="badgeAtualizado">Atualizado 26/08/2026</div>
+    <div class="badge-week" id="badgeAtualizado">Atualizado 30/08/2026</div>
     <button class="toggle-btn" id="navAcao" style="background:var(--nok)">Plano de Ação</button>
   </div>
 </header>
@@ -171,7 +171,7 @@
   </div>
   <div class="kpi kpi-fill-green">
     <div class="label">Entregues 2026 (Log.)</div>
-    <div class="n" id="kpiEntregues">528</div>
+    <div class="n" id="kpiEntregues">529</div>
   </div>
   <div class="kpi kpi-fill-red">
     <div class="label">Canceladas 2026 (Almox.)</div>
@@ -184,9 +184,9 @@
   <p class="panel-note">Situações que ainda aguardam ação (Almoxarifado ou Logística)</p>
   <div class="aberto" id="abertoBadges">
     <div class="aberto-badge"><div class="n" id="abEmSeparacao">12</div><div class="l">Em separação</div></div>
-    <div class="aberto-badge"><div class="n" id="abAguardandoColeta">12</div><div class="l">Aguardando coleta</div></div>
-    <div class="aberto-badge warn"><div class="n" id="abEmTrajeto">3</div><div class="l">Em trajeto</div></div>
-    <div class="aberto-badge total"><div class="n" id="abTotal">27</div><div class="l">Total em aberto</div></div>
+    <div class="aberto-badge"><div class="n" id="abAguardandoColeta">10</div><div class="l">Aguardando coleta</div></div>
+    <div class="aberto-badge warn"><div class="n" id="abEmTrajeto">4</div><div class="l">Em trajeto</div></div>
+    <div class="aberto-badge total"><div class="n" id="abTotal">26</div><div class="l">Total em aberto</div></div>
   </div>
 </div>
 
@@ -213,9 +213,9 @@
 
   <div class="collapsible" id="acaoBody">
   <div class="aberto" style="max-width:620px; margin:6px 0 16px">
-    <div class="aberto-badge"><div class="n" id="acaoCountAlmox">24</div><div class="l">Ações Almoxarifado</div></div>
-    <div class="aberto-badge"><div class="n" id="acaoCountLog">3</div><div class="l">Ações Logística</div></div>
-    <div class="aberto-badge warn"><div class="n" id="acaoCountAssinatura">3</div><div class="l">Aguardando Assinatura</div></div>
+    <div class="aberto-badge"><div class="n" id="acaoCountAlmox">22</div><div class="l">Ações Almoxarifado</div></div>
+    <div class="aberto-badge"><div class="n" id="acaoCountLog">4</div><div class="l">Ações Logística</div></div>
+    <div class="aberto-badge warn"><div class="n" id="acaoCountAssinatura">4</div><div class="l">Aguardando Assinatura</div></div>
   </div>
 
   <h3 style="font-size:12.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:0 0 8px;">Ações Almoxarifado</h3>
@@ -233,8 +233,6 @@
     <tr><td>SERRA DA BABILONIA</td><td>WILDNER</td><td>12/08/2026</td><td></td><td>AGUARDANDO COLETA</td></tr>
     <tr><td>SERRA DA BABILONIA</td><td>WILDNER</td><td>12/08/2026</td><td></td><td>AGUARDANDO COLETA</td></tr>
     <tr><td>SERRA DA BABILONIA</td><td>WILDNER</td><td>12/08/2026</td><td></td><td>AGUARDANDO COLETA</td></tr>
-    <tr><td>SANTO AGOSTINHO</td><td>EVAIR</td><td>25/08/2026</td><td></td><td>AGUARDANDO COLETA</td></tr>
-    <tr><td>BAIXA DO FEIJÃO</td><td>WILDNER</td><td>25/08/2026</td><td></td><td>AGUARDANDO COLETA</td></tr>
     <tr><td>MÉXICO 1</td><td>EVAIR</td><td>sem previsão</td><td></td><td>A SEPARAR</td></tr>
     <tr><td>MÉXICO 1</td><td>EVAIR</td><td>sem previsão</td><td></td><td>A SEPARAR</td></tr>
     <tr><td>MÉXICO 1</td><td>EVAIR</td><td>sem previsão</td><td></td><td>A SEPARAR</td></tr>
@@ -256,6 +254,7 @@
   <table>
     <thead><tr><th>Projeto</th><th>Responsável</th><th>Prazo para Entrega</th><th>Destinatário</th><th>Data de Entrega</th><th>Status</th></tr></thead>
     <tbody id="acoesLog">
+    <tr class="row-warn"><td>BAIXA DO FEIJÃO</td><td>WILDNER</td><td>25/08/2026</td><td>WILLIAMES LEANDRO</td><td></td><td>EM TRAJETO</td></tr>
     <tr class="row-warn"><td>TUCANO</td><td>JAMILE</td><td>25/08/2026</td><td>DIEGO PEREIRA BERNARDINO</td><td></td><td>EM TRAJETO</td></tr>
     <tr class="row-warn"><td>TUCANO</td><td>JAMILE</td><td>25/08/2026</td><td>ÉDIPO CARDOSO</td><td></td><td>EM TRAJETO</td></tr>
     <tr class="row-warn"><td>TUCANO</td><td>JAMILE</td><td>25/08/2026</td><td>ANTÔNIO ERIVANDO</td><td></td><td>EM TRAJETO</td></tr>
@@ -269,6 +268,7 @@
   <table>
     <thead><tr><th>Projeto</th><th>Responsável</th><th>Prazo para Entrega</th><th>Destinatário</th><th>Data de Entrega</th></tr></thead>
     <tbody id="acoesAssinatura">
+    <tr class="row-warn"><td>BAIXA DO FEIJÃO</td><td>WILDNER</td><td>25/08/2026</td><td>WILLIAMES LEANDRO</td><td></td></tr>
     <tr class="row-warn"><td>TUCANO</td><td>JAMILE</td><td>25/08/2026</td><td>DIEGO PEREIRA BERNARDINO</td><td></td></tr>
     <tr class="row-warn"><td>TUCANO</td><td>JAMILE</td><td>25/08/2026</td><td>ÉDIPO CARDOSO</td><td></td></tr>
     <tr class="row-warn"><td>TUCANO</td><td>JAMILE</td><td>25/08/2026</td><td>ANTÔNIO ERIVANDO</td><td></td></tr>
@@ -283,7 +283,7 @@
 <script>
   var evolucaoMeses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago"];
   var evolucaoReq = [100, 83, 106, 76, 58, 83, 38, 42];
-  var evolucaoEnt = [96, 76, 103, 72, 58, 73, 33, 17];
+  var evolucaoEnt = [96, 76, 103, 72, 58, 73, 33, 18];
   new Chart(document.getElementById("chartEvolucao"), {
     type:"line",
     data:{ labels: evolucaoMeses,
