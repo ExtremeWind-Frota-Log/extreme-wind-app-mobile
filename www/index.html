@@ -71,7 +71,7 @@
 
   .home{position:absolute; inset:0; overflow-y:auto; padding:32px; display:none;}
   .home.active{display:block;}
-  .home .hero{
+  .home .hero;
     position:relative; background:linear-gradient(135deg,var(--brand),var(--brand-dark));
     border-radius:14px; padding:18px 32px; overflow:hidden;
     display:flex; align-items:center; gap:22px; margin-bottom:28px;
@@ -160,6 +160,7 @@
       <div class="menu-label">Visão</div>
       <div class="menu-item active" data-view="home"><span class="ic">&#8962;</span> Início</div>
       <div class="menu-item" data-view="reuniao-diaria"><span class="ic">&#128197;</span> Reunião Diária</div>
+      <div class="menu-item" data-view="portal-administrativo"><span class="ic">&#127970;</span> Portal Administrativo</div>
       <div class="menu-item" data-view="demandas"><span class="ic">&#9888;</span> <span id="menuDemandasLabel">NOSSAS DEMANDAS (HOJE)</span></div>
       <div class="menu-item" data-view="busca-tecnico"><span class="ic">&#128269;</span> Buscar Técnico</div>
       <div style="padding:2px 12px 10px 40px;">
@@ -212,6 +213,11 @@
         <div class="card" data-view="reuniao-diaria" style="border-left-color:var(--teal); margin-bottom:28px;">
           <div class="card-title">&#128197; Reunião Diária</div>
           <div class="go">Abrir o dashboard da reunião diária (RDO) →</div>
+        </div>
+
+        <div class="card" data-view="portal-administrativo" style="border-left-color:var(--brand); margin-bottom:28px;">
+          <div class="card-title">&#127970; Portal Administrativo</div>
+          <div class="go">Abrir o Portal Administrativo (solicitação de materiais) →</div>
         </div>
 
         <div class="note-box" style="position:relative; padding:0; overflow:hidden; margin-bottom:28px; height:340px; isolation:isolate;">
@@ -296,8 +302,8 @@
               <div><div class="n" style="color:var(--nok)">22</div><div class="l">Em aberto</div></div>
             </div>
             <div class="go">Ver requisições de materiais e plano de ação →</div>
-          </div>
         </div>
+      </div>
 
         <div class="note-box">
           Dados consolidados a partir do Diário de Bordo e da planilha de Controle de Frota. Confira os valores na fonte antes de compartilhar externamente — uso interno da equipe.
@@ -305,6 +311,7 @@
       </div>
 
       <iframe id="view-reuniao-diaria" src="dashboard-reuniao-diaria.html" title="Reunião Diária"></iframe>
+      <iframe id="view-portal-administrativo" src="https://extremewind-ferramentas-de-campo.github.io/administrativo/modulos/solicitacao-materiais.html" title="Portal Administrativo"></iframe>
       <iframe id="view-demandas" src="dashboard-nossas-demandas.html" title="Nossas Demandas"></iframe>
       <iframe id="view-busca-tecnico" src="dashboard-resumo-equipes.html#busca" title="Buscar Técnico"></iframe>
       <iframe id="view-equipes" src="dashboard-resumo-equipes.html" title="Controle de Equipes"></iframe>
@@ -324,6 +331,7 @@
   const TITLES = {
     home: { title: "Início", path: "Extreme Wind / Painel Geral" },
     "reuniao-diaria": { title: "Reunião Diária", path: "Extreme Wind / Painel Geral / Reunião Diária" },
+    "portal-administrativo": { title: "Portal Administrativo", path: "Extreme Wind / Painel Geral / Portal Administrativo" },
     demandas: { title: "Nossas Demandas", path: "Extreme Wind / Painel Geral / Nossas Demandas" },
     "busca-tecnico": { title: "Buscar Técnico", path: "Extreme Wind / Painel Geral / Buscar Técnico" },
     equipes: { title: "Controle de Equipes", path: "Extreme Wind / Painel Geral / Controle de Equipes" },
@@ -339,6 +347,7 @@
     document.querySelectorAll(".menu-item").forEach(function(el){ el.classList.toggle("active", el.dataset.view === view); });
     document.getElementById("view-home").classList.toggle("active", view === "home");
     document.getElementById("view-reuniao-diaria").classList.toggle("active", view === "reuniao-diaria");
+    document.getElementById("view-portal-administrativo").classList.toggle("active", view === "portal-administrativo");
     document.getElementById("view-demandas").classList.toggle("active", view === "demandas");
     document.getElementById("view-busca-tecnico").classList.toggle("active", view === "busca-tecnico");
     document.getElementById("view-equipes").classList.toggle("active", view === "equipes");
