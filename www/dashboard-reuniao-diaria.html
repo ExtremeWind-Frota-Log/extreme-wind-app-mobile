@@ -554,10 +554,38 @@
       .replace(/[^a-z0-9]+/g, ' ')
       .trim();
   }
+  /* Mapa de aliases de nome de parque (03/09/2026): o RDO preenchido pela
+     equipe as vezes usa um nome ligeiramente diferente do cadastro em
+     RD_Parques -- ex.: "Oitis 1" no cadastro, mas a equipe passou a
+     preencher o RDO como "Oitis MCU 1" a partir de 21/08/2026 (mesmo
+     parque/equipe, confirmado pelo Robson). O match por prefixo abaixo nao
+     cobre esse caso porque "MCU" fica no meio do nome, nao no fim. Para
+     resolver sem reescrever a logica de match, mantemos aqui uma lista de
+     grupos de nomes equivalentes (normalizados) -- toda vez que aparecer um
+     caso novo desses (nome do RDO nao bate com o card do parque, mas e o
+     mesmo parque/equipe segundo o Robson), so acrescentar o nome novo no
+     grupo correspondente (ou criar um grupo novo), sem tocar no resto da
+     funcao.
+     Nomes sao normalizados com normalizeParkName antes de comparar aqui,
+     entao nao precisa se preocupar com acento/maiusculas/sufixo "/UF". */
+  var PARK_NAME_ALIAS_GROUPS = [
+    ['oitis 1', 'oitis mcu 1']
+  ];
+  function parkAliasGroup(nome){
+    for (var i = 0; i < PARK_NAME_ALIAS_GROUPS.length; i++){
+      if (PARK_NAME_ALIAS_GROUPS[i].indexOf(nome) !== -1) return PARK_NAME_ALIAS_GROUPS[i];
+    }
+    return null;
+  }
   function parkMatchesReport(nomeParque, reportParque){
     const a = normalizeParkName(nomeParque), b = normalizeParkName(reportParque);
     if (!a || !b) return false;
-    return a === b || a.indexOf(b) === 0 || b.indexOf(a) === 0;
+    if (a === b || a.indexOf(b) === 0 || b.indexOf(a) === 0) return true;
+    var groupA = parkAliasGroup(a);
+    if (groupA && groupA.indexOf(b) !== -1) return true;
+    var groupB = parkAliasGroup(b);
+    if (groupB && groupB.indexOf(a) !== -1) return true;
+    return false;
   }
   /* Data_exp pode vir como "2026-08-17" (ISO) ou "17/08/2026" (BR) — normaliza pra "YYYY-MM-DD" */
   function normalizeDateExp(s){
