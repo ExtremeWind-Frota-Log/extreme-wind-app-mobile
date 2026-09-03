@@ -71,7 +71,7 @@
 
   .home{position:absolute; inset:0; overflow-y:auto; padding:32px; display:none;}
   .home.active{display:block;}
-  .home .hero;
+  .home .hero{
     position:relative; background:linear-gradient(135deg,var(--brand),var(--brand-dark));
     border-radius:14px; padding:18px 32px; overflow:hidden;
     display:flex; align-items:center; gap:22px; margin-bottom:28px;
@@ -412,7 +412,7 @@
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", function(){
       navigator.serviceWorker.register("./sw.js").then(function(reg){
-        // Checa se tem versao nova toda vezb¥ue o app volta pro primeiro plano
+        // Checa se tem versao nova toda vez que o app volta pro primeiro plano
         // (sem isso, no app instalado o SW so verifica de tempos em tempos).
         document.addEventListener("visibilitychange", function(){
           if (document.visibilityState === "visible") { reg.update().catch(function(){}); }
