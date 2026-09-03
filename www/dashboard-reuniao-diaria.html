@@ -789,6 +789,25 @@
       garantia: 0 // sem rastreio na planilha ainda — ver comentário acima
     };
   }
+  /* BUG na origem (planilha/Apps Script), corrigido aqui em 03/09/2026: o
+     campo "Registrado_em" vem, para varios RDOs recentes, com mes e dia
+     INVERTIDOS (ex.: um RDO de 03/09 as 08:48 chega como
+     "2026-03-09T11:43:00.000Z" -- o "03" no lugar do mes e o "09" no
+     lugar do dia, quando deveria ser o contrario). Confirmado comparando com
+     o campo "ID" de cada RDO, que embute o timestamp real da gravacao no
+     formato "AAAAMMDD-HHMMSS" (ex.: "20260903-084826" = 03/09 as 08:48) e
+     nao tem esse problema. Por isso, sempre que o ID existir e bater nesse
+     formato, usamos ele como fonte da data/hora exibida em vez de confiar em
+     Registrado_em -- Registrado_em so entra como fallback se o ID vier
+     ausente ou fora do padrao esperado. Isso resolve a exibicao sem
+     depender de corrigir a gravacao na planilha/Apps Script (fora do nosso
+     controle aqui). */
+  function formatDataHoraFromId(id){
+    const s = String(id == null ? '' : id).trim();
+    const m = s.match(/^(\d{4})(\d{2})(\d{2})-(\d{2})(\d{2})(\d{2})$/);
+    if (!m) return null;
+    return m[3] + '/' + m[2] + ' ' + m[4] + ':' + m[5];
+  }
   function formatDataHoraEnvio(registradoEm){
     const s = String(registradoEm == null ? '' : registradoEm).trim();
     if (!s) return '—';
@@ -803,7 +822,7 @@
     if (!rows.length){
       return '<div class="ab-title">RDO Enviado</div><div class="ab-not-sent">Não Enviado</div>';
     }
-    const dataStr = formatDataHoraEnvio(rows[0].Registrado_em);
+    const dataStr = formatDataHoraFromId(rows[0].ID) || formatDataHoraEnvio(rows[0].Registrado_em);
     if (!stats){
       return '<div class="ab-title">RDO Enviado</div><div class="rdo-date">' + escapeHtml(dataStr) + '</div>' +
         '<div class="ab-empty">Sem atividades lançadas</div>';
