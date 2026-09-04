@@ -113,7 +113,10 @@
   <div class="kpi"><div class="label">Tecnicos ativos</div><div class="value">15</div><div class="sub">em campo agora</div></div>
   <div class="kpi"><div class="label">Planejado (headcount)</div><div class="value">27</div><div class="sub">meta de equipes</div></div>
   <div class="kpi"><div class="label">Deficit total</div><div class="value red">-12</div><div class="sub">abaixo do plano</div></div>
-  <div class="kpi"><div class="label">Parques ativos</div><div class="value">5<span class="sub" style="font-size:16px;"> / 8</span></div><div class="sub">3 parques vazios</div></div>
+  <div class="kpi" style="display:flex; gap:12px; padding:0; overflow:hidden;">
+    <div style="flex:1; padding:16px 14px;"><div class="label">Parques ativos</div><div class="value">5<span class="sub" style="font-size:16px;"> / 8</span></div></div>
+    <div style="flex:1; padding:16px 14px; border-left:1px solid var(--line);"><div class="label">Em tramitacao</div><div class="value amber">3</div></div>
+  </div>
 </div>
 <div class="grid2">
   <div class="card"><h2>Por cliente <span>tecnicos ativos</span></h2><canvas id="chartCliente" style="max-height:187px;"></canvas></div>
